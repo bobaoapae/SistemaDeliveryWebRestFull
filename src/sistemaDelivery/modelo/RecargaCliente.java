@@ -19,19 +19,31 @@ public class RecargaCliente {
     @Ignore
     private UUID uuid, uuid_cliente, uuid_estabelecimento;
     private Date dataRecarga;
-    private double valorRecarga;
+    boolean ativo;
     @Ignore
     private transient Estabelecimento estabelecimento;
     @Ignore
     private transient Cliente cliente;
     private TipoRecarga tipoRecarga;
+    private double valor;
 
-    public RecargaCliente(Estabelecimento estabelecimento, Cliente cliente, double valorRecarga, TipoRecarga tipoRecarga) {
-        this.valorRecarga = valorRecarga;
+    public RecargaCliente(Estabelecimento estabelecimento, Cliente cliente, double valor, TipoRecarga tipoRecarga) {
+        this.valor = valor;
         this.estabelecimento = estabelecimento;
         this.cliente = cliente;
         dataRecarga = new Date();
         this.tipoRecarga = tipoRecarga;
+    }
+
+    public RecargaCliente() {
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
     }
 
     public Date getDataRecarga() {
@@ -42,12 +54,12 @@ public class RecargaCliente {
         this.dataRecarga = dataRecarga;
     }
 
-    public double getValorRecarga() {
-        return valorRecarga;
+    public double getValor() {
+        return valor;
     }
 
-    public void setValorRecarga(double valorRecarga) {
-        this.valorRecarga = valorRecarga;
+    public void setValor(double valor) {
+        this.valor = valor;
     }
 
     public UUID getUuid() {
@@ -111,7 +123,5 @@ public class RecargaCliente {
         return Objects.hash(uuid);
     }
 
-    public enum TipoRecarga {
-        DEPOSITO, SAQUE
-    }
+
 }

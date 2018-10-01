@@ -6,7 +6,6 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import sistemaDelivery.modelo.Categoria;
 import sistemaDelivery.modelo.Estabelecimento;
-import sistemaDelivery.modelo.RestricaoVisibilidade;
 import utils.Utilitarios;
 
 import java.sql.Connection;
@@ -133,25 +132,13 @@ public class ControleCategorias {
                     if (preparedStatement.executeUpdate() != 1) {
                         throw new SQLException("Falha ao atualizar");
                     }
+                    if (ControleRestricaoVisibilidade.getInstace().getRestricaoCategoria(cat) != null && !ControleRestricaoVisibilidade.getInstace().excluirRestricao(cat)) {
+                        throw new SQLException("Falha ao remover restrição");
+                    }
                     if (cat.getRestricaoVisibilidade() != null) {
                         cat.getRestricaoVisibilidade().setCategoria(cat);
-                        if (cat.getRestricaoVisibilidade().getUuid() != null) {
-                            if (ControleRestricaoVisibilidade.getInstace().getRestricaoByUUID(cat.getRestricaoVisibilidade().getUuid()) != null) {
-                                RestricaoVisibilidade res = ControleRestricaoVisibilidade.getInstace().getRestricaoByUUID(cat.getRestricaoVisibilidade().getUuid());
-                                if (res.getProduto() != null && !res.getProduto().getCategoria().getEstabelecimento().equals(cat.getEstabelecimento())) {
-                                    throw new SQLException("Inject detected");
-                                }
-                                if (res.getCategoria() != null && !res.getCategoria().getEstabelecimento().equals(cat.getEstabelecimento())) {
-                                    throw new SQLException("Inject detected");
-                                }
-                            }
-                        }
                         if (!ControleRestricaoVisibilidade.getInstace().salvarRestricao(connection, cat.getRestricaoVisibilidade())) {
                             throw new SQLException("Falha ao salvar restrição");
-                        }
-                    } else {
-                        if (ControleRestricaoVisibilidade.getInstace().getRestricaoCategoria(cat) != null && !ControleRestricaoVisibilidade.getInstace().excluirRestricao(cat)) {
-                            throw new SQLException("Falha ao remover restrição");
                         }
                     }
                     try (PreparedStatement preparedStatement1 = connection.prepareStatement("delete from \"Categorias_Necessarias_Entrega\" where uuid_categoria = ?")) {

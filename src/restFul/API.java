@@ -3,7 +3,9 @@ package restFul;
 import adapters.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import driver.WebWhatsDriver;
 import modelo.Chat;
 import modelo.EstadoDriver;
@@ -443,6 +445,12 @@ public class API {
         RecargaCliente recargaCliente = builder.fromJson(recarga, RecargaCliente.class);
         recargaCliente.setCliente(ControleClientes.getInstace().getClienteByUUID(recargaCliente.getUuid_cliente()));
         recargaCliente.setEstabelecimento(token.getEstabelecimento());
+        if (recargaCliente.getValor() < 0) {
+            recargaCliente.setValor(recargaCliente.getValor() * -1);
+            recargaCliente.setTipoRecarga(TipoRecarga.SAQUE);
+        } else {
+            recargaCliente.setTipoRecarga(TipoRecarga.DEPOSITO);
+        }
         if (ControleRecargas.getInstace().salvarRecarga(recargaCliente)) {
             return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleRecargas.getInstace().getRecargaByUUID(recargaCliente.getUuid()))).build();
         } else {
@@ -454,7 +462,13 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/recargasCliente")
     public Response getRecargasClientes(@QueryParam("uuid") String uuid) {
-        return Response.status(Response.Status.OK).entity(builder.toJson(ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid)).getRegargas(token.getEstabelecimento()))).build();
+        List<RecargaCliente> recargaClientes = ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid)).getRegargas(token.getEstabelecimento());
+        JsonObject object = new JsonObject();
+        object.addProperty("saldo", ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid)).getCreditosDisponiveis(token.getEstabelecimento()));
+        JsonElement element = builder.toJsonTree(ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid)).getRegargas(token.getEstabelecimento()), new TypeToken<List<RecargaCliente>>() {
+        }.getType());
+        object.add("recargas", element);
+        return Response.status(Response.Status.OK).entity(builder.toJson(object)).build();
     }
 
 

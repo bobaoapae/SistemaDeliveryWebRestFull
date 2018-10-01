@@ -6,7 +6,6 @@ import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import sistemaDelivery.modelo.Categoria;
 import sistemaDelivery.modelo.Produto;
-import sistemaDelivery.modelo.RestricaoVisibilidade;
 import utils.Utilitarios;
 
 import java.sql.Connection;
@@ -101,28 +100,14 @@ public class ControleProdutos {
                     preparedStatement.setBoolean(5, prod.isOnlyLocal());
                     preparedStatement.setBoolean(6, prod.isVisivel());
                     preparedStatement.setObject(7, prod.getUuid());
-                    if (preparedStatement.executeUpdate() != 1) {
-                        throw new SQLException("Falha ao atualizar");
+                    preparedStatement.executeUpdate();
+                    if (ControleRestricaoVisibilidade.getInstace().getRestricaoProduto(prod) != null && !ControleRestricaoVisibilidade.getInstace().excluirRestricao(prod)) {
+                        throw new SQLException("Falha ao remover restrição");
                     }
                     if (prod.getRestricaoVisibilidade() != null) {
                         prod.getRestricaoVisibilidade().setProduto(prod);
-                        if (prod.getRestricaoVisibilidade().getUuid() != null) {
-                            if (ControleRestricaoVisibilidade.getInstace().getRestricaoByUUID(prod.getRestricaoVisibilidade().getUuid()) != null) {
-                                RestricaoVisibilidade res = ControleRestricaoVisibilidade.getInstace().getRestricaoByUUID(prod.getRestricaoVisibilidade().getUuid());
-                                if (res.getProduto() != null && !res.getProduto().getCategoria().getEstabelecimento().equals(prod.getCategoria().getEstabelecimento())) {
-                                    throw new SQLException("Inject detected");
-                                }
-                                if (res.getCategoria() != null && !res.getCategoria().getEstabelecimento().equals(prod.getCategoria().getEstabelecimento())) {
-                                    throw new SQLException("Inject detected");
-                                }
-                            }
-                        }
                         if (!ControleRestricaoVisibilidade.getInstace().salvarRestricao(connection, prod.getRestricaoVisibilidade())) {
                             throw new SQLException("Falha ao salvar restrição");
-                        }
-                    } else {
-                        if (ControleRestricaoVisibilidade.getInstace().getRestricaoProduto(prod) != null && !ControleRestricaoVisibilidade.getInstace().excluirRestricao(prod)) {
-                            throw new SQLException("Falha ao remover restrição");
                         }
                     }
                     connection.commit();

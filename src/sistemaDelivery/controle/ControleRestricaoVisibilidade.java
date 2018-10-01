@@ -6,7 +6,6 @@ import org.apache.commons.dbutils.handlers.BeanHandler;
 import sistemaDelivery.modelo.Categoria;
 import sistemaDelivery.modelo.Produto;
 import sistemaDelivery.modelo.RestricaoVisibilidade;
-import utils.Utilitarios;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -69,61 +68,28 @@ public class ControleRestricaoVisibilidade {
     public boolean salvarRestricao(Connection connection, RestricaoVisibilidade restricaoVisibilidade) {
         try {
             connection.setAutoCommit(false);
-            if (restricaoVisibilidade.getUuid() == null) {
-                try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Restricoes_Visibilidade\" (uuid, uuid_categoria, uuid_produto, \"restricaoHorario\", \"restricaoDia\", \"horarioDe\", \"horarioAte\", domingo, segunda, terca, quarta, quinta, sexta, sabado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
-                    restricaoVisibilidade.setUuid(UUID.randomUUID());
-                    preparedStatement.setObject(1, restricaoVisibilidade.getUuid());
-                    if (restricaoVisibilidade.getCategoria() != null) {
-                        preparedStatement.setObject(2, restricaoVisibilidade.getCategoria().getUuid());
-                    } else {
-                        preparedStatement.setObject(2, null);
-                    }
-                    if (restricaoVisibilidade.getProduto() != null) {
-                        preparedStatement.setObject(3, restricaoVisibilidade.getProduto().getUuid());
-                    } else {
-                        preparedStatement.setObject(3, null);
-                    }
-                    preparedStatement.setBoolean(4, restricaoVisibilidade.isRestricaoHorario());
-                    preparedStatement.setBoolean(5, restricaoVisibilidade.isRestricaoDia());
-                    preparedStatement.setTime(6, restricaoVisibilidade.getHorarioDe());
-                    preparedStatement.setTime(7, restricaoVisibilidade.getHorarioAte());
-                    for (int x = 0; x < 7; x++) {
-                        preparedStatement.setBoolean(x + 8, restricaoVisibilidade.getDiasSemana()[x]);
-                    }
-                    preparedStatement.executeUpdate();
-                    return true;
+            try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Restricoes_Visibilidade\" (uuid, uuid_categoria, uuid_produto, \"restricaoHorario\", \"restricaoDia\", \"horarioDe\", \"horarioAte\", domingo, segunda, terca, quarta, quinta, sexta, sabado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+                restricaoVisibilidade.setUuid(UUID.randomUUID());
+                preparedStatement.setObject(1, restricaoVisibilidade.getUuid());
+                if (restricaoVisibilidade.getCategoria() != null) {
+                    preparedStatement.setObject(2, restricaoVisibilidade.getCategoria().getUuid());
+                } else {
+                    preparedStatement.setObject(2, null);
                 }
-            } else {
-                try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE \"Restricoes_Visibilidade\"\n" +
-                        "   SET uuid_categoria=?, uuid_produto=?, \"restricaoHorario\"=?, \n" +
-                        "       \"restricaoDia\"=?, \"horarioDe\"=?, \"horarioAte\"=?, domingo=?, segunda=?, \n" +
-                        "       terca=?, quarta=?, quinta=?, sexta=?, sabado=?\n" +
-                        " WHERE  uuid=?;\n")) {
-                    if (restricaoVisibilidade.getCategoria() != null) {
-                        preparedStatement.setObject(1, restricaoVisibilidade.getCategoria().getUuid());
-                    } else {
-                        preparedStatement.setObject(1, null);
-                    }
-                    if (restricaoVisibilidade.getProduto() != null) {
-                        preparedStatement.setObject(2, restricaoVisibilidade.getProduto().getUuid());
-                    } else {
-                        preparedStatement.setObject(2, null);
-                    }
-                    preparedStatement.setBoolean(3, restricaoVisibilidade.isRestricaoHorario());
-                    preparedStatement.setBoolean(4, restricaoVisibilidade.isRestricaoDia());
-                    preparedStatement.setTime(5, restricaoVisibilidade.getHorarioDe());
-                    preparedStatement.setTime(6, restricaoVisibilidade.getHorarioAte());
-                    for (int x = 0; x < 7; x++) {
-                        preparedStatement.setBoolean(x + 6, restricaoVisibilidade.getDiasSemana()[x]);
-                    }
-                    preparedStatement.setObject(14, restricaoVisibilidade.getUuid());
-                    preparedStatement.executeUpdate();
-                    connection.commit();
-                    if (restricoes.containsKey(restricaoVisibilidade.getUuid())) {
-                        Utilitarios.atualizarObjeto(restricoes.get(restricaoVisibilidade.getUuid()), restricaoVisibilidade);
-                    }
-                    return true;
+                if (restricaoVisibilidade.getProduto() != null) {
+                    preparedStatement.setObject(3, restricaoVisibilidade.getProduto().getUuid());
+                } else {
+                    preparedStatement.setObject(3, null);
                 }
+                preparedStatement.setBoolean(4, restricaoVisibilidade.isRestricaoHorario());
+                preparedStatement.setBoolean(5, restricaoVisibilidade.isRestricaoDia());
+                preparedStatement.setTime(6, restricaoVisibilidade.getHorarioDe());
+                preparedStatement.setTime(7, restricaoVisibilidade.getHorarioAte());
+                for (int x = 0; x < 7; x++) {
+                    preparedStatement.setBoolean(x + 8, restricaoVisibilidade.getDiasSemana()[x]);
+                }
+                preparedStatement.executeUpdate();
+                return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -147,7 +113,9 @@ public class ControleRestricaoVisibilidade {
                 preparedStatement.executeUpdate();
                 connection.commit();
                 synchronized (restricoes) {
-                    restricoes.remove(restricaoVisibilidade.getUuid());
+                    if (restricoes.containsKey(restricaoVisibilidade.getUuid())) {
+                        restricoes.remove(restricaoVisibilidade.getUuid());
+                    }
                 }
                 return true;
             } catch (SQLException ex) {

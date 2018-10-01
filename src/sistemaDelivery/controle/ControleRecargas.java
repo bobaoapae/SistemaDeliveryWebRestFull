@@ -61,7 +61,7 @@ public class ControleRecargas {
                 preparedStatement.setObject(1, recargaCliente.getUuid());
                 preparedStatement.setObject(2, recargaCliente.getCliente().getUuid());
                 preparedStatement.setObject(3, recargaCliente.getEstabelecimento().getUuid());
-                preparedStatement.setDouble(4, recargaCliente.getValorRecarga());
+                preparedStatement.setDouble(4, recargaCliente.getValor());
                 preparedStatement.setString(5, recargaCliente.getTipoRecarga().toString());
                 preparedStatement.executeUpdate();
                 connection.commit();
@@ -83,7 +83,7 @@ public class ControleRecargas {
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select * from \"Recargas_Clientes\" where uuid_cliente = ? and uuid_estabelecimento = ?")) {
             preparedStatement.setObject(1, cliente.getUuid());
-            preparedStatement.setObject(2, cliente.getUuid());
+            preparedStatement.setObject(2, estabelecimento.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     recargaClientes.add(getRecargaByUUID(UUID.fromString(resultSet.getString("uuid"))));

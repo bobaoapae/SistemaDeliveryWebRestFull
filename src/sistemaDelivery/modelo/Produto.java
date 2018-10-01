@@ -13,7 +13,6 @@ public class Produto implements Comparable<Produto> {
     private String nome, descricao, foto;
     private double valor;
     private boolean onlyLocal, ativo, visivel;
-    @Ignore
     private RestricaoVisibilidade restricaoVisibilidade;
     @Ignore
     private List<GrupoAdicional> gruposAdicionais;

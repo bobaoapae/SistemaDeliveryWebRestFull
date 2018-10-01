@@ -50,7 +50,7 @@ public class Cliente {
         this.uuid = uuid;
     }
 
-    public void realizarRecarga(Estabelecimento e, double valorRecarga, RecargaCliente.TipoRecarga tipoRecarga) {
+    public void realizarRecarga(Estabelecimento e, double valorRecarga, TipoRecarga tipoRecarga) {
         ControleRecargas.getInstace().salvarRecarga(new RecargaCliente(e, this, valorRecarga, tipoRecarga));
     }
 
@@ -66,10 +66,10 @@ public class Cliente {
     public double getCreditosDisponiveis(Estabelecimento e) {
         double valor = 0;
         for (RecargaCliente recargaCliente : this.getRegargas(e)) {
-            if (recargaCliente.getTipoRecarga() == RecargaCliente.TipoRecarga.DEPOSITO) {
-                valor += recargaCliente.getValorRecarga();
-            } else if (recargaCliente.getTipoRecarga() == RecargaCliente.TipoRecarga.SAQUE) {
-                valor -= recargaCliente.getValorRecarga();
+            if (recargaCliente.getTipoRecarga() == TipoRecarga.DEPOSITO) {
+                valor += recargaCliente.getValor();
+            } else if (recargaCliente.getTipoRecarga() == TipoRecarga.SAQUE) {
+                valor -= recargaCliente.getValor();
             }
         }
         return valor;

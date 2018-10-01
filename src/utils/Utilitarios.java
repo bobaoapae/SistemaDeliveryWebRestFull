@@ -77,9 +77,13 @@ public class Utilitarios {
                         metodoSet.invoke(x, new Object[]{null});
                         continue;
                     }
-                    if (listaField1.getType().isPrimitive() || listaField1.getType().equals(String.class) || listaField1.getType().getClass().equals(Date.class) || listaField1.getType().getClass().equals(Time.class)) {
+                    if (listaField1.getType().isPrimitive() || listaField1.getType().isArray() || listaField1.getType().equals(String.class) || listaField1.getType().equals(Date.class) || listaField1.getType().equals(Time.class)) {
                         metodoSet.invoke(x, metodoGet.invoke(y));
                     } else {
+                        if (metodoGet.invoke(x) == null) {
+                            metodoSet.invoke(x, metodoGet.invoke(y));
+                            continue;
+                        }
                         atualizarObjeto(metodoGet.invoke(x), metodoGet.invoke(y));
                     }
                 }

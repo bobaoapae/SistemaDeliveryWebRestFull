@@ -8,7 +8,7 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.modelo.ChatBotDelivery;
-import sistemaDelivery.modelo.RecargaCliente;
+import sistemaDelivery.modelo.TipoRecarga;
 
 /**
  * @author jvbor
@@ -22,11 +22,11 @@ public class HandlerPagarComCreditos extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) >= ((ChatBotDelivery) chat).getPedidoAtual().getTotal()) {
-            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) - ((ChatBotDelivery) chat).getPedidoAtual().getTotal(), RecargaCliente.TipoRecarga.SAQUE);
+            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) - ((ChatBotDelivery) chat).getPedidoAtual().getTotal(), TipoRecarga.SAQUE);
             ((ChatBotDelivery) chat).getPedidoAtual().setPgCreditos(((ChatBotDelivery) chat).getPedidoAtual().getTotal());
         } else {
             ((ChatBotDelivery) chat).getPedidoAtual().setPgCreditos(((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()));
-            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()), RecargaCliente.TipoRecarga.SAQUE);
+            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()), TipoRecarga.SAQUE);
         }
         if (((ChatBotDelivery) chat).getPedidoAtual().getTotal() == 0) {
             chat.getChat().sendMessage("Perfeito, seu pedido foi pago por completo utilizando seus créditos", 500);

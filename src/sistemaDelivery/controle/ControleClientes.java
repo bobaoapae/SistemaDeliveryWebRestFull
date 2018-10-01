@@ -1,6 +1,7 @@
 package sistemaDelivery.controle;
 
 import DAO.Conexao;
+import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import sistemaDelivery.modelo.Cliente;
@@ -33,23 +34,19 @@ public class ControleClientes {
         if (clientes.containsKey(uuid)) {
             return clientes.get(uuid);
         }
-        try (Connection connection = Conexao.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("select * from \"Clientes\" where uuid = ?")) {
-            preparedStatement.setObject(1, uuid);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-
-                ResultSetHandler<Cliente> h = new BeanHandler<Cliente>(Cliente.class);
-                ResultSetHandler<Endereco> h1 = new BeanHandler<Endereco>(Endereco.class);
-                Cliente cliente = h.handle(resultSet);
-                if (cliente == null) {
-                    return null;
-                }
-                resultSet.first();
-                cliente.setEndereco(h1.handle(resultSet));
-                synchronized (clientes) {
-                    clientes.put(uuid, cliente);
-                }
-                return cliente;
+        try {
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<Cliente> h = new BeanHandler<Cliente>(Cliente.class);
+            ResultSetHandler<Endereco> h1 = new BeanHandler<Endereco>(Endereco.class);
+            Cliente cliente = queryRunner.query("select * from \"Clientes\" where uuid = ?", h, uuid);
+            if (cliente == null) {
+                return null;
             }
+            cliente.setEndereco(queryRunner.query("select * from \"Clientes\" where uuid = ?", h1, uuid));
+            synchronized (clientes) {
+                clientes.put(uuid, cliente);
+            }
+            return cliente;
         } catch (SQLException e) {
             e.printStackTrace();
         }
