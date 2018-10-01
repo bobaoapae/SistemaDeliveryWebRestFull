@@ -1,0 +1,75 @@
+package restFul.controle;
+
+import DAO.Conexao;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.BeanHandler;
+import restFul.modelo.Token;
+import sistemaDelivery.controle.ControleEstabelecimentos;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.HashMap;
+
+public class ControleTokens {
+
+    private static ControleTokens instace;
+    private HashMap<String, Token> tokens;
+
+    private ControleTokens() {
+        this.tokens = new HashMap<>();
+    }
+
+    public static ControleTokens getInstace() {
+        if (instace == null) {
+            instace = new ControleTokens();
+        }
+        return instace;
+    }
+
+    public Token getToken(String token) {
+        if (tokens.containsKey(token)) {
+            return tokens.get(token);
+        }
+        try {
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<Token> h = new BeanHandler<Token>(Token.class);
+            Token u = queryRunner.query("select * from \"Tokens\" where token = ?", h, token);
+            if (u == null) {
+                return null;
+            }
+            tokens.put(token, u);
+            u.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(u.getUuid_estabelecimento()));
+            u.setUsuario(ControleUsuarios.getInstace().getUsuarioByUUID(u.getUuid_usuario()));
+            return u;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean saveToken(Token token) {
+        try (Connection connection = Conexao.getConnection()) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Tokens\" (token, uuid_estabelecimento, uuid_usuario, validade) values (?,?,?,?)")) {
+                preparedStatement.setString(1, token.getToken());
+                preparedStatement.setObject(2, token.getEstabelecimento().getUuid());
+                preparedStatement.setObject(3, token.getUsuario().getUuid());
+                preparedStatement.setDate(4, new java.sql.Date(token.getValidade().getTime()));
+                int i = preparedStatement.executeUpdate();
+                connection.commit();
+                return true;
+            } catch (SQLException ex) {
+                connection.rollback();
+                throw ex;
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
+}

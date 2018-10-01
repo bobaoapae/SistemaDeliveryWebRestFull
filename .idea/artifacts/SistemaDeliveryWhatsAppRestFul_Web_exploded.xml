@@ -1,0 +1,23 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" build-on-make="true" name="SistemaDeliveryWhatsAppRestFul:Web exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/SistemaDeliveryWhatsAppRestFul_Web_exploded</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="SistemaDeliveryWhatsAppRestFul/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="SistemaDeliveryWhatsAppRestFul" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="WebWhatsNew" />
+          <element id="library" level="project" name="BotWhatsApp" />
+          <element id="library" level="project" name="jsoup-1.11.3" />
+          <element id="library" level="project" name="com.google.code.gson:gson:2.8.5" />
+          <element id="library" level="project" name="org.apache.commons:commons-collections4:4.2" />
+          <element id="library" level="project" name="org.postgresql:postgresql:42.2.5" />
+          <element id="library" level="project" name="commons-dbutils:commons-dbutils:1.7" />
+          <element id="library" level="project" name="javax.inject:javax.inject:1" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>
