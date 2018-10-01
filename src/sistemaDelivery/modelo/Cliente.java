@@ -5,7 +5,9 @@
  */
 package sistemaDelivery.modelo;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import sistemaDelivery.controle.ControlePedidos;
+import sistemaDelivery.controle.ControleRecargas;
 
 import java.util.*;
 
@@ -14,6 +16,7 @@ import java.util.*;
  */
 public class Cliente {
 
+    @Ignore
     private UUID uuid;
     private String nome, chatId, telefoneMovel, telefoneFixo;
     private Date dataAniversario;
@@ -47,12 +50,12 @@ public class Cliente {
         this.uuid = uuid;
     }
 
-    public void realizarRecarga(Estabelecimento e, double valorRecarga) {
-        this.getRegargas(e).add(new RecargaCliente(e, this, valorRecarga));
+    public void realizarRecarga(Estabelecimento e, double valorRecarga, RecargaCliente.TipoRecarga tipoRecarga) {
+        ControleRecargas.getInstace().salvarRecarga(new RecargaCliente(e, this, valorRecarga, tipoRecarga));
     }
 
     public List<RecargaCliente> getRegargas(Estabelecimento e) {
-        return null;
+        return ControleRecargas.getInstace().getRecargasCliente(this, e);
     }
 
 
@@ -61,7 +64,15 @@ public class Cliente {
     }
 
     public double getCreditosDisponiveis(Estabelecimento e) {
-        return 0;
+        double valor = 0;
+        for (RecargaCliente recargaCliente : this.getRegargas(e)) {
+            if (recargaCliente.getTipoRecarga() == RecargaCliente.TipoRecarga.DEPOSITO) {
+                valor += recargaCliente.getValorRecarga();
+            } else if (recargaCliente.getTipoRecarga() == RecargaCliente.TipoRecarga.SAQUE) {
+                valor -= recargaCliente.getValorRecarga();
+            }
+        }
+        return valor;
 
     }
 

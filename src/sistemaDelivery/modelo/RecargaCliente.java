@@ -5,6 +5,8 @@
  */
 package sistemaDelivery.modelo;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
+
 import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
@@ -14,17 +16,22 @@ import java.util.UUID;
  */
 public class RecargaCliente {
 
+    @Ignore
     private UUID uuid, uuid_cliente, uuid_estabelecimento;
     private Date dataRecarga;
     private double valorRecarga;
-    private Estabelecimento estabelecimento;
-    private Cliente cliente;
+    @Ignore
+    private transient Estabelecimento estabelecimento;
+    @Ignore
+    private transient Cliente cliente;
+    private TipoRecarga tipoRecarga;
 
-    public RecargaCliente(Estabelecimento estabelecimento, Cliente cliente, double valorRecarga) {
+    public RecargaCliente(Estabelecimento estabelecimento, Cliente cliente, double valorRecarga, TipoRecarga tipoRecarga) {
         this.valorRecarga = valorRecarga;
         this.estabelecimento = estabelecimento;
         this.cliente = cliente;
         dataRecarga = new Date();
+        this.tipoRecarga = tipoRecarga;
     }
 
     public Date getDataRecarga() {
@@ -83,6 +90,14 @@ public class RecargaCliente {
         this.cliente = cliente;
     }
 
+    public TipoRecarga getTipoRecarga() {
+        return tipoRecarga;
+    }
+
+    public void setTipoRecarga(TipoRecarga tipoRecarga) {
+        this.tipoRecarga = tipoRecarga;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -94,5 +109,9 @@ public class RecargaCliente {
     @Override
     public int hashCode() {
         return Objects.hash(uuid);
+    }
+
+    public enum TipoRecarga {
+        DEPOSITO, SAQUE
     }
 }

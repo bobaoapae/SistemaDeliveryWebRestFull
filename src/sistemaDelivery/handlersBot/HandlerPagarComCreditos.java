@@ -8,6 +8,7 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.modelo.ChatBotDelivery;
+import sistemaDelivery.modelo.RecargaCliente;
 
 /**
  * @author jvbor
@@ -21,11 +22,11 @@ public class HandlerPagarComCreditos extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) >= ((ChatBotDelivery) chat).getPedidoAtual().getTotal()) {
-            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), -((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) - ((ChatBotDelivery) chat).getPedidoAtual().getTotal());
+            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) - ((ChatBotDelivery) chat).getPedidoAtual().getTotal(), RecargaCliente.TipoRecarga.SAQUE);
             ((ChatBotDelivery) chat).getPedidoAtual().setPgCreditos(((ChatBotDelivery) chat).getPedidoAtual().getTotal());
         } else {
             ((ChatBotDelivery) chat).getPedidoAtual().setPgCreditos(((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()));
-            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), -((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()));
+            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()), RecargaCliente.TipoRecarga.SAQUE);
         }
         if (((ChatBotDelivery) chat).getPedidoAtual().getTotal() == 0) {
             chat.getChat().sendMessage("Perfeito, seu pedido foi pago por completo utilizando seus créditos", 500);
@@ -41,11 +42,6 @@ public class HandlerPagarComCreditos extends HandlerBotDelivery {
             chat.getChat().sendMessage("Seu saldo de créditos foi insuficiente para pagar o pedido por completo, porém o valor que você tinha foi utilizado como desconto");
             chat.getChat().sendMessage("Ainda faltam R$" + moneyFormat.format(((ChatBotDelivery) chat).getPedidoAtual().getTotal()) + " a serem pagos", 5000);
             chat.setHandler(new HandlerDesejaAgendar(chat), true);
-        }
-        try {
-            //ControleClientes.getInstance(Db4oGenerico.getInstance("banco")).alterar(((ChatBotDelivery) chat).getCliente());
-        } catch (Exception ex) {
-            chat.getChat().getDriver().onError(ex);
         }
         return true;
     }

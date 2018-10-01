@@ -428,11 +428,33 @@ public class API {
                 e.printStackTrace();
             }
         }
+        cliente.setCadastroRealizado(true);
         if (ControleClientes.getInstace().salvarCliente(cliente)) {
-            return Response.status(Response.Status.OK).entity(builder.toJson(ControleClientes.getInstace().getClienteByUUID(cliente.getUuid()))).build();
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleClientes.getInstace().getClienteByUUID(cliente.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/salvarRecarga")
+    public Response salvarRecarga(@FormParam("recarga") String recarga) {
+        RecargaCliente recargaCliente = builder.fromJson(recarga, RecargaCliente.class);
+        recargaCliente.setCliente(ControleClientes.getInstace().getClienteByUUID(recargaCliente.getUuid_cliente()));
+        recargaCliente.setEstabelecimento(token.getEstabelecimento());
+        if (ControleRecargas.getInstace().salvarRecarga(recargaCliente)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleRecargas.getInstace().getRecargaByUUID(recargaCliente.getUuid()))).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/recargasCliente")
+    public Response getRecargasClientes(@QueryParam("uuid") String uuid) {
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid)).getRegargas(token.getEstabelecimento()))).build();
     }
 
 

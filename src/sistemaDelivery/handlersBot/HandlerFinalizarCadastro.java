@@ -7,6 +7,7 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
+import sistemaDelivery.controle.ControleClientes;
 import sistemaDelivery.modelo.ChatBotDelivery;
 
 /**
@@ -22,7 +23,7 @@ public class HandlerFinalizarCadastro extends HandlerBotDelivery {
     protected boolean runFirstTime(Message m) {
         try {
             ((ChatBotDelivery) chat).getCliente().setCadastroRealizado(true);
-            // ControleClientes.getInstance(Db4oGenerico.getInstance("banco")).salvar(((ChatBotDelivery)chat).getCliente());
+            ControleClientes.getInstace().salvarCliente(((ChatBotDelivery) chat).getCliente());
         } catch (Exception ex) {
             chat.getChat().getDriver().onError(ex);
             chat.getChat().sendMessage("Falha ao salvar seu cadastro, tente novamente em alguns minutos");

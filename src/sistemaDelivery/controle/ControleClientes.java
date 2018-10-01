@@ -1,7 +1,6 @@
 package sistemaDelivery.controle;
 
 import DAO.Conexao;
-import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import sistemaDelivery.modelo.Cliente;
@@ -34,19 +33,23 @@ public class ControleClientes {
         if (clientes.containsKey(uuid)) {
             return clientes.get(uuid);
         }
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            ResultSetHandler<Cliente> h = new BeanHandler<Cliente>(Cliente.class);
-            Cliente cliente = queryRunner.query("select * from \"Clientes\" where uuid = ?", h, uuid);
-            if (cliente == null) {
-                return null;
+        try (Connection connection = Conexao.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("select * from \"Clientes\" where uuid = ?")) {
+            preparedStatement.setObject(1, uuid);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+
+                ResultSetHandler<Cliente> h = new BeanHandler<Cliente>(Cliente.class);
+                ResultSetHandler<Endereco> h1 = new BeanHandler<Endereco>(Endereco.class);
+                Cliente cliente = h.handle(resultSet);
+                if (cliente == null) {
+                    return null;
+                }
+                resultSet.first();
+                cliente.setEndereco(h1.handle(resultSet));
+                synchronized (clientes) {
+                    clientes.put(uuid, cliente);
+                }
+                return cliente;
             }
-            synchronized (clientes) {
-                clientes.put(uuid, cliente);
-            }
-            ResultSetHandler<Endereco> h1 = new BeanHandler<Endereco>(Endereco.class);
-            cliente.setEndereco(queryRunner.query("select * from \"Clientes\" where uuid = ?", h1, uuid));
-            return cliente;
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -55,9 +58,11 @@ public class ControleClientes {
 
     public Cliente getClienteChatId(String chatid) {
         try (Connection connection = Conexao.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("select uuid from \"Clientes\" where \"chatId\" !='' and \"chatId\" = ?")) {
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return getClienteByUUID(UUID.fromString(resultSet.getString("uuid")));
+            preparedStatement.setString(1, chatid);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return getClienteByUUID(UUID.fromString(resultSet.getString("uuid")));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -72,7 +77,7 @@ public class ControleClientes {
                 if (cliente.getUuid() == null) {
                     cliente.setUuid(UUID.randomUUID());
                 }
-                try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Clientes\" (uuid,\"chatId\", nome, \"telefoneMovel\", \"telefoneFixo\", \"dataAniversario\", logradouro, bairro,referencia,numero) values(?,?,?,?,?,?,?,?,?,?)")) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Clientes\" (uuid,\"chatId\", nome, \"telefoneMovel\", \"telefoneFixo\", \"dataAniversario\", logradouro, bairro,referencia,numero,\"cadastroRealizado\") values(?,?,?,?,?,?,?,?,?,?,?)")) {
                     preparedStatement.setObject(1, cliente.getUuid());
                     preparedStatement.setString(2, cliente.getChatId());
                     preparedStatement.setString(3, cliente.getNome());
@@ -83,6 +88,7 @@ public class ControleClientes {
                     preparedStatement.setString(8, cliente.getEndereco().getBairro());
                     preparedStatement.setString(9, cliente.getEndereco().getReferencia());
                     preparedStatement.setString(10, cliente.getEndereco().getNumero());
+                    preparedStatement.setBoolean(11, cliente.isCadastroRealizado());
                     preparedStatement.executeUpdate();
                     connection.commit();
                     return true;
@@ -93,7 +99,7 @@ public class ControleClientes {
                     connection.setAutoCommit(true);
                 }
             } else {
-                try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Clientes\" set \"chatId\" = ?,nome = ?,\"telefoneMovel\" = ?, \"telefoneFixo\" = ?,\"dataAniversario\" = ?, logradouro = ?, bairro = ?, referencia = ?, numero = ? where uuid = ?")) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Clientes\" set \"chatId\" = ?,nome = ?,\"telefoneMovel\" = ?, \"telefoneFixo\" = ?,\"dataAniversario\" = ?, logradouro = ?, bairro = ?, referencia = ?, numero = ?, \"cadastroRealizado\" = ? where uuid = ?")) {
                     preparedStatement.setString(1, cliente.getChatId());
                     preparedStatement.setString(2, cliente.getNome());
                     preparedStatement.setString(3, cliente.getTelefoneMovel());
@@ -103,7 +109,8 @@ public class ControleClientes {
                     preparedStatement.setString(7, cliente.getEndereco().getBairro());
                     preparedStatement.setString(8, cliente.getEndereco().getReferencia());
                     preparedStatement.setString(9, cliente.getEndereco().getNumero());
-                    preparedStatement.setObject(10, cliente.getUuid());
+                    preparedStatement.setBoolean(10, cliente.isCadastroRealizado());
+                    preparedStatement.setObject(11, cliente.getUuid());
                     preparedStatement.executeUpdate();
                     connection.commit();
                     if (clientes.containsKey(cliente.getUuid())) {
