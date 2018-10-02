@@ -72,9 +72,9 @@ public class ControleGruposAdicionais {
                     preparedStatement.executeUpdate();
                     connection.commit();
                     if (grupo.getCategoria() != null) {
-                        grupo.getCategoria().getGruposAdicionais().add(grupo);
+                        grupo.getCategoria().getGruposAdicionais().add(getGrupoByUUID(grupo.getUuid()));
                     } else if (grupo.getProduto() != null) {
-                        grupo.getProduto().getGruposAdicionais().add(grupo);
+                        grupo.getProduto().getGruposAdicionais().add(getGrupoByUUID(grupo.getUuid()));
                     }
                     return true;
                 } catch (SQLException ex) {

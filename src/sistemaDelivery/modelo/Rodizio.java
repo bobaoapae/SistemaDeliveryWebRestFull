@@ -5,15 +5,88 @@
  */
 package sistemaDelivery.modelo;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
+
 import java.sql.Time;
+import java.util.UUID;
 
 /**
  * @author SYSTEM
  */
-public class Rodizio extends Produto {
+public class Rodizio {
 
+    @Ignore
+    private UUID uuid, uuid_estabelecimento;
+    private String nome, descricao;
+    private double valor;
+    private boolean ativo;
     private Time horaInicio;
     private boolean diasSemana[];
+    @Ignore
+    private transient Estabelecimento estabelecimento;
+
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public UUID getUuid_estabelecimento() {
+        return uuid_estabelecimento;
+    }
+
+    public void setUuid_estabelecimento(UUID uuid_estabelecimento) {
+        this.uuid_estabelecimento = uuid_estabelecimento;
+    }
+
+    public String getDescricao() {
+        if (descricao == null) {
+            return "";
+        }
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
+    }
+
+    public double getValor() {
+        return valor;
+    }
+
+    public void setValor(double valor) {
+        this.valor = valor;
+    }
+
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+
+    public Estabelecimento getEstabelecimento() {
+        return estabelecimento;
+    }
+
+    public void setEstabelecimento(Estabelecimento estabelecimento) {
+        this.estabelecimento = estabelecimento;
+    }
+
+    public String getNome() {
+        if (nome == null) {
+            return "";
+        }
+        if (!nome.contains("Rodizio")) {
+            return "Rodizio - " + nome; //To change body of generated methods, choose Tools | Templates.
+        } else {
+            return nome;
+        }
+    }
 
     public Rodizio() {
         this.diasSemana = new boolean[]{false, false, false, false, false, false, false};
@@ -91,13 +164,8 @@ public class Rodizio extends Produto {
         this.diasSemana = diasSemana;
     }
 
-    @Override
-    public String getNome() {
-        if (!getNome().contains("Rodizio")) {
-            return "Rodizio - " + super.getNome(); //To change body of generated methods, choose Tools | Templates.
-        } else {
-            return super.getNome();
-        }
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 
 }

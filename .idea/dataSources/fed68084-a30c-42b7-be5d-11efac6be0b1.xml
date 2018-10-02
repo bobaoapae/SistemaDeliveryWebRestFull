@@ -31,2329 +31,3144 @@
     <table id="20" parent="7" name="Recargas_Clientes"/>
     <table id="21" parent="7" name="Reservas"/>
     <table id="22" parent="7" name="Restricoes_Visibilidade"/>
-    <table id="23" parent="7" name="Tokens"/>
-    <table id="24" parent="7" name="Usuarios"/>
-    <table id="25" parent="7" name="_pgmdd_backup_Categorias_2018-27-09_19:15"/>
-    <table id="26" parent="7" name="_pgmdd_backup_Clientes_2018-29-09_17:58"/>
-    <table id="27" parent="7" name="_pgmdd_backup_Clientes_2018-29-09_18:29"/>
-    <table id="28" parent="7" name="_pgmdd_backup_Estabelecimentos_2018-26-09_21:21"/>
-    <table id="29" parent="7" name="_pgmdd_backup_Estabelecimentos_2018-27-09_19:15"/>
-    <table id="30" parent="7" name="_pgmdd_backup_Estabelecimentos_2018-29-09_17:58"/>
-    <table id="31" parent="7" name="_pgmdd_backup_Estabelecimentos_2018-29-09_18:29"/>
-    <table id="32" parent="7" name="_pgmdd_backup_Pedidos_2018-26-09_21:21"/>
-    <table id="33" parent="7" name="_pgmdd_backup_Pedidos_2018-27-09_19:15"/>
-    <table id="34" parent="7" name="_pgmdd_backup_Pedidos_2018-29-09_17:58"/>
-    <table id="35" parent="7" name="_pgmdd_backup_Pedidos_2018-29-09_18:29"/>
-    <table id="36" parent="7" name="_pgmdd_backup_Produtos_2018-27-09_19:15"/>
-    <table id="37" parent="7" name="_pgmdd_backup_Produtos_2018-29-09_17:58"/>
-    <table id="38" parent="7" name="_pgmdd_backup_Usuarios_2018-26-09_21:21"/>
-    <table id="39" parent="7" name="_pgmdd_backup_Usuarios_2018-27-09_19:15"/>
-    <table id="40" parent="7" name="_pgmdd_backup_Usuarios_2018-29-09_17:58"/>
-    <table id="41" parent="7" name="_pgmdd_backup_Usuarios_2018-29-09_18:29"/>
-    <routine id="42" parent="7" name="uuid_generate_v1">
+    <table id="23" parent="7" name="Rodizios"/>
+    <table id="24" parent="7" name="Tokens"/>
+    <table id="25" parent="7" name="Usuarios"/>
+    <table id="26" parent="7" name="_pgmdd_backup_Adicionais_2018-01-10_22:53"/>
+    <table id="27" parent="7" name="_pgmdd_backup_Categorias_2018-01-10_22:53"/>
+    <table id="28" parent="7" name="_pgmdd_backup_Categorias_2018-27-09_19:15"/>
+    <table id="29" parent="7" name="_pgmdd_backup_Clientes_2018-01-10_22:53"/>
+    <table id="30" parent="7" name="_pgmdd_backup_Clientes_2018-29-09_17:58"/>
+    <table id="31" parent="7" name="_pgmdd_backup_Clientes_2018-29-09_18:29"/>
+    <table id="32" parent="7" name="_pgmdd_backup_Clientes_2018-29-09_18:48"/>
+    <table id="33" parent="7" name="_pgmdd_backup_Estabelecimentos_2018-01-10_22:53"/>
+    <table id="34" parent="7" name="_pgmdd_backup_Estabelecimentos_2018-26-09_21:21"/>
+    <table id="35" parent="7" name="_pgmdd_backup_Estabelecimentos_2018-27-09_19:15"/>
+    <table id="36" parent="7" name="_pgmdd_backup_Estabelecimentos_2018-29-09_17:58"/>
+    <table id="37" parent="7" name="_pgmdd_backup_Estabelecimentos_2018-29-09_18:29"/>
+    <table id="38" parent="7" name="_pgmdd_backup_Estabelecimentos_2018-29-09_18:48"/>
+    <table id="39" parent="7" name="_pgmdd_backup_Grupos_Adicionais_2018-01-10_22:53"/>
+    <table id="40" parent="7" name="_pgmdd_backup_Items_Pedidos_2018-01-10_22:53"/>
+    <table id="41" parent="7" name="_pgmdd_backup_Pedidos_2018-01-10_22:53"/>
+    <table id="42" parent="7" name="_pgmdd_backup_Pedidos_2018-26-09_21:21"/>
+    <table id="43" parent="7" name="_pgmdd_backup_Pedidos_2018-27-09_19:15"/>
+    <table id="44" parent="7" name="_pgmdd_backup_Pedidos_2018-29-09_17:58"/>
+    <table id="45" parent="7" name="_pgmdd_backup_Pedidos_2018-29-09_18:29"/>
+    <table id="46" parent="7" name="_pgmdd_backup_Pedidos_2018-29-09_18:48"/>
+    <table id="47" parent="7" name="_pgmdd_backup_Produtos_2018-01-10_22:53"/>
+    <table id="48" parent="7" name="_pgmdd_backup_Produtos_2018-27-09_19:15"/>
+    <table id="49" parent="7" name="_pgmdd_backup_Produtos_2018-29-09_17:58"/>
+    <table id="50" parent="7" name="_pgmdd_backup_Recargas_Clientes_2018-01-10_22:53"/>
+    <table id="51" parent="7" name="_pgmdd_backup_Reservas_2018-01-10_22:53"/>
+    <table id="52" parent="7" name="_pgmdd_backup_Usuarios_2018-01-10_22:53"/>
+    <table id="53" parent="7" name="_pgmdd_backup_Usuarios_2018-26-09_21:21"/>
+    <table id="54" parent="7" name="_pgmdd_backup_Usuarios_2018-27-09_19:15"/>
+    <table id="55" parent="7" name="_pgmdd_backup_Usuarios_2018-29-09_17:58"/>
+    <table id="56" parent="7" name="_pgmdd_backup_Usuarios_2018-29-09_18:29"/>
+    <table id="57" parent="7" name="_pgmdd_backup_Usuarios_2018-29-09_18:48"/>
+    <routine id="58" parent="7" name="uuid_generate_v1">
       <SourceTextLength>16</SourceTextLength>
       <ResultsDefinition>uuid</ResultsDefinition>
       <LanguageName>c</LanguageName>
       <RoutineKind>function</RoutineKind>
     </routine>
-    <routine id="43" parent="7" name="uuid_generate_v1mc">
+    <routine id="59" parent="7" name="uuid_generate_v1mc">
       <SourceTextLength>18</SourceTextLength>
       <ResultsDefinition>uuid</ResultsDefinition>
       <LanguageName>c</LanguageName>
       <RoutineKind>function</RoutineKind>
     </routine>
-    <routine id="44" parent="7" name="uuid_generate_v3">
+    <routine id="60" parent="7" name="uuid_generate_v3">
       <SourceTextLength>16</SourceTextLength>
       <ArgumentsDefinition>namespace uuid, name text</ArgumentsDefinition>
       <ResultsDefinition>uuid</ResultsDefinition>
       <LanguageName>c</LanguageName>
       <RoutineKind>function</RoutineKind>
     </routine>
-    <routine id="45" parent="7" name="uuid_generate_v4">
+    <routine id="61" parent="7" name="uuid_generate_v4">
       <SourceTextLength>16</SourceTextLength>
       <ResultsDefinition>uuid</ResultsDefinition>
       <LanguageName>c</LanguageName>
       <RoutineKind>function</RoutineKind>
     </routine>
-    <routine id="46" parent="7" name="uuid_generate_v5">
+    <routine id="62" parent="7" name="uuid_generate_v5">
       <SourceTextLength>16</SourceTextLength>
       <ArgumentsDefinition>namespace uuid, name text</ArgumentsDefinition>
       <ResultsDefinition>uuid</ResultsDefinition>
       <LanguageName>c</LanguageName>
       <RoutineKind>function</RoutineKind>
     </routine>
-    <routine id="47" parent="7" name="uuid_nil">
+    <routine id="63" parent="7" name="uuid_nil">
       <SourceTextLength>8</SourceTextLength>
       <ResultsDefinition>uuid</ResultsDefinition>
       <LanguageName>c</LanguageName>
       <RoutineKind>function</RoutineKind>
     </routine>
-    <routine id="48" parent="7" name="uuid_ns_dns">
+    <routine id="64" parent="7" name="uuid_ns_dns">
       <SourceTextLength>11</SourceTextLength>
       <ResultsDefinition>uuid</ResultsDefinition>
       <LanguageName>c</LanguageName>
       <RoutineKind>function</RoutineKind>
     </routine>
-    <routine id="49" parent="7" name="uuid_ns_oid">
+    <routine id="65" parent="7" name="uuid_ns_oid">
       <SourceTextLength>11</SourceTextLength>
       <ResultsDefinition>uuid</ResultsDefinition>
       <LanguageName>c</LanguageName>
       <RoutineKind>function</RoutineKind>
     </routine>
-    <routine id="50" parent="7" name="uuid_ns_url">
+    <routine id="66" parent="7" name="uuid_ns_url">
       <SourceTextLength>11</SourceTextLength>
       <ResultsDefinition>uuid</ResultsDefinition>
       <LanguageName>c</LanguageName>
       <RoutineKind>function</RoutineKind>
     </routine>
-    <routine id="51" parent="7" name="uuid_ns_x500">
+    <routine id="67" parent="7" name="uuid_ns_x500">
       <SourceTextLength>12</SourceTextLength>
       <ResultsDefinition>uuid</ResultsDefinition>
       <LanguageName>c</LanguageName>
       <RoutineKind>function</RoutineKind>
     </routine>
-    <column id="52" parent="9" name="uuid">
+    <column id="68" parent="9" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="53" parent="9" name="uuid_grupo_adicional">
+    <column id="69" parent="9" name="uuid_grupo_adicional">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="54" parent="9" name="nome">
+    <column id="70" parent="9" name="nome">
       <Position>3</Position>
-      <DataType>varchar(25)|12s</DataType>
+      <DataType>varchar(50)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="55" parent="9" name="descricao">
+    <column id="71" parent="9" name="descricao">
       <Position>4</Position>
       <DataType>varchar(80)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="56" parent="9" name="valor">
+    <column id="72" parent="9" name="valor">
       <Position>5</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>0</DefaultExpression>
     </column>
-    <column id="57" parent="9" name="ativo">
+    <column id="73" parent="9" name="ativo">
       <Position>6</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <index id="58" parent="9" name="307">
+    <index id="74" parent="9" name="307">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="59" parent="9" name="113">
+    <index id="75" parent="9" name="113">
       <ColNames>uuid_grupo_adicional
 ativo</ColNames>
     </index>
-    <index id="60" parent="9" name="112">
+    <index id="76" parent="9" name="112">
       <ColNames>uuid_grupo_adicional</ColNames>
     </index>
-    <key id="61" parent="9" name="307">
+    <key id="77" parent="9" name="307">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="62" parent="9" name="Ref_Adicionais_to_Grupos_Adicionais">
+    <foreign-key id="78" parent="9" name="Ref_Adicionais_to_Grupos_Adicionais">
       <ColNames>uuid_grupo_adicional</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Grupos_Adicionais</RefTableName>
       <RefKeyName>305</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="63" parent="10" name="uuid_item_pedido">
+    <column id="79" parent="10" name="uuid_item_pedido">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="64" parent="10" name="uuid_adicional">
+    <column id="80" parent="10" name="uuid_adicional">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <index id="65" parent="10" name="122">
+    <index id="81" parent="10" name="122">
       <ColNames>uuid_item_pedido</ColNames>
     </index>
-    <foreign-key id="66" parent="10" name="Ref_Adicionais_Items_Pedidos_to_Items_Pedidos">
+    <foreign-key id="82" parent="10" name="Ref_Adicionais_Items_Pedidos_to_Items_Pedidos">
       <ColNames>uuid_item_pedido</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Items_Pedidos</RefTableName>
       <RefKeyName>313</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="67" parent="10" name="Ref_Adicionais_Items_Pedidos_to_Adicionais">
+    <foreign-key id="83" parent="10" name="Ref_Adicionais_Items_Pedidos_to_Adicionais">
       <ColNames>uuid_adicional</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Adicionais</RefTableName>
       <RefKeyName>307</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="68" parent="11" name="uuid">
+    <column id="84" parent="11" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="69" parent="11" name="uuid_estabelecimento">
+    <column id="85" parent="11" name="uuid_estabelecimento">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="70" parent="11" name="uuid_categoria_pai">
+    <column id="86" parent="11" name="uuid_categoria_pai">
       <Position>3</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="71" parent="11" name="nomeCategoria">
+    <column id="87" parent="11" name="nomeCategoria">
       <Position>4</Position>
-      <DataType>varchar(25)|12s</DataType>
+      <DataType>varchar(50)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="72" parent="11" name="exemplosComentarioPedido">
+    <column id="88" parent="11" name="exemplosComentarioPedido">
       <Position>5</Position>
       <DataType>varchar(80)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="73" parent="11" name="qtdMinEntrega">
+    <column id="89" parent="11" name="qtdMinEntrega">
       <Position>6</Position>
       <DataType>int4(10)|4s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <column id="74" parent="11" name="ordemExibicao">
+    <column id="90" parent="11" name="ordemExibicao">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>0</DefaultExpression>
     </column>
-    <column id="75" parent="11" name="fazEntrega">
+    <column id="91" parent="11" name="fazEntrega">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <column id="76" parent="11" name="precisaPedirOutraCategoria">
+    <column id="92" parent="11" name="precisaPedirOutraCategoria">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="77" parent="11" name="entregaGratis">
+    <column id="93" parent="11" name="entregaGratis">
       <Position>10</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <column id="78" parent="11" name="ativo">
+    <column id="94" parent="11" name="ativo">
       <Position>11</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <column id="79" parent="11" name="visivel">
+    <column id="95" parent="11" name="visivel">
       <Position>12</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <index id="80" parent="11" name="304">
+    <index id="96" parent="11" name="304">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="81" parent="11" name="104">
+    <index id="97" parent="11" name="104">
       <ColNames>uuid_estabelecimento
 ativo</ColNames>
     </index>
-    <index id="82" parent="11" name="102">
+    <index id="98" parent="11" name="102">
       <ColNames>uuid_estabelecimento</ColNames>
     </index>
-    <index id="83" parent="11" name="105">
+    <index id="99" parent="11" name="105">
       <ColNames>uuid_categoria_pai
 ativo</ColNames>
     </index>
-    <index id="84" parent="11" name="103">
+    <index id="100" parent="11" name="103">
       <ColNames>uuid_categoria_pai</ColNames>
     </index>
-    <key id="85" parent="11" name="304">
+    <key id="101" parent="11" name="304">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="86" parent="11" name="Ref_Categeorias_to_Estabelecimentos">
+    <foreign-key id="102" parent="11" name="Ref_Categeorias_to_Estabelecimentos">
       <ColNames>uuid_estabelecimento</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Estabelecimentos</RefTableName>
       <RefKeyName>302</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="87" parent="11" name="Ref_Categorias_to_Categorias">
+    <foreign-key id="103" parent="11" name="Ref_Categorias_to_Categorias">
       <ColNames>uuid_categoria_pai</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Categorias</RefTableName>
       <RefKeyName>304</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="88" parent="12" name="uuid_categoria">
+    <column id="104" parent="12" name="uuid_categoria">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="89" parent="12" name="uuid_categoria_necessaria">
+    <column id="105" parent="12" name="uuid_categoria_necessaria">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="90" parent="12" name="315">
+    <index id="106" parent="12" name="315">
       <ColNames>uuid_categoria
 uuid_categoria_necessaria</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="91" parent="12" name="315">
+    <key id="107" parent="12" name="315">
       <ColNames>uuid_categoria
 uuid_categoria_necessaria</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="92" parent="12" name="Ref_Categorias_Necessarias_Entrega_to_Categorias">
+    <foreign-key id="108" parent="12" name="Ref_Categorias_Necessarias_Entrega_to_Categorias">
       <ColNames>uuid_categoria</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Categorias</RefTableName>
       <RefKeyName>304</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="93" parent="12" name="Ref_Categorias_Necessarias_Entrega_to_Categorias1">
+    <foreign-key id="109" parent="12" name="Ref_Categorias_Necessarias_Entrega_to_Categorias1">
       <ColNames>uuid_categoria_necessaria</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Categorias</RefTableName>
       <RefKeyName>304</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="94" parent="13" name="uuid">
+    <column id="110" parent="13" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="95" parent="13" name="chatId">
+    <column id="111" parent="13" name="chatId">
       <Position>2</Position>
       <DataType>varchar(50)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="96" parent="13" name="nome">
+    <column id="112" parent="13" name="nome">
       <Position>3</Position>
       <DataType>varchar(80)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="97" parent="13" name="telefoneMovel">
+    <column id="113" parent="13" name="telefoneMovel">
       <Position>4</Position>
       <DataType>varchar(50)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="98" parent="13" name="telefoneFixo">
+    <column id="114" parent="13" name="telefoneFixo">
       <Position>5</Position>
       <DataType>varchar(50)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="99" parent="13" name="dataAniversario">
+    <column id="115" parent="13" name="dataAniversario">
       <Position>6</Position>
       <DataType>date(13)|91s</DataType>
     </column>
-    <column id="100" parent="13" name="dataCadastro">
+    <column id="116" parent="13" name="dataCadastro">
       <Position>7</Position>
       <DataType>date(13)|91s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>CURRENT_DATE</DefaultExpression>
     </column>
-    <column id="101" parent="13" name="cadastroRealizado">
+    <column id="117" parent="13" name="cadastroRealizado">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="102" parent="13" name="logradouro">
+    <column id="118" parent="13" name="logradouro">
       <Position>9</Position>
       <DataType>varchar(80)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="103" parent="13" name="rua">
+    <column id="119" parent="13" name="rua">
       <Position>10</Position>
       <DataType>varchar(80)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="104" parent="13" name="bairro">
+    <column id="120" parent="13" name="bairro">
       <Position>11</Position>
       <DataType>varchar(80)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="105" parent="13" name="referencia">
+    <column id="121" parent="13" name="referencia">
       <Position>12</Position>
-      <DataType>varchar(10)|12s</DataType>
+      <DataType>varchar(80)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="106" parent="13" name="numero">
+    <column id="122" parent="13" name="numero">
       <Position>13</Position>
       <DataType>varchar(10)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <index id="107" parent="13" name="308">
+    <index id="123" parent="13" name="308">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="108" parent="13" name="309">
-      <ColNames>chatId</ColNames>
-      <Unique>1</Unique>
-    </index>
-    <index id="109" parent="13" name="115">
-      <ColNames>chatId
-uuid</ColNames>
-    </index>
-    <index id="110" parent="13" name="114">
+    <index id="124" parent="13" name="114">
       <ColNames>chatId</ColNames>
     </index>
-    <key id="111" parent="13" name="308">
+    <key id="125" parent="13" name="308">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <key id="112" parent="13" name="309">
-      <ColNames>chatId</ColNames>
-    </key>
-    <column id="113" parent="14" name="uuid">
+    <column id="126" parent="14" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="114" parent="14" name="nomeEstabelecimento">
+    <column id="127" parent="14" name="nomeEstabelecimento">
       <Position>2</Position>
       <DataType>varchar(50)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="115" parent="14" name="logo">
+    <column id="128" parent="14" name="logo">
       <Position>3</Position>
       <DataType>text(max)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="116" parent="14" name="nomeBot">
+    <column id="129" parent="14" name="nomeBot">
       <Position>4</Position>
       <DataType>varchar(25)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="117" parent="14" name="numeroAviso">
+    <column id="130" parent="14" name="numeroAviso">
       <Position>5</Position>
       <DataType>varchar(20)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="118" parent="14" name="tempoMedioRetirada">
+    <column id="131" parent="14" name="tempoMedioRetirada">
       <Position>6</Position>
       <DataType>int4(10)|4s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>0</DefaultExpression>
     </column>
-    <column id="119" parent="14" name="tempoMedioEntrega">
+    <column id="132" parent="14" name="tempoMedioEntrega">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>0</DefaultExpression>
     </column>
-    <column id="120" parent="14" name="openPedidos">
+    <column id="133" parent="14" name="openPedidos">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="121" parent="14" name="openChatBot">
+    <column id="134" parent="14" name="openChatBot">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <column id="122" parent="14" name="reservas">
+    <column id="135" parent="14" name="reservas">
       <Position>10</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="123" parent="14" name="reservasComPedidosFechados">
+    <column id="136" parent="14" name="reservasComPedidosFechados">
       <Position>11</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="124" parent="14" name="abrirFecharPedidosAutomatico">
+    <column id="137" parent="14" name="abrirFecharPedidosAutomatico">
       <Position>12</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="125" parent="14" name="agendamentoDePedidos">
+    <column id="138" parent="14" name="agendamentoDePedidos">
       <Position>13</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="126" parent="14" name="horaAberturaPedidos">
+    <column id="139" parent="14" name="horaAberturaPedidos">
       <Position>14</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="127" parent="14" name="horaAutomaticaAbrirPedidos">
+    <column id="140" parent="14" name="horaAutomaticaAbrirPedidos">
       <Position>15</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="128" parent="14" name="horaAutomaticaFecharPedidos">
+    <column id="141" parent="14" name="horaAutomaticaFecharPedidos">
       <Position>16</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="129" parent="14" name="horaInicioReservas">
+    <column id="142" parent="14" name="horaInicioReservas">
       <Position>17</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="130" parent="14" name="taxaEntregaFixa">
+    <column id="143" parent="14" name="taxaEntregaFixa">
       <Position>18</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="131" parent="14" name="taxaEntregaKm">
+    <column id="144" parent="14" name="taxaEntregaKm">
       <Position>19</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="132" parent="14" name="valorSelo">
+    <column id="145" parent="14" name="valorSelo">
       <Position>20</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>0</DefaultExpression>
     </column>
-    <column id="133" parent="14" name="maximoSeloPorCompra">
+    <column id="146" parent="14" name="maximoSeloPorCompra">
       <Position>21</Position>
       <DataType>int4(10)|4s</DataType>
       <DefaultExpression>0</DefaultExpression>
     </column>
-    <column id="134" parent="14" name="validadeSeloFidelidade">
+    <column id="147" parent="14" name="validadeSeloFidelidade">
       <Position>22</Position>
       <DataType>int4(10)|4s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;-1&apos;::integer</DefaultExpression>
     </column>
-    <column id="135" parent="14" name="webHookNovaReserva">
+    <column id="148" parent="14" name="webHookNovaReserva">
       <Position>23</Position>
       <DataType>varchar(200)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="136" parent="14" name="webHookNovoPedido">
+    <column id="149" parent="14" name="webHookNovoPedido">
       <Position>24</Position>
       <DataType>varchar(200)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="137" parent="14" name="dataCriacao">
+    <column id="150" parent="14" name="dataCriacao">
       <Position>25</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="138" parent="14" name="ativo">
+    <column id="151" parent="14" name="ativo">
       <Position>26</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <index id="139" parent="14" name="302">
+    <index id="152" parent="14" name="302">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="140" parent="14" name="302">
+    <key id="153" parent="14" name="302">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="141" parent="15" name="uuid_usuario">
+    <column id="154" parent="15" name="uuid_usuario">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="142" parent="15" name="uuid_estabelecimento">
+    <column id="155" parent="15" name="uuid_estabelecimento">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="143" parent="15" name="311">
+    <index id="156" parent="15" name="311">
       <ColNames>uuid_usuario
 uuid_estabelecimento</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="144" parent="15" name="311">
+    <key id="157" parent="15" name="311">
       <ColNames>uuid_usuario
 uuid_estabelecimento</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="145" parent="15" name="Ref_Estabelecimentos_Usuario_to_Usuarios">
+    <foreign-key id="158" parent="15" name="Ref_Estabelecimentos_Usuario_to_Usuarios">
       <ColNames>uuid_usuario</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Usuarios</RefTableName>
       <RefKeyName>300</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="146" parent="15" name="Ref_Estabelecimentos_Usuario_to_Estabelecimentos">
+    <foreign-key id="159" parent="15" name="Ref_Estabelecimentos_Usuario_to_Estabelecimentos">
       <ColNames>uuid_estabelecimento</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Estabelecimentos</RefTableName>
       <RefKeyName>302</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="147" parent="16" name="uuid">
+    <column id="160" parent="16" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="148" parent="16" name="uuid_categoria">
+    <column id="161" parent="16" name="uuid_categoria">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="149" parent="16" name="uuid_produto">
+    <column id="162" parent="16" name="uuid_produto">
       <Position>3</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="150" parent="16" name="nomeGrupo">
+    <column id="163" parent="16" name="nomeGrupo">
       <Position>4</Position>
-      <DataType>varchar(25)|12s</DataType>
+      <DataType>varchar(50)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="151" parent="16" name="descricaoGrupo">
+    <column id="164" parent="16" name="descricaoGrupo">
       <Position>5</Position>
       <DataType>varchar(80)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="152" parent="16" name="qtdMin">
+    <column id="165" parent="16" name="qtdMin">
       <Position>6</Position>
       <DataType>int4(10)|4s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <column id="153" parent="16" name="qtdMax">
+    <column id="166" parent="16" name="qtdMax">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <column id="154" parent="16" name="formaCobranca">
+    <column id="167" parent="16" name="formaCobranca">
       <Position>8</Position>
       <DataType>varchar(150)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>0</DefaultExpression>
     </column>
-    <column id="155" parent="16" name="ativo">
+    <column id="168" parent="16" name="ativo">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <index id="156" parent="16" name="305">
+    <index id="169" parent="16" name="305">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="157" parent="16" name="109">
+    <index id="170" parent="16" name="109">
       <ColNames>uuid_categoria
 ativo</ColNames>
     </index>
-    <index id="158" parent="16" name="106">
+    <index id="171" parent="16" name="106">
       <ColNames>uuid_categoria</ColNames>
     </index>
-    <index id="159" parent="16" name="108">
+    <index id="172" parent="16" name="108">
       <ColNames>uuid_produto
 ativo</ColNames>
     </index>
-    <index id="160" parent="16" name="107">
+    <index id="173" parent="16" name="107">
       <ColNames>uuid_produto</ColNames>
     </index>
-    <key id="161" parent="16" name="305">
+    <key id="174" parent="16" name="305">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="162" parent="16" name="Ref_Grupos_Adicionais_to_Categorias">
+    <foreign-key id="175" parent="16" name="Ref_Grupos_Adicionais_to_Categorias">
       <ColNames>uuid_categoria</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Categorias</RefTableName>
       <RefKeyName>304</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="163" parent="16" name="Ref_Grupos_Adicionais_to_Produtos">
+    <foreign-key id="176" parent="16" name="Ref_Grupos_Adicionais_to_Produtos">
       <ColNames>uuid_produto</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Produtos</RefTableName>
       <RefKeyName>306</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="164" parent="17" name="uuid">
+    <column id="177" parent="17" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="165" parent="17" name="uuid_pedido">
+    <column id="178" parent="17" name="uuid_pedido">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="166" parent="17" name="uuid_produto">
+    <column id="179" parent="17" name="uuid_produto">
       <Position>3</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="167" parent="17" name="comentario">
+    <column id="180" parent="17" name="comentario">
       <Position>4</Position>
       <DataType>varchar(200)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="168" parent="17" name="qtd">
+    <column id="181" parent="17" name="qtd">
       <Position>5</Position>
       <DataType>int4(10)|4s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <column id="169" parent="17" name="subTotal">
+    <column id="182" parent="17" name="subTotal">
       <Position>6</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="170" parent="17" name="removido">
+    <column id="183" parent="17" name="removido">
       <Position>7</Position>
       <DataType>bool(1)|-7s</DataType>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <index id="171" parent="17" name="313">
+    <index id="184" parent="17" name="313">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="172" parent="17" name="121">
+    <index id="185" parent="17" name="121">
       <ColNames>uuid_pedido</ColNames>
     </index>
-    <key id="173" parent="17" name="313">
+    <index id="186" parent="17" name="129">
+      <ColNames>uuid_produto</ColNames>
+    </index>
+    <key id="187" parent="17" name="313">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="174" parent="17" name="Ref_Items_Pedidos_to_Pedido">
+    <foreign-key id="188" parent="17" name="Ref_Items_Pedidos_to_Pedido">
       <ColNames>uuid_pedido</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Pedidos</RefTableName>
       <RefKeyName>312</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="175" parent="17" name="Ref_Items_Pedidos_to_Produtos">
+    <foreign-key id="189" parent="17" name="Ref_Items_Pedidos_to_Produtos">
       <ColNames>uuid_produto</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Produtos</RefTableName>
       <RefKeyName>306</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="176" parent="18" name="uuid">
+    <column id="190" parent="18" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="177" parent="18" name="uuid_cliente">
+    <column id="191" parent="18" name="uuid_cliente">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="178" parent="18" name="uuid_estabelecimento">
+    <column id="192" parent="18" name="uuid_estabelecimento">
       <Position>3</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="179" parent="18" name="endereco">
+    <column id="193" parent="18" name="endereco">
       <Position>4</Position>
       <DataType>varchar(200)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="180" parent="18" name="comentarioPedido">
+    <column id="194" parent="18" name="comentarioPedido">
       <Position>5</Position>
       <DataType>varchar(200)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="181" parent="18" name="entrega">
+    <column id="195" parent="18" name="entrega">
       <Position>6</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="182" parent="18" name="cartao">
+    <column id="196" parent="18" name="cartao">
       <Position>7</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="183" parent="18" name="impresso">
+    <column id="197" parent="18" name="impresso">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="184" parent="18" name="valorPago">
+    <column id="198" parent="18" name="valorPago">
       <Position>9</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>0</DefaultExpression>
     </column>
-    <column id="185" parent="18" name="desconto">
+    <column id="199" parent="18" name="desconto">
       <Position>10</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="186" parent="18" name="pgCreditos">
+    <column id="200" parent="18" name="pgCreditos">
       <Position>11</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>0</DefaultExpression>
     </column>
-    <column id="187" parent="18" name="subTotal">
+    <column id="201" parent="18" name="subTotal">
       <Position>12</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="188" parent="18" name="total">
+    <column id="202" parent="18" name="total">
       <Position>13</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="189" parent="18" name="horaAgendamento">
+    <column id="203" parent="18" name="horaAgendamento">
       <Position>14</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="190" parent="18" name="dataPedido">
+    <column id="204" parent="18" name="dataPedido">
       <Position>15</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="191" parent="18" name="estadoPedido">
+    <column id="205" parent="18" name="estadoPedido">
       <Position>16</Position>
       <DataType>varchar(40)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;Novo&apos;</DefaultExpression>
     </column>
-    <index id="192" parent="18" name="312">
+    <index id="206" parent="18" name="312">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="193" parent="18" name="119">
+    <index id="207" parent="18" name="119">
       <ColNames>uuid_cliente
 uuid_estabelecimento
 estadoPedido</ColNames>
     </index>
-    <index id="194" parent="18" name="118">
+    <index id="208" parent="18" name="118">
       <ColNames>uuid_cliente
 uuid_estabelecimento</ColNames>
     </index>
-    <index id="195" parent="18" name="120">
+    <index id="209" parent="18" name="120">
       <ColNames>uuid_estabelecimento
 impresso</ColNames>
     </index>
-    <key id="196" parent="18" name="312">
+    <key id="210" parent="18" name="312">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="197" parent="18" name="Ref_Pedido_to_Clientes">
+    <foreign-key id="211" parent="18" name="Ref_Pedido_to_Clientes">
       <ColNames>uuid_cliente</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Clientes</RefTableName>
       <RefKeyName>308</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="198" parent="18" name="Ref_Pedido_to_Estabelecimentos">
+    <foreign-key id="212" parent="18" name="Ref_Pedido_to_Estabelecimentos">
       <ColNames>uuid_estabelecimento</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Estabelecimentos</RefTableName>
       <RefKeyName>302</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="199" parent="19" name="uuid">
+    <column id="213" parent="19" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="200" parent="19" name="uuid_categoria">
+    <column id="214" parent="19" name="uuid_categoria">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="201" parent="19" name="nome">
+    <column id="215" parent="19" name="nome">
       <Position>3</Position>
-      <DataType>varchar(25)|12s</DataType>
+      <DataType>varchar(50)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="202" parent="19" name="descricao">
+    <column id="216" parent="19" name="descricao">
       <Position>4</Position>
       <DataType>varchar(80)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="203" parent="19" name="valor">
+    <column id="217" parent="19" name="valor">
       <Position>5</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="204" parent="19" name="onlyLocal">
+    <column id="218" parent="19" name="onlyLocal">
       <Position>6</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="205" parent="19" name="ativo">
+    <column id="219" parent="19" name="ativo">
       <Position>7</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <column id="206" parent="19" name="visivel">
+    <column id="220" parent="19" name="visivel">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <column id="207" parent="19" name="foto">
+    <column id="221" parent="19" name="foto">
       <Position>9</Position>
       <DataType>text(max)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="208" parent="19" name="306">
+    <index id="222" parent="19" name="306">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="209" parent="19" name="111">
+    <index id="223" parent="19" name="111">
       <ColNames>uuid_categoria
 ativo</ColNames>
     </index>
-    <index id="210" parent="19" name="110">
+    <index id="224" parent="19" name="110">
       <ColNames>uuid_categoria</ColNames>
     </index>
-    <key id="211" parent="19" name="306">
+    <key id="225" parent="19" name="306">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="212" parent="19" name="Ref_Produtos_to_Categorias">
+    <foreign-key id="226" parent="19" name="Ref_Produtos_to_Categorias">
       <ColNames>uuid_categoria</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Categorias</RefTableName>
       <RefKeyName>304</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="213" parent="20" name="uuid">
+    <column id="227" parent="20" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="214" parent="20" name="uuid_cliente">
+    <column id="228" parent="20" name="uuid_cliente">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="215" parent="20" name="uuid_estabelecimento">
+    <column id="229" parent="20" name="uuid_estabelecimento">
       <Position>3</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="216" parent="20" name="valor">
+    <column id="230" parent="20" name="valor">
       <Position>4</Position>
       <DataType>numeric(6,2)|2s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="217" parent="20" name="dataRecarga">
+    <column id="231" parent="20" name="dataRecarga">
       <Position>5</Position>
-      <DataType>date(13)|91s</DataType>
+      <DataType>timestamptz(35,6)|93s</DataType>
       <NotNull>1</NotNull>
-      <DefaultExpression>CURRENT_DATE</DefaultExpression>
+      <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="218" parent="20" name="tipoRecarga">
+    <column id="232" parent="20" name="tipoRecarga">
       <Position>6</Position>
-      <DataType>int4(10)|4s</DataType>
+      <DataType>varchar(15)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>0</DefaultExpression>
     </column>
-    <column id="219" parent="20" name="ativo">
+    <column id="233" parent="20" name="ativo">
       <Position>7</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <index id="220" parent="20" name="310">
+    <index id="234" parent="20" name="310">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="221" parent="20" name="117">
+    <index id="235" parent="20" name="117">
       <ColNames>uuid_estabelecimento
 uuid_cliente
 ativo</ColNames>
     </index>
-    <index id="222" parent="20" name="116">
+    <index id="236" parent="20" name="116">
       <ColNames>uuid_estabelecimento
 uuid_cliente</ColNames>
     </index>
-    <key id="223" parent="20" name="310">
+    <key id="237" parent="20" name="310">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="224" parent="20" name="Ref_Recargas_Clientes_to_Clientes">
+    <foreign-key id="238" parent="20" name="Ref_Recargas_Clientes_to_Clientes">
       <ColNames>uuid_cliente</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Clientes</RefTableName>
       <RefKeyName>308</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="225" parent="20" name="Ref_Recargas_Clientes_to_Estabelecimentos">
+    <foreign-key id="239" parent="20" name="Ref_Recargas_Clientes_to_Estabelecimentos">
       <ColNames>uuid_estabelecimento</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Estabelecimentos</RefTableName>
       <RefKeyName>302</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="226" parent="21" name="uuid">
+    <column id="240" parent="21" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="227" parent="21" name="uuid_estabelecimento">
+    <column id="241" parent="21" name="uuid_estabelecimento">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="228" parent="21" name="uuid_cliente">
+    <column id="242" parent="21" name="uuid_cliente">
       <Position>3</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="229" parent="21" name="dataReserva">
+    <column id="243" parent="21" name="dataReserva">
       <Position>4</Position>
-      <DataType>date(13)|91s</DataType>
+      <DataType>timestamptz(35,6)|93s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="230" parent="21" name="telefoneContato">
+    <column id="244" parent="21" name="telefoneContato">
       <Position>5</Position>
       <DataType>varchar(50)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="231" parent="21" name="nomeContato">
+    <column id="245" parent="21" name="nomeContato">
       <Position>6</Position>
       <DataType>varchar(100)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="232" parent="21" name="comentario">
+    <column id="246" parent="21" name="comentario">
       <Position>7</Position>
       <DataType>varchar(150)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="233" parent="21" name="impresso">
+    <column id="247" parent="21" name="impresso">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <index id="234" parent="21" name="316">
+    <index id="248" parent="21" name="316">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="235" parent="21" name="127">
+    <index id="249" parent="21" name="127">
       <ColNames>uuid_estabelecimento
 uuid_cliente</ColNames>
     </index>
-    <index id="236" parent="21" name="126">
+    <index id="250" parent="21" name="126">
       <ColNames>uuid_estabelecimento
 impresso</ColNames>
     </index>
-    <index id="237" parent="21" name="125">
+    <index id="251" parent="21" name="125">
       <ColNames>uuid_estabelecimento</ColNames>
     </index>
-    <key id="238" parent="21" name="316">
+    <key id="252" parent="21" name="316">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="239" parent="21" name="Ref_Reservas_to_Estabelecimentos">
+    <foreign-key id="253" parent="21" name="Ref_Reservas_to_Estabelecimentos">
       <ColNames>uuid_estabelecimento</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Estabelecimentos</RefTableName>
       <RefKeyName>302</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="240" parent="21" name="Ref_Reservas_to_Clientes">
+    <foreign-key id="254" parent="21" name="Ref_Reservas_to_Clientes">
       <ColNames>uuid_cliente</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Clientes</RefTableName>
       <RefKeyName>308</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="241" parent="22" name="uuid">
+    <column id="255" parent="22" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="242" parent="22" name="uuid_categoria">
+    <column id="256" parent="22" name="uuid_categoria">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="243" parent="22" name="uuid_produto">
+    <column id="257" parent="22" name="uuid_produto">
       <Position>3</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="244" parent="22" name="restricaoHorario">
+    <column id="258" parent="22" name="restricaoHorario">
       <Position>4</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="245" parent="22" name="restricaoDia">
+    <column id="259" parent="22" name="restricaoDia">
       <Position>5</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="246" parent="22" name="horarioDe">
+    <column id="260" parent="22" name="horarioDe">
       <Position>6</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="247" parent="22" name="horarioAte">
+    <column id="261" parent="22" name="horarioAte">
       <Position>7</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="248" parent="22" name="domingo">
+    <column id="262" parent="22" name="domingo">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="249" parent="22" name="segunda">
+    <column id="263" parent="22" name="segunda">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="250" parent="22" name="terca">
+    <column id="264" parent="22" name="terca">
       <Position>10</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="251" parent="22" name="quarta">
+    <column id="265" parent="22" name="quarta">
       <Position>11</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="252" parent="22" name="quinta">
+    <column id="266" parent="22" name="quinta">
       <Position>12</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="253" parent="22" name="sexta">
+    <column id="267" parent="22" name="sexta">
       <Position>13</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <column id="254" parent="22" name="sabado">
+    <column id="268" parent="22" name="sabado">
       <Position>14</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>false</DefaultExpression>
     </column>
-    <index id="255" parent="22" name="314">
+    <index id="269" parent="22" name="314">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="256" parent="22" name="123">
+    <index id="270" parent="22" name="123">
       <ColNames>uuid_categoria</ColNames>
     </index>
-    <index id="257" parent="22" name="124">
+    <index id="271" parent="22" name="124">
       <ColNames>uuid_produto</ColNames>
     </index>
-    <key id="258" parent="22" name="314">
+    <key id="272" parent="22" name="314">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="259" parent="22" name="Ref_Restricoes_Visibilidade_to_Categorias">
+    <foreign-key id="273" parent="22" name="Ref_Restricoes_Visibilidade_to_Categorias">
       <ColNames>uuid_categoria</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Categorias</RefTableName>
       <RefKeyName>304</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="260" parent="22" name="Ref_Restricoes_Visibilidade_to_Produtos">
+    <foreign-key id="274" parent="22" name="Ref_Restricoes_Visibilidade_to_Produtos">
       <ColNames>uuid_produto</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Produtos</RefTableName>
       <RefKeyName>306</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="261" parent="23" name="token">
+    <column id="275" parent="23" name="uuid">
       <Position>1</Position>
-      <DataType>varchar(128)|12s</DataType>
+      <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
+      <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="262" parent="23" name="uuid_estabelecimento">
+    <column id="276" parent="23" name="uuid_estabelecimento">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
-      <NotNull>1</NotNull>
+      <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="263" parent="23" name="uuid_usuario">
+    <column id="277" parent="23" name="nome">
       <Position>3</Position>
-      <DataType>uuid(max)|1111s</DataType>
+      <DataType>varchar(50)|12s</DataType>
       <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="264" parent="23" name="validade">
+    <column id="278" parent="23" name="descricao">
       <Position>4</Position>
-      <DataType>date(13)|91s</DataType>
+      <DataType>text(max)|12s</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>&apos;&apos;</DefaultExpression>
+    </column>
+    <column id="279" parent="23" name="valor">
+      <Position>5</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>0</DefaultExpression>
+    </column>
+    <column id="280" parent="23" name="horaInicio">
+      <Position>6</Position>
+      <DataType>timetz(21,6)|92s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="265" parent="23" name="303">
-      <ColNames>token</ColNames>
+    <column id="281" parent="23" name="diasSemana">
+      <Position>7</Position>
+      <DataType>_bool(1)|2003s</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="282" parent="23" name="ativo">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+      <NotNull>1</NotNull>
+      <DefaultExpression>true</DefaultExpression>
+    </column>
+    <index id="283" parent="23" name="317">
+      <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="266" parent="23" name="101">
+    <index id="284" parent="23" name="130">
       <ColNames>uuid_estabelecimento</ColNames>
     </index>
-    <key id="267" parent="23" name="303">
-      <ColNames>token</ColNames>
+    <key id="285" parent="23" name="317">
+      <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <foreign-key id="268" parent="23" name="Ref_Tokens_to_Estabelecimentos">
+    <foreign-key id="286" parent="23" name="Ref_Rodizios_to_Estabelecimentos">
       <ColNames>uuid_estabelecimento</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Estabelecimentos</RefTableName>
       <RefKeyName>302</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <foreign-key id="269" parent="23" name="Ref_Tokens_to_Usuarios">
+    <column id="287" parent="24" name="token">
+      <Position>1</Position>
+      <DataType>varchar(128)|12s</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="288" parent="24" name="uuid_estabelecimento">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="289" parent="24" name="uuid_usuario">
+      <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="290" parent="24" name="validade">
+      <Position>4</Position>
+      <DataType>date(13)|91s</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <index id="291" parent="24" name="303">
+      <ColNames>token</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <index id="292" parent="24" name="101">
+      <ColNames>uuid_estabelecimento</ColNames>
+    </index>
+    <key id="293" parent="24" name="303">
+      <ColNames>token</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <foreign-key id="294" parent="24" name="Ref_Tokens_to_Estabelecimentos">
+      <ColNames>uuid_estabelecimento</ColNames>
+      <RefSchemaName>public</RefSchemaName>
+      <RefTableName>Estabelecimentos</RefTableName>
+      <RefKeyName>302</RefKeyName>
+      <RefColNames>uuid</RefColNames>
+    </foreign-key>
+    <foreign-key id="295" parent="24" name="Ref_Tokens_to_Usuarios">
       <ColNames>uuid_usuario</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Usuarios</RefTableName>
       <RefKeyName>300</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="270" parent="24" name="uuid">
+    <column id="296" parent="25" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>uuid_generate_v1()</DefaultExpression>
     </column>
-    <column id="271" parent="24" name="uuid_usuario_indicacao">
+    <column id="297" parent="25" name="uuid_usuario_indicacao">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="272" parent="24" name="usuario">
+    <column id="298" parent="25" name="usuario">
       <Position>3</Position>
       <DataType>varchar(25)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="273" parent="24" name="senha">
+    <column id="299" parent="25" name="senha">
       <Position>4</Position>
       <DataType>varchar(32)|12s</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="274" parent="24" name="dataRegistro">
+    <column id="300" parent="25" name="dataRegistro">
       <Position>5</Position>
       <DataType>date(13)|91s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>CURRENT_DATE</DefaultExpression>
     </column>
-    <column id="275" parent="24" name="tipoUsuario">
+    <column id="301" parent="25" name="tipoUsuario">
       <Position>6</Position>
       <DataType>varchar(80)|12s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;SUPER_ADMIN&apos;</DefaultExpression>
     </column>
-    <column id="276" parent="24" name="maxEstabelecimentos">
+    <column id="302" parent="25" name="maxEstabelecimentos">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>1</DefaultExpression>
     </column>
-    <column id="277" parent="24" name="dataCriacao">
+    <column id="303" parent="25" name="dataCriacao">
       <Position>8</Position>
       <DataType>timetz(21,6)|92s</DataType>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="278" parent="24" name="ativo">
+    <column id="304" parent="25" name="ativo">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>true</DefaultExpression>
     </column>
-    <index id="279" parent="24" name="300">
+    <index id="305" parent="25" name="300">
       <ColNames>uuid</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="280" parent="24" name="301">
+    <index id="306" parent="25" name="301">
       <ColNames>usuario</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="281" parent="24" name="100">
+    <index id="307" parent="25" name="100">
       <ColNames>uuid_usuario_indicacao</ColNames>
     </index>
-    <index id="282" parent="24" name="128">
+    <index id="308" parent="25" name="128">
       <ColNames>usuario
 senha</ColNames>
     </index>
-    <key id="283" parent="24" name="300">
+    <key id="309" parent="25" name="300">
       <ColNames>uuid</ColNames>
       <Primary>1</Primary>
     </key>
-    <key id="284" parent="24" name="301">
+    <key id="310" parent="25" name="301">
       <ColNames>usuario</ColNames>
     </key>
-    <foreign-key id="285" parent="24" name="Ref_Usuarios_to_Usuarios">
+    <foreign-key id="311" parent="25" name="Ref_Usuarios_to_Usuarios">
       <ColNames>uuid_usuario_indicacao</ColNames>
       <RefSchemaName>public</RefSchemaName>
       <RefTableName>Usuarios</RefTableName>
       <RefKeyName>300</RefKeyName>
       <RefColNames>uuid</RefColNames>
     </foreign-key>
-    <column id="286" parent="25" name="uuid">
+    <column id="312" parent="26" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="287" parent="25" name="uuid_estabelecimento">
+    <column id="313" parent="26" name="uuid_grupo_adicional">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="288" parent="25" name="uuid_categoria_pai">
+    <column id="314" parent="26" name="nome">
+      <Position>3</Position>
+      <DataType>varchar(25)|12s</DataType>
+    </column>
+    <column id="315" parent="26" name="descricao">
+      <Position>4</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="316" parent="26" name="valor">
+      <Position>5</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="317" parent="26" name="ativo">
+      <Position>6</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="318" parent="27" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="319" parent="27" name="uuid_estabelecimento">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="320" parent="27" name="uuid_categoria_pai">
       <Position>3</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="289" parent="25" name="nomeCategoria">
+    <column id="321" parent="27" name="nomeCategoria">
       <Position>4</Position>
       <DataType>varchar(25)|12s</DataType>
     </column>
-    <column id="290" parent="25" name="exemplosComentarioPedido">
+    <column id="322" parent="27" name="exemplosComentarioPedido">
       <Position>5</Position>
       <DataType>varchar(80)|12s</DataType>
     </column>
-    <column id="291" parent="25" name="qtdMinEntrega">
+    <column id="323" parent="27" name="qtdMinEntrega">
       <Position>6</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="292" parent="25" name="ordemExibicao">
+    <column id="324" parent="27" name="ordemExibicao">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="293" parent="25" name="fazEntrega">
+    <column id="325" parent="27" name="fazEntrega">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="294" parent="25" name="precisaPedirOutraCategoria">
+    <column id="326" parent="27" name="precisaPedirOutraCategoria">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="295" parent="25" name="entregaGratis">
+    <column id="327" parent="27" name="entregaGratis">
       <Position>10</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="296" parent="25" name="ativo">
+    <column id="328" parent="27" name="ativo">
       <Position>11</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="297" parent="26" name="uuid">
+    <column id="329" parent="27" name="visivel">
+      <Position>12</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="330" parent="28" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="298" parent="26" name="chatId">
+    <column id="331" parent="28" name="uuid_estabelecimento">
       <Position>2</Position>
-      <DataType>varchar(50)|12s</DataType>
+      <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="299" parent="26" name="nome">
+    <column id="332" parent="28" name="uuid_categoria_pai">
       <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="333" parent="28" name="nomeCategoria">
+      <Position>4</Position>
+      <DataType>varchar(25)|12s</DataType>
+    </column>
+    <column id="334" parent="28" name="exemplosComentarioPedido">
+      <Position>5</Position>
       <DataType>varchar(80)|12s</DataType>
     </column>
-    <column id="300" parent="26" name="telefoneMovel">
-      <Position>4</Position>
-      <DataType>varchar(50)|12s</DataType>
-    </column>
-    <column id="301" parent="26" name="telefoneFixo">
-      <Position>5</Position>
-      <DataType>varchar(50)|12s</DataType>
-    </column>
-    <column id="302" parent="26" name="dataAniversario">
+    <column id="335" parent="28" name="qtdMinEntrega">
       <Position>6</Position>
-      <DataType>date(13)|91s</DataType>
+      <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="303" parent="26" name="dataCadastro">
+    <column id="336" parent="28" name="ordemExibicao">
       <Position>7</Position>
-      <DataType>date(13)|91s</DataType>
+      <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="304" parent="26" name="cadastroRealizado">
+    <column id="337" parent="28" name="fazEntrega">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="305" parent="27" name="uuid">
+    <column id="338" parent="28" name="precisaPedirOutraCategoria">
+      <Position>9</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="339" parent="28" name="entregaGratis">
+      <Position>10</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="340" parent="28" name="ativo">
+      <Position>11</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="341" parent="29" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="306" parent="27" name="chatId">
+    <column id="342" parent="29" name="chatId">
       <Position>2</Position>
       <DataType>varchar(50)|12s</DataType>
     </column>
-    <column id="307" parent="27" name="nome">
+    <column id="343" parent="29" name="nome">
       <Position>3</Position>
       <DataType>varchar(80)|12s</DataType>
     </column>
-    <column id="308" parent="27" name="telefoneMovel">
+    <column id="344" parent="29" name="telefoneMovel">
       <Position>4</Position>
       <DataType>varchar(50)|12s</DataType>
     </column>
-    <column id="309" parent="27" name="telefoneFixo">
+    <column id="345" parent="29" name="telefoneFixo">
       <Position>5</Position>
       <DataType>varchar(50)|12s</DataType>
     </column>
-    <column id="310" parent="27" name="dataAniversario">
+    <column id="346" parent="29" name="dataAniversario">
       <Position>6</Position>
       <DataType>date(13)|91s</DataType>
     </column>
-    <column id="311" parent="27" name="dataCadastro">
+    <column id="347" parent="29" name="dataCadastro">
       <Position>7</Position>
       <DataType>date(13)|91s</DataType>
     </column>
-    <column id="312" parent="27" name="cadastroRealizado">
+    <column id="348" parent="29" name="cadastroRealizado">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="313" parent="28" name="uuid">
+    <column id="349" parent="29" name="logradouro">
+      <Position>9</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="350" parent="29" name="rua">
+      <Position>10</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="351" parent="29" name="bairro">
+      <Position>11</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="352" parent="29" name="referencia">
+      <Position>12</Position>
+      <DataType>varchar(10)|12s</DataType>
+    </column>
+    <column id="353" parent="29" name="numero">
+      <Position>13</Position>
+      <DataType>varchar(10)|12s</DataType>
+    </column>
+    <column id="354" parent="30" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="314" parent="28" name="nomeEstabelecimento">
+    <column id="355" parent="30" name="chatId">
       <Position>2</Position>
       <DataType>varchar(50)|12s</DataType>
     </column>
-    <column id="315" parent="28" name="logo">
+    <column id="356" parent="30" name="nome">
+      <Position>3</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="357" parent="30" name="telefoneMovel">
+      <Position>4</Position>
+      <DataType>varchar(50)|12s</DataType>
+    </column>
+    <column id="358" parent="30" name="telefoneFixo">
+      <Position>5</Position>
+      <DataType>varchar(50)|12s</DataType>
+    </column>
+    <column id="359" parent="30" name="dataAniversario">
+      <Position>6</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="360" parent="30" name="dataCadastro">
+      <Position>7</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="361" parent="30" name="cadastroRealizado">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="362" parent="31" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="363" parent="31" name="chatId">
+      <Position>2</Position>
+      <DataType>varchar(50)|12s</DataType>
+    </column>
+    <column id="364" parent="31" name="nome">
+      <Position>3</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="365" parent="31" name="telefoneMovel">
+      <Position>4</Position>
+      <DataType>varchar(50)|12s</DataType>
+    </column>
+    <column id="366" parent="31" name="telefoneFixo">
+      <Position>5</Position>
+      <DataType>varchar(50)|12s</DataType>
+    </column>
+    <column id="367" parent="31" name="dataAniversario">
+      <Position>6</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="368" parent="31" name="dataCadastro">
+      <Position>7</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="369" parent="31" name="cadastroRealizado">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="370" parent="32" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="371" parent="32" name="chatId">
+      <Position>2</Position>
+      <DataType>varchar(50)|12s</DataType>
+    </column>
+    <column id="372" parent="32" name="nome">
+      <Position>3</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="373" parent="32" name="telefoneMovel">
+      <Position>4</Position>
+      <DataType>varchar(50)|12s</DataType>
+    </column>
+    <column id="374" parent="32" name="telefoneFixo">
+      <Position>5</Position>
+      <DataType>varchar(50)|12s</DataType>
+    </column>
+    <column id="375" parent="32" name="dataAniversario">
+      <Position>6</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="376" parent="32" name="dataCadastro">
+      <Position>7</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="377" parent="32" name="cadastroRealizado">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="378" parent="32" name="logradouro">
+      <Position>9</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="379" parent="32" name="rua">
+      <Position>10</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="380" parent="32" name="bairro">
+      <Position>11</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="381" parent="32" name="referencia">
+      <Position>12</Position>
+      <DataType>varchar(10)|12s</DataType>
+    </column>
+    <column id="382" parent="32" name="numero">
+      <Position>13</Position>
+      <DataType>varchar(10)|12s</DataType>
+    </column>
+    <column id="383" parent="33" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="384" parent="33" name="nomeEstabelecimento">
+      <Position>2</Position>
+      <DataType>varchar(50)|12s</DataType>
+    </column>
+    <column id="385" parent="33" name="logo">
       <Position>3</Position>
       <DataType>text(max)|12s</DataType>
     </column>
-    <column id="316" parent="28" name="nomeBot">
+    <column id="386" parent="33" name="nomeBot">
       <Position>4</Position>
       <DataType>varchar(25)|12s</DataType>
     </column>
-    <column id="317" parent="28" name="numeroAviso">
+    <column id="387" parent="33" name="numeroAviso">
       <Position>5</Position>
       <DataType>varchar(20)|12s</DataType>
     </column>
-    <column id="318" parent="28" name="tempoMedioRetirada">
+    <column id="388" parent="33" name="tempoMedioRetirada">
       <Position>6</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="319" parent="28" name="tempoMedioEntrega">
+    <column id="389" parent="33" name="tempoMedioEntrega">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="320" parent="28" name="openPedidos">
+    <column id="390" parent="33" name="openPedidos">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="321" parent="28" name="openChatBot">
+    <column id="391" parent="33" name="openChatBot">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="322" parent="28" name="reservas">
+    <column id="392" parent="33" name="reservas">
       <Position>10</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="323" parent="28" name="reservasComPedidosFechados">
+    <column id="393" parent="33" name="reservasComPedidosFechados">
       <Position>11</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="324" parent="28" name="abrirFecharPedidosAutomatico">
+    <column id="394" parent="33" name="abrirFecharPedidosAutomatico">
       <Position>12</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="325" parent="28" name="agendamentoDePedidos">
+    <column id="395" parent="33" name="agendamentoDePedidos">
       <Position>13</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="326" parent="28" name="horaAberturaPedidos">
+    <column id="396" parent="33" name="horaAberturaPedidos">
       <Position>14</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
     </column>
-    <column id="327" parent="28" name="horaAutomaticaAbrirPedidos">
+    <column id="397" parent="33" name="horaAutomaticaAbrirPedidos">
       <Position>15</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="328" parent="28" name="horaAutomaticaFecharPedidos">
+    <column id="398" parent="33" name="horaAutomaticaFecharPedidos">
       <Position>16</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="329" parent="28" name="horaInicioReservas">
+    <column id="399" parent="33" name="horaInicioReservas">
       <Position>17</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="330" parent="28" name="taxaEntregaFixa">
+    <column id="400" parent="33" name="taxaEntregaFixa">
       <Position>18</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="331" parent="28" name="taxaEntregaKm">
+    <column id="401" parent="33" name="taxaEntregaKm">
       <Position>19</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="332" parent="28" name="valorSelo">
+    <column id="402" parent="33" name="valorSelo">
       <Position>20</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="333" parent="28" name="maximoSeloPorCompra">
+    <column id="403" parent="33" name="maximoSeloPorCompra">
       <Position>21</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="334" parent="28" name="validadeSeloFidelidade">
+    <column id="404" parent="33" name="validadeSeloFidelidade">
       <Position>22</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="335" parent="28" name="webHookNovaReserva">
+    <column id="405" parent="33" name="webHookNovaReserva">
       <Position>23</Position>
       <DataType>varchar(200)|12s</DataType>
     </column>
-    <column id="336" parent="28" name="webHookNovoPedido">
+    <column id="406" parent="33" name="webHookNovoPedido">
       <Position>24</Position>
       <DataType>varchar(200)|12s</DataType>
     </column>
-    <column id="337" parent="28" name="dataCriacao">
+    <column id="407" parent="33" name="dataCriacao">
       <Position>25</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
     </column>
-    <column id="338" parent="28" name="ativo">
+    <column id="408" parent="33" name="ativo">
       <Position>26</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="339" parent="29" name="uuid">
+    <column id="409" parent="34" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="340" parent="29" name="nomeEstabelecimento">
+    <column id="410" parent="34" name="nomeEstabelecimento">
       <Position>2</Position>
       <DataType>varchar(50)|12s</DataType>
     </column>
-    <column id="341" parent="29" name="logo">
+    <column id="411" parent="34" name="logo">
       <Position>3</Position>
       <DataType>text(max)|12s</DataType>
     </column>
-    <column id="342" parent="29" name="nomeBot">
+    <column id="412" parent="34" name="nomeBot">
       <Position>4</Position>
       <DataType>varchar(25)|12s</DataType>
     </column>
-    <column id="343" parent="29" name="numeroAviso">
+    <column id="413" parent="34" name="numeroAviso">
       <Position>5</Position>
       <DataType>varchar(20)|12s</DataType>
     </column>
-    <column id="344" parent="29" name="tempoMedioRetirada">
+    <column id="414" parent="34" name="tempoMedioRetirada">
       <Position>6</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="345" parent="29" name="tempoMedioEntrega">
+    <column id="415" parent="34" name="tempoMedioEntrega">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="346" parent="29" name="openPedidos">
+    <column id="416" parent="34" name="openPedidos">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="347" parent="29" name="openChatBot">
+    <column id="417" parent="34" name="openChatBot">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="348" parent="29" name="reservas">
+    <column id="418" parent="34" name="reservas">
       <Position>10</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="349" parent="29" name="reservasComPedidosFechados">
+    <column id="419" parent="34" name="reservasComPedidosFechados">
       <Position>11</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="350" parent="29" name="abrirFecharPedidosAutomatico">
+    <column id="420" parent="34" name="abrirFecharPedidosAutomatico">
       <Position>12</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="351" parent="29" name="agendamentoDePedidos">
+    <column id="421" parent="34" name="agendamentoDePedidos">
       <Position>13</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="352" parent="29" name="horaAberturaPedidos">
+    <column id="422" parent="34" name="horaAberturaPedidos">
       <Position>14</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
     </column>
-    <column id="353" parent="29" name="horaAutomaticaAbrirPedidos">
+    <column id="423" parent="34" name="horaAutomaticaAbrirPedidos">
       <Position>15</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="354" parent="29" name="horaAutomaticaFecharPedidos">
+    <column id="424" parent="34" name="horaAutomaticaFecharPedidos">
       <Position>16</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="355" parent="29" name="horaInicioReservas">
+    <column id="425" parent="34" name="horaInicioReservas">
       <Position>17</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="356" parent="29" name="taxaEntregaFixa">
+    <column id="426" parent="34" name="taxaEntregaFixa">
       <Position>18</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="357" parent="29" name="taxaEntregaKm">
+    <column id="427" parent="34" name="taxaEntregaKm">
       <Position>19</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="358" parent="29" name="valorSelo">
+    <column id="428" parent="34" name="valorSelo">
       <Position>20</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="359" parent="29" name="maximoSeloPorCompra">
+    <column id="429" parent="34" name="maximoSeloPorCompra">
       <Position>21</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="360" parent="29" name="validadeSeloFidelidade">
+    <column id="430" parent="34" name="validadeSeloFidelidade">
       <Position>22</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="361" parent="29" name="webHookNovaReserva">
+    <column id="431" parent="34" name="webHookNovaReserva">
       <Position>23</Position>
       <DataType>varchar(200)|12s</DataType>
     </column>
-    <column id="362" parent="29" name="webHookNovoPedido">
+    <column id="432" parent="34" name="webHookNovoPedido">
       <Position>24</Position>
       <DataType>varchar(200)|12s</DataType>
     </column>
-    <column id="363" parent="29" name="dataCriacao">
+    <column id="433" parent="34" name="dataCriacao">
       <Position>25</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
     </column>
-    <column id="364" parent="29" name="ativo">
+    <column id="434" parent="34" name="ativo">
       <Position>26</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="365" parent="30" name="uuid">
+    <column id="435" parent="35" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="366" parent="30" name="nomeEstabelecimento">
+    <column id="436" parent="35" name="nomeEstabelecimento">
       <Position>2</Position>
       <DataType>varchar(50)|12s</DataType>
     </column>
-    <column id="367" parent="30" name="logo">
+    <column id="437" parent="35" name="logo">
       <Position>3</Position>
       <DataType>text(max)|12s</DataType>
     </column>
-    <column id="368" parent="30" name="nomeBot">
+    <column id="438" parent="35" name="nomeBot">
       <Position>4</Position>
       <DataType>varchar(25)|12s</DataType>
     </column>
-    <column id="369" parent="30" name="numeroAviso">
+    <column id="439" parent="35" name="numeroAviso">
       <Position>5</Position>
       <DataType>varchar(20)|12s</DataType>
     </column>
-    <column id="370" parent="30" name="tempoMedioRetirada">
+    <column id="440" parent="35" name="tempoMedioRetirada">
       <Position>6</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="371" parent="30" name="tempoMedioEntrega">
+    <column id="441" parent="35" name="tempoMedioEntrega">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="372" parent="30" name="openPedidos">
+    <column id="442" parent="35" name="openPedidos">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="373" parent="30" name="openChatBot">
+    <column id="443" parent="35" name="openChatBot">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="374" parent="30" name="reservas">
+    <column id="444" parent="35" name="reservas">
       <Position>10</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="375" parent="30" name="reservasComPedidosFechados">
+    <column id="445" parent="35" name="reservasComPedidosFechados">
       <Position>11</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="376" parent="30" name="abrirFecharPedidosAutomatico">
+    <column id="446" parent="35" name="abrirFecharPedidosAutomatico">
       <Position>12</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="377" parent="30" name="agendamentoDePedidos">
+    <column id="447" parent="35" name="agendamentoDePedidos">
       <Position>13</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="378" parent="30" name="horaAberturaPedidos">
+    <column id="448" parent="35" name="horaAberturaPedidos">
       <Position>14</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
     </column>
-    <column id="379" parent="30" name="horaAutomaticaAbrirPedidos">
+    <column id="449" parent="35" name="horaAutomaticaAbrirPedidos">
       <Position>15</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="380" parent="30" name="horaAutomaticaFecharPedidos">
+    <column id="450" parent="35" name="horaAutomaticaFecharPedidos">
       <Position>16</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="381" parent="30" name="horaInicioReservas">
+    <column id="451" parent="35" name="horaInicioReservas">
       <Position>17</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="382" parent="30" name="taxaEntregaFixa">
+    <column id="452" parent="35" name="taxaEntregaFixa">
       <Position>18</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="383" parent="30" name="taxaEntregaKm">
+    <column id="453" parent="35" name="taxaEntregaKm">
       <Position>19</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="384" parent="30" name="valorSelo">
+    <column id="454" parent="35" name="valorSelo">
       <Position>20</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="385" parent="30" name="maximoSeloPorCompra">
+    <column id="455" parent="35" name="maximoSeloPorCompra">
       <Position>21</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="386" parent="30" name="validadeSeloFidelidade">
+    <column id="456" parent="35" name="validadeSeloFidelidade">
       <Position>22</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="387" parent="30" name="webHookNovaReserva">
+    <column id="457" parent="35" name="webHookNovaReserva">
       <Position>23</Position>
       <DataType>varchar(200)|12s</DataType>
     </column>
-    <column id="388" parent="30" name="webHookNovoPedido">
+    <column id="458" parent="35" name="webHookNovoPedido">
       <Position>24</Position>
       <DataType>varchar(200)|12s</DataType>
     </column>
-    <column id="389" parent="30" name="dataCriacao">
+    <column id="459" parent="35" name="dataCriacao">
       <Position>25</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
     </column>
-    <column id="390" parent="30" name="ativo">
+    <column id="460" parent="35" name="ativo">
       <Position>26</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="391" parent="31" name="uuid">
+    <column id="461" parent="36" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="392" parent="31" name="nomeEstabelecimento">
+    <column id="462" parent="36" name="nomeEstabelecimento">
       <Position>2</Position>
       <DataType>varchar(50)|12s</DataType>
     </column>
-    <column id="393" parent="31" name="logo">
+    <column id="463" parent="36" name="logo">
       <Position>3</Position>
       <DataType>text(max)|12s</DataType>
     </column>
-    <column id="394" parent="31" name="nomeBot">
+    <column id="464" parent="36" name="nomeBot">
       <Position>4</Position>
       <DataType>varchar(25)|12s</DataType>
     </column>
-    <column id="395" parent="31" name="numeroAviso">
+    <column id="465" parent="36" name="numeroAviso">
       <Position>5</Position>
       <DataType>varchar(20)|12s</DataType>
     </column>
-    <column id="396" parent="31" name="tempoMedioRetirada">
+    <column id="466" parent="36" name="tempoMedioRetirada">
       <Position>6</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="397" parent="31" name="tempoMedioEntrega">
+    <column id="467" parent="36" name="tempoMedioEntrega">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="398" parent="31" name="openPedidos">
+    <column id="468" parent="36" name="openPedidos">
       <Position>8</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="399" parent="31" name="openChatBot">
+    <column id="469" parent="36" name="openChatBot">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="400" parent="31" name="reservas">
+    <column id="470" parent="36" name="reservas">
       <Position>10</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="401" parent="31" name="reservasComPedidosFechados">
+    <column id="471" parent="36" name="reservasComPedidosFechados">
       <Position>11</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="402" parent="31" name="abrirFecharPedidosAutomatico">
+    <column id="472" parent="36" name="abrirFecharPedidosAutomatico">
       <Position>12</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="403" parent="31" name="agendamentoDePedidos">
+    <column id="473" parent="36" name="agendamentoDePedidos">
       <Position>13</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="404" parent="31" name="horaAberturaPedidos">
+    <column id="474" parent="36" name="horaAberturaPedidos">
       <Position>14</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
     </column>
-    <column id="405" parent="31" name="horaAutomaticaAbrirPedidos">
+    <column id="475" parent="36" name="horaAutomaticaAbrirPedidos">
       <Position>15</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="406" parent="31" name="horaAutomaticaFecharPedidos">
+    <column id="476" parent="36" name="horaAutomaticaFecharPedidos">
       <Position>16</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="407" parent="31" name="horaInicioReservas">
+    <column id="477" parent="36" name="horaInicioReservas">
       <Position>17</Position>
       <DataType>time(15,6)|92s</DataType>
     </column>
-    <column id="408" parent="31" name="taxaEntregaFixa">
+    <column id="478" parent="36" name="taxaEntregaFixa">
       <Position>18</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="409" parent="31" name="taxaEntregaKm">
+    <column id="479" parent="36" name="taxaEntregaKm">
       <Position>19</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="410" parent="31" name="valorSelo">
+    <column id="480" parent="36" name="valorSelo">
       <Position>20</Position>
       <DataType>numeric(6,2)|2s</DataType>
     </column>
-    <column id="411" parent="31" name="maximoSeloPorCompra">
+    <column id="481" parent="36" name="maximoSeloPorCompra">
       <Position>21</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="412" parent="31" name="validadeSeloFidelidade">
+    <column id="482" parent="36" name="validadeSeloFidelidade">
       <Position>22</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="413" parent="31" name="webHookNovaReserva">
+    <column id="483" parent="36" name="webHookNovaReserva">
       <Position>23</Position>
       <DataType>varchar(200)|12s</DataType>
     </column>
-    <column id="414" parent="31" name="webHookNovoPedido">
+    <column id="484" parent="36" name="webHookNovoPedido">
       <Position>24</Position>
       <DataType>varchar(200)|12s</DataType>
     </column>
-    <column id="415" parent="31" name="dataCriacao">
+    <column id="485" parent="36" name="dataCriacao">
       <Position>25</Position>
       <DataType>timestamptz(35,6)|93s</DataType>
     </column>
-    <column id="416" parent="31" name="ativo">
+    <column id="486" parent="36" name="ativo">
       <Position>26</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="417" parent="32" name="uuid">
+    <column id="487" parent="37" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="418" parent="32" name="uuid_cliente">
+    <column id="488" parent="37" name="nomeEstabelecimento">
       <Position>2</Position>
-      <DataType>uuid(max)|1111s</DataType>
+      <DataType>varchar(50)|12s</DataType>
     </column>
-    <column id="419" parent="32" name="uuid_estabelecimento">
+    <column id="489" parent="37" name="logo">
       <Position>3</Position>
-      <DataType>uuid(max)|1111s</DataType>
+      <DataType>text(max)|12s</DataType>
     </column>
-    <column id="420" parent="32" name="endereco">
+    <column id="490" parent="37" name="nomeBot">
       <Position>4</Position>
-      <DataType>varchar(200)|12s</DataType>
-    </column>
-    <column id="421" parent="32" name="comentarioPedido">
-      <Position>5</Position>
-      <DataType>varchar(200)|12s</DataType>
-    </column>
-    <column id="422" parent="32" name="entrega">
-      <Position>6</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="423" parent="32" name="cartao">
-      <Position>7</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="424" parent="32" name="impresso">
-      <Position>8</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="425" parent="32" name="valorPago">
-      <Position>9</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="426" parent="32" name="desconto">
-      <Position>10</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="427" parent="32" name="pgCreditos">
-      <Position>11</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="428" parent="32" name="subTotal">
-      <Position>12</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="429" parent="32" name="total">
-      <Position>13</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="430" parent="32" name="horaAgendamento">
-      <Position>14</Position>
-      <DataType>time(15,6)|92s</DataType>
-    </column>
-    <column id="431" parent="32" name="dataPedido">
-      <Position>15</Position>
-      <DataType>timestamptz(35,6)|93s</DataType>
-    </column>
-    <column id="432" parent="32" name="estadoPedido">
-      <Position>16</Position>
-      <DataType>varchar(40)|12s</DataType>
-    </column>
-    <column id="433" parent="33" name="uuid">
-      <Position>1</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="434" parent="33" name="uuid_cliente">
-      <Position>2</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="435" parent="33" name="uuid_estabelecimento">
-      <Position>3</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="436" parent="33" name="endereco">
-      <Position>4</Position>
-      <DataType>varchar(200)|12s</DataType>
-    </column>
-    <column id="437" parent="33" name="comentarioPedido">
-      <Position>5</Position>
-      <DataType>varchar(200)|12s</DataType>
-    </column>
-    <column id="438" parent="33" name="entrega">
-      <Position>6</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="439" parent="33" name="cartao">
-      <Position>7</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="440" parent="33" name="impresso">
-      <Position>8</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="441" parent="33" name="valorPago">
-      <Position>9</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="442" parent="33" name="desconto">
-      <Position>10</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="443" parent="33" name="pgCreditos">
-      <Position>11</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="444" parent="33" name="subTotal">
-      <Position>12</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="445" parent="33" name="total">
-      <Position>13</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="446" parent="33" name="horaAgendamento">
-      <Position>14</Position>
-      <DataType>time(15,6)|92s</DataType>
-    </column>
-    <column id="447" parent="33" name="dataPedido">
-      <Position>15</Position>
-      <DataType>timestamptz(35,6)|93s</DataType>
-    </column>
-    <column id="448" parent="33" name="estadoPedido">
-      <Position>16</Position>
-      <DataType>varchar(40)|12s</DataType>
-    </column>
-    <column id="449" parent="34" name="uuid">
-      <Position>1</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="450" parent="34" name="uuid_cliente">
-      <Position>2</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="451" parent="34" name="uuid_estabelecimento">
-      <Position>3</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="452" parent="34" name="endereco">
-      <Position>4</Position>
-      <DataType>varchar(200)|12s</DataType>
-    </column>
-    <column id="453" parent="34" name="comentarioPedido">
-      <Position>5</Position>
-      <DataType>varchar(200)|12s</DataType>
-    </column>
-    <column id="454" parent="34" name="entrega">
-      <Position>6</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="455" parent="34" name="cartao">
-      <Position>7</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="456" parent="34" name="impresso">
-      <Position>8</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="457" parent="34" name="valorPago">
-      <Position>9</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="458" parent="34" name="desconto">
-      <Position>10</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="459" parent="34" name="pgCreditos">
-      <Position>11</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="460" parent="34" name="subTotal">
-      <Position>12</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="461" parent="34" name="total">
-      <Position>13</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="462" parent="34" name="horaAgendamento">
-      <Position>14</Position>
-      <DataType>time(15,6)|92s</DataType>
-    </column>
-    <column id="463" parent="34" name="dataPedido">
-      <Position>15</Position>
-      <DataType>timestamptz(35,6)|93s</DataType>
-    </column>
-    <column id="464" parent="34" name="estadoPedido">
-      <Position>16</Position>
-      <DataType>varchar(40)|12s</DataType>
-    </column>
-    <column id="465" parent="35" name="uuid">
-      <Position>1</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="466" parent="35" name="uuid_cliente">
-      <Position>2</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="467" parent="35" name="uuid_estabelecimento">
-      <Position>3</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="468" parent="35" name="endereco">
-      <Position>4</Position>
-      <DataType>varchar(200)|12s</DataType>
-    </column>
-    <column id="469" parent="35" name="comentarioPedido">
-      <Position>5</Position>
-      <DataType>varchar(200)|12s</DataType>
-    </column>
-    <column id="470" parent="35" name="entrega">
-      <Position>6</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="471" parent="35" name="cartao">
-      <Position>7</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="472" parent="35" name="impresso">
-      <Position>8</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="473" parent="35" name="valorPago">
-      <Position>9</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="474" parent="35" name="desconto">
-      <Position>10</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="475" parent="35" name="pgCreditos">
-      <Position>11</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="476" parent="35" name="subTotal">
-      <Position>12</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="477" parent="35" name="total">
-      <Position>13</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="478" parent="35" name="horaAgendamento">
-      <Position>14</Position>
-      <DataType>time(15,6)|92s</DataType>
-    </column>
-    <column id="479" parent="35" name="dataPedido">
-      <Position>15</Position>
-      <DataType>timestamptz(35,6)|93s</DataType>
-    </column>
-    <column id="480" parent="35" name="estadoPedido">
-      <Position>16</Position>
-      <DataType>varchar(40)|12s</DataType>
-    </column>
-    <column id="481" parent="36" name="uuid">
-      <Position>1</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="482" parent="36" name="uuid_categoria">
-      <Position>2</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="483" parent="36" name="nome">
-      <Position>3</Position>
       <DataType>varchar(25)|12s</DataType>
     </column>
-    <column id="484" parent="36" name="descricao">
-      <Position>4</Position>
-      <DataType>varchar(80)|12s</DataType>
-    </column>
-    <column id="485" parent="36" name="valor">
+    <column id="491" parent="37" name="numeroAviso">
       <Position>5</Position>
-      <DataType>numeric(6,2)|2s</DataType>
+      <DataType>varchar(20)|12s</DataType>
     </column>
-    <column id="486" parent="36" name="onlyLocal">
+    <column id="492" parent="37" name="tempoMedioRetirada">
       <Position>6</Position>
-      <DataType>bool(1)|-7s</DataType>
+      <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="487" parent="36" name="ativo">
-      <Position>7</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="488" parent="37" name="uuid">
-      <Position>1</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="489" parent="37" name="uuid_categoria">
-      <Position>2</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="490" parent="37" name="nome">
-      <Position>3</Position>
-      <DataType>varchar(25)|12s</DataType>
-    </column>
-    <column id="491" parent="37" name="descricao">
-      <Position>4</Position>
-      <DataType>varchar(80)|12s</DataType>
-    </column>
-    <column id="492" parent="37" name="valor">
-      <Position>5</Position>
-      <DataType>numeric(6,2)|2s</DataType>
-    </column>
-    <column id="493" parent="37" name="onlyLocal">
-      <Position>6</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="494" parent="37" name="ativo">
-      <Position>7</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="495" parent="37" name="visivel">
-      <Position>8</Position>
-      <DataType>bool(1)|-7s</DataType>
-    </column>
-    <column id="496" parent="38" name="uuid">
-      <Position>1</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="497" parent="38" name="uuid_usuario_indicacao">
-      <Position>2</Position>
-      <DataType>uuid(max)|1111s</DataType>
-    </column>
-    <column id="498" parent="38" name="usuario">
-      <Position>3</Position>
-      <DataType>varchar(25)|12s</DataType>
-    </column>
-    <column id="499" parent="38" name="senha">
-      <Position>4</Position>
-      <DataType>varchar(32)|12s</DataType>
-    </column>
-    <column id="500" parent="38" name="dataRegistro">
-      <Position>5</Position>
-      <DataType>date(13)|91s</DataType>
-    </column>
-    <column id="501" parent="38" name="tipoUsuario">
-      <Position>6</Position>
-      <DataType>varchar(80)|12s</DataType>
-    </column>
-    <column id="502" parent="38" name="maxEstabelecimentos">
+    <column id="493" parent="37" name="tempoMedioEntrega">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="503" parent="38" name="dataCriacao">
+    <column id="494" parent="37" name="openPedidos">
       <Position>8</Position>
-      <DataType>timetz(21,6)|92s</DataType>
+      <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="504" parent="38" name="ativo">
+    <column id="495" parent="37" name="openChatBot">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="505" parent="39" name="uuid">
+    <column id="496" parent="37" name="reservas">
+      <Position>10</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="497" parent="37" name="reservasComPedidosFechados">
+      <Position>11</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="498" parent="37" name="abrirFecharPedidosAutomatico">
+      <Position>12</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="499" parent="37" name="agendamentoDePedidos">
+      <Position>13</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="500" parent="37" name="horaAberturaPedidos">
+      <Position>14</Position>
+      <DataType>timestamptz(35,6)|93s</DataType>
+    </column>
+    <column id="501" parent="37" name="horaAutomaticaAbrirPedidos">
+      <Position>15</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="502" parent="37" name="horaAutomaticaFecharPedidos">
+      <Position>16</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="503" parent="37" name="horaInicioReservas">
+      <Position>17</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="504" parent="37" name="taxaEntregaFixa">
+      <Position>18</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="505" parent="37" name="taxaEntregaKm">
+      <Position>19</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="506" parent="37" name="valorSelo">
+      <Position>20</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="507" parent="37" name="maximoSeloPorCompra">
+      <Position>21</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="508" parent="37" name="validadeSeloFidelidade">
+      <Position>22</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="509" parent="37" name="webHookNovaReserva">
+      <Position>23</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="510" parent="37" name="webHookNovoPedido">
+      <Position>24</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="511" parent="37" name="dataCriacao">
+      <Position>25</Position>
+      <DataType>timestamptz(35,6)|93s</DataType>
+    </column>
+    <column id="512" parent="37" name="ativo">
+      <Position>26</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="513" parent="38" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="506" parent="39" name="uuid_usuario_indicacao">
+    <column id="514" parent="38" name="nomeEstabelecimento">
       <Position>2</Position>
-      <DataType>uuid(max)|1111s</DataType>
+      <DataType>varchar(50)|12s</DataType>
     </column>
-    <column id="507" parent="39" name="usuario">
+    <column id="515" parent="38" name="logo">
       <Position>3</Position>
+      <DataType>text(max)|12s</DataType>
+    </column>
+    <column id="516" parent="38" name="nomeBot">
+      <Position>4</Position>
       <DataType>varchar(25)|12s</DataType>
     </column>
-    <column id="508" parent="39" name="senha">
-      <Position>4</Position>
-      <DataType>varchar(32)|12s</DataType>
-    </column>
-    <column id="509" parent="39" name="dataRegistro">
+    <column id="517" parent="38" name="numeroAviso">
       <Position>5</Position>
-      <DataType>date(13)|91s</DataType>
+      <DataType>varchar(20)|12s</DataType>
     </column>
-    <column id="510" parent="39" name="tipoUsuario">
+    <column id="518" parent="38" name="tempoMedioRetirada">
       <Position>6</Position>
-      <DataType>varchar(80)|12s</DataType>
+      <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="511" parent="39" name="maxEstabelecimentos">
+    <column id="519" parent="38" name="tempoMedioEntrega">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="512" parent="39" name="dataCriacao">
+    <column id="520" parent="38" name="openPedidos">
       <Position>8</Position>
-      <DataType>timetz(21,6)|92s</DataType>
+      <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="513" parent="39" name="ativo">
+    <column id="521" parent="38" name="openChatBot">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="514" parent="40" name="uuid">
+    <column id="522" parent="38" name="reservas">
+      <Position>10</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="523" parent="38" name="reservasComPedidosFechados">
+      <Position>11</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="524" parent="38" name="abrirFecharPedidosAutomatico">
+      <Position>12</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="525" parent="38" name="agendamentoDePedidos">
+      <Position>13</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="526" parent="38" name="horaAberturaPedidos">
+      <Position>14</Position>
+      <DataType>timestamptz(35,6)|93s</DataType>
+    </column>
+    <column id="527" parent="38" name="horaAutomaticaAbrirPedidos">
+      <Position>15</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="528" parent="38" name="horaAutomaticaFecharPedidos">
+      <Position>16</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="529" parent="38" name="horaInicioReservas">
+      <Position>17</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="530" parent="38" name="taxaEntregaFixa">
+      <Position>18</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="531" parent="38" name="taxaEntregaKm">
+      <Position>19</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="532" parent="38" name="valorSelo">
+      <Position>20</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="533" parent="38" name="maximoSeloPorCompra">
+      <Position>21</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="534" parent="38" name="validadeSeloFidelidade">
+      <Position>22</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="535" parent="38" name="webHookNovaReserva">
+      <Position>23</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="536" parent="38" name="webHookNovoPedido">
+      <Position>24</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="537" parent="38" name="dataCriacao">
+      <Position>25</Position>
+      <DataType>timestamptz(35,6)|93s</DataType>
+    </column>
+    <column id="538" parent="38" name="ativo">
+      <Position>26</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="539" parent="39" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="515" parent="40" name="uuid_usuario_indicacao">
+    <column id="540" parent="39" name="uuid_categoria">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="516" parent="40" name="usuario">
+    <column id="541" parent="39" name="uuid_produto">
       <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="542" parent="39" name="nomeGrupo">
+      <Position>4</Position>
       <DataType>varchar(25)|12s</DataType>
     </column>
-    <column id="517" parent="40" name="senha">
-      <Position>4</Position>
-      <DataType>varchar(32)|12s</DataType>
-    </column>
-    <column id="518" parent="40" name="dataRegistro">
+    <column id="543" parent="39" name="descricaoGrupo">
       <Position>5</Position>
-      <DataType>date(13)|91s</DataType>
-    </column>
-    <column id="519" parent="40" name="tipoUsuario">
-      <Position>6</Position>
       <DataType>varchar(80)|12s</DataType>
     </column>
-    <column id="520" parent="40" name="maxEstabelecimentos">
+    <column id="544" parent="39" name="qtdMin">
+      <Position>6</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="545" parent="39" name="qtdMax">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="521" parent="40" name="dataCriacao">
+    <column id="546" parent="39" name="formaCobranca">
       <Position>8</Position>
-      <DataType>timetz(21,6)|92s</DataType>
+      <DataType>varchar(150)|12s</DataType>
     </column>
-    <column id="522" parent="40" name="ativo">
+    <column id="547" parent="39" name="ativo">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <column id="523" parent="41" name="uuid">
+    <column id="548" parent="40" name="uuid">
       <Position>1</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="524" parent="41" name="uuid_usuario_indicacao">
+    <column id="549" parent="40" name="uuid_pedido">
       <Position>2</Position>
       <DataType>uuid(max)|1111s</DataType>
     </column>
-    <column id="525" parent="41" name="usuario">
+    <column id="550" parent="40" name="uuid_produto">
+      <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="551" parent="40" name="comentario">
+      <Position>4</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="552" parent="40" name="qtd">
+      <Position>5</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="553" parent="40" name="subTotal">
+      <Position>6</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="554" parent="40" name="removido">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="555" parent="41" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="556" parent="41" name="uuid_cliente">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="557" parent="41" name="uuid_estabelecimento">
+      <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="558" parent="41" name="endereco">
+      <Position>4</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="559" parent="41" name="comentarioPedido">
+      <Position>5</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="560" parent="41" name="entrega">
+      <Position>6</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="561" parent="41" name="cartao">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="562" parent="41" name="impresso">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="563" parent="41" name="valorPago">
+      <Position>9</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="564" parent="41" name="desconto">
+      <Position>10</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="565" parent="41" name="pgCreditos">
+      <Position>11</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="566" parent="41" name="subTotal">
+      <Position>12</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="567" parent="41" name="total">
+      <Position>13</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="568" parent="41" name="horaAgendamento">
+      <Position>14</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="569" parent="41" name="dataPedido">
+      <Position>15</Position>
+      <DataType>timestamptz(35,6)|93s</DataType>
+    </column>
+    <column id="570" parent="41" name="estadoPedido">
+      <Position>16</Position>
+      <DataType>varchar(40)|12s</DataType>
+    </column>
+    <column id="571" parent="42" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="572" parent="42" name="uuid_cliente">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="573" parent="42" name="uuid_estabelecimento">
+      <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="574" parent="42" name="endereco">
+      <Position>4</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="575" parent="42" name="comentarioPedido">
+      <Position>5</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="576" parent="42" name="entrega">
+      <Position>6</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="577" parent="42" name="cartao">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="578" parent="42" name="impresso">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="579" parent="42" name="valorPago">
+      <Position>9</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="580" parent="42" name="desconto">
+      <Position>10</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="581" parent="42" name="pgCreditos">
+      <Position>11</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="582" parent="42" name="subTotal">
+      <Position>12</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="583" parent="42" name="total">
+      <Position>13</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="584" parent="42" name="horaAgendamento">
+      <Position>14</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="585" parent="42" name="dataPedido">
+      <Position>15</Position>
+      <DataType>timestamptz(35,6)|93s</DataType>
+    </column>
+    <column id="586" parent="42" name="estadoPedido">
+      <Position>16</Position>
+      <DataType>varchar(40)|12s</DataType>
+    </column>
+    <column id="587" parent="43" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="588" parent="43" name="uuid_cliente">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="589" parent="43" name="uuid_estabelecimento">
+      <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="590" parent="43" name="endereco">
+      <Position>4</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="591" parent="43" name="comentarioPedido">
+      <Position>5</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="592" parent="43" name="entrega">
+      <Position>6</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="593" parent="43" name="cartao">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="594" parent="43" name="impresso">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="595" parent="43" name="valorPago">
+      <Position>9</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="596" parent="43" name="desconto">
+      <Position>10</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="597" parent="43" name="pgCreditos">
+      <Position>11</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="598" parent="43" name="subTotal">
+      <Position>12</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="599" parent="43" name="total">
+      <Position>13</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="600" parent="43" name="horaAgendamento">
+      <Position>14</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="601" parent="43" name="dataPedido">
+      <Position>15</Position>
+      <DataType>timestamptz(35,6)|93s</DataType>
+    </column>
+    <column id="602" parent="43" name="estadoPedido">
+      <Position>16</Position>
+      <DataType>varchar(40)|12s</DataType>
+    </column>
+    <column id="603" parent="44" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="604" parent="44" name="uuid_cliente">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="605" parent="44" name="uuid_estabelecimento">
+      <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="606" parent="44" name="endereco">
+      <Position>4</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="607" parent="44" name="comentarioPedido">
+      <Position>5</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="608" parent="44" name="entrega">
+      <Position>6</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="609" parent="44" name="cartao">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="610" parent="44" name="impresso">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="611" parent="44" name="valorPago">
+      <Position>9</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="612" parent="44" name="desconto">
+      <Position>10</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="613" parent="44" name="pgCreditos">
+      <Position>11</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="614" parent="44" name="subTotal">
+      <Position>12</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="615" parent="44" name="total">
+      <Position>13</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="616" parent="44" name="horaAgendamento">
+      <Position>14</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="617" parent="44" name="dataPedido">
+      <Position>15</Position>
+      <DataType>timestamptz(35,6)|93s</DataType>
+    </column>
+    <column id="618" parent="44" name="estadoPedido">
+      <Position>16</Position>
+      <DataType>varchar(40)|12s</DataType>
+    </column>
+    <column id="619" parent="45" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="620" parent="45" name="uuid_cliente">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="621" parent="45" name="uuid_estabelecimento">
+      <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="622" parent="45" name="endereco">
+      <Position>4</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="623" parent="45" name="comentarioPedido">
+      <Position>5</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="624" parent="45" name="entrega">
+      <Position>6</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="625" parent="45" name="cartao">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="626" parent="45" name="impresso">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="627" parent="45" name="valorPago">
+      <Position>9</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="628" parent="45" name="desconto">
+      <Position>10</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="629" parent="45" name="pgCreditos">
+      <Position>11</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="630" parent="45" name="subTotal">
+      <Position>12</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="631" parent="45" name="total">
+      <Position>13</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="632" parent="45" name="horaAgendamento">
+      <Position>14</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="633" parent="45" name="dataPedido">
+      <Position>15</Position>
+      <DataType>timestamptz(35,6)|93s</DataType>
+    </column>
+    <column id="634" parent="45" name="estadoPedido">
+      <Position>16</Position>
+      <DataType>varchar(40)|12s</DataType>
+    </column>
+    <column id="635" parent="46" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="636" parent="46" name="uuid_cliente">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="637" parent="46" name="uuid_estabelecimento">
+      <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="638" parent="46" name="endereco">
+      <Position>4</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="639" parent="46" name="comentarioPedido">
+      <Position>5</Position>
+      <DataType>varchar(200)|12s</DataType>
+    </column>
+    <column id="640" parent="46" name="entrega">
+      <Position>6</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="641" parent="46" name="cartao">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="642" parent="46" name="impresso">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="643" parent="46" name="valorPago">
+      <Position>9</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="644" parent="46" name="desconto">
+      <Position>10</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="645" parent="46" name="pgCreditos">
+      <Position>11</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="646" parent="46" name="subTotal">
+      <Position>12</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="647" parent="46" name="total">
+      <Position>13</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="648" parent="46" name="horaAgendamento">
+      <Position>14</Position>
+      <DataType>time(15,6)|92s</DataType>
+    </column>
+    <column id="649" parent="46" name="dataPedido">
+      <Position>15</Position>
+      <DataType>timestamptz(35,6)|93s</DataType>
+    </column>
+    <column id="650" parent="46" name="estadoPedido">
+      <Position>16</Position>
+      <DataType>varchar(40)|12s</DataType>
+    </column>
+    <column id="651" parent="47" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="652" parent="47" name="uuid_categoria">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="653" parent="47" name="nome">
       <Position>3</Position>
       <DataType>varchar(25)|12s</DataType>
     </column>
-    <column id="526" parent="41" name="senha">
+    <column id="654" parent="47" name="descricao">
       <Position>4</Position>
-      <DataType>varchar(32)|12s</DataType>
+      <DataType>varchar(80)|12s</DataType>
     </column>
-    <column id="527" parent="41" name="dataRegistro">
+    <column id="655" parent="47" name="valor">
+      <Position>5</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="656" parent="47" name="onlyLocal">
+      <Position>6</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="657" parent="47" name="ativo">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="658" parent="47" name="visivel">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="659" parent="47" name="foto">
+      <Position>9</Position>
+      <DataType>text(max)|12s</DataType>
+    </column>
+    <column id="660" parent="48" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="661" parent="48" name="uuid_categoria">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="662" parent="48" name="nome">
+      <Position>3</Position>
+      <DataType>varchar(25)|12s</DataType>
+    </column>
+    <column id="663" parent="48" name="descricao">
+      <Position>4</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="664" parent="48" name="valor">
+      <Position>5</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="665" parent="48" name="onlyLocal">
+      <Position>6</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="666" parent="48" name="ativo">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="667" parent="49" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="668" parent="49" name="uuid_categoria">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="669" parent="49" name="nome">
+      <Position>3</Position>
+      <DataType>varchar(25)|12s</DataType>
+    </column>
+    <column id="670" parent="49" name="descricao">
+      <Position>4</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="671" parent="49" name="valor">
+      <Position>5</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="672" parent="49" name="onlyLocal">
+      <Position>6</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="673" parent="49" name="ativo">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="674" parent="49" name="visivel">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="675" parent="50" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="676" parent="50" name="uuid_cliente">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="677" parent="50" name="uuid_estabelecimento">
+      <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="678" parent="50" name="valor">
+      <Position>4</Position>
+      <DataType>numeric(6,2)|2s</DataType>
+    </column>
+    <column id="679" parent="50" name="dataRecarga">
       <Position>5</Position>
       <DataType>date(13)|91s</DataType>
     </column>
-    <column id="528" parent="41" name="tipoUsuario">
+    <column id="680" parent="50" name="tipoRecarga">
+      <Position>6</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="681" parent="50" name="ativo">
+      <Position>7</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="682" parent="51" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="683" parent="51" name="uuid_estabelecimento">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="684" parent="51" name="uuid_cliente">
+      <Position>3</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="685" parent="51" name="dataReserva">
+      <Position>4</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="686" parent="51" name="telefoneContato">
+      <Position>5</Position>
+      <DataType>varchar(50)|12s</DataType>
+    </column>
+    <column id="687" parent="51" name="nomeContato">
+      <Position>6</Position>
+      <DataType>varchar(100)|12s</DataType>
+    </column>
+    <column id="688" parent="51" name="comentario">
+      <Position>7</Position>
+      <DataType>varchar(150)|12s</DataType>
+    </column>
+    <column id="689" parent="51" name="impresso">
+      <Position>8</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="690" parent="52" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="691" parent="52" name="uuid_usuario_indicacao">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="692" parent="52" name="usuario">
+      <Position>3</Position>
+      <DataType>varchar(25)|12s</DataType>
+    </column>
+    <column id="693" parent="52" name="senha">
+      <Position>4</Position>
+      <DataType>varchar(32)|12s</DataType>
+    </column>
+    <column id="694" parent="52" name="dataRegistro">
+      <Position>5</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="695" parent="52" name="tipoUsuario">
       <Position>6</Position>
       <DataType>varchar(80)|12s</DataType>
     </column>
-    <column id="529" parent="41" name="maxEstabelecimentos">
+    <column id="696" parent="52" name="maxEstabelecimentos">
       <Position>7</Position>
       <DataType>int4(10)|4s</DataType>
     </column>
-    <column id="530" parent="41" name="dataCriacao">
+    <column id="697" parent="52" name="dataCriacao">
       <Position>8</Position>
       <DataType>timetz(21,6)|92s</DataType>
     </column>
-    <column id="531" parent="41" name="ativo">
+    <column id="698" parent="52" name="ativo">
       <Position>9</Position>
       <DataType>bool(1)|-7s</DataType>
     </column>
-    <argument id="532" parent="42">
+    <column id="699" parent="53" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="700" parent="53" name="uuid_usuario_indicacao">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="701" parent="53" name="usuario">
+      <Position>3</Position>
+      <DataType>varchar(25)|12s</DataType>
+    </column>
+    <column id="702" parent="53" name="senha">
+      <Position>4</Position>
+      <DataType>varchar(32)|12s</DataType>
+    </column>
+    <column id="703" parent="53" name="dataRegistro">
+      <Position>5</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="704" parent="53" name="tipoUsuario">
+      <Position>6</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="705" parent="53" name="maxEstabelecimentos">
+      <Position>7</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="706" parent="53" name="dataCriacao">
+      <Position>8</Position>
+      <DataType>timetz(21,6)|92s</DataType>
+    </column>
+    <column id="707" parent="53" name="ativo">
+      <Position>9</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="708" parent="54" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="709" parent="54" name="uuid_usuario_indicacao">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="710" parent="54" name="usuario">
+      <Position>3</Position>
+      <DataType>varchar(25)|12s</DataType>
+    </column>
+    <column id="711" parent="54" name="senha">
+      <Position>4</Position>
+      <DataType>varchar(32)|12s</DataType>
+    </column>
+    <column id="712" parent="54" name="dataRegistro">
+      <Position>5</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="713" parent="54" name="tipoUsuario">
+      <Position>6</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="714" parent="54" name="maxEstabelecimentos">
+      <Position>7</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="715" parent="54" name="dataCriacao">
+      <Position>8</Position>
+      <DataType>timetz(21,6)|92s</DataType>
+    </column>
+    <column id="716" parent="54" name="ativo">
+      <Position>9</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="717" parent="55" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="718" parent="55" name="uuid_usuario_indicacao">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="719" parent="55" name="usuario">
+      <Position>3</Position>
+      <DataType>varchar(25)|12s</DataType>
+    </column>
+    <column id="720" parent="55" name="senha">
+      <Position>4</Position>
+      <DataType>varchar(32)|12s</DataType>
+    </column>
+    <column id="721" parent="55" name="dataRegistro">
+      <Position>5</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="722" parent="55" name="tipoUsuario">
+      <Position>6</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="723" parent="55" name="maxEstabelecimentos">
+      <Position>7</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="724" parent="55" name="dataCriacao">
+      <Position>8</Position>
+      <DataType>timetz(21,6)|92s</DataType>
+    </column>
+    <column id="725" parent="55" name="ativo">
+      <Position>9</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="726" parent="56" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="727" parent="56" name="uuid_usuario_indicacao">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="728" parent="56" name="usuario">
+      <Position>3</Position>
+      <DataType>varchar(25)|12s</DataType>
+    </column>
+    <column id="729" parent="56" name="senha">
+      <Position>4</Position>
+      <DataType>varchar(32)|12s</DataType>
+    </column>
+    <column id="730" parent="56" name="dataRegistro">
+      <Position>5</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="731" parent="56" name="tipoUsuario">
+      <Position>6</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="732" parent="56" name="maxEstabelecimentos">
+      <Position>7</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="733" parent="56" name="dataCriacao">
+      <Position>8</Position>
+      <DataType>timetz(21,6)|92s</DataType>
+    </column>
+    <column id="734" parent="56" name="ativo">
+      <Position>9</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <column id="735" parent="57" name="uuid">
+      <Position>1</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="736" parent="57" name="uuid_usuario_indicacao">
+      <Position>2</Position>
+      <DataType>uuid(max)|1111s</DataType>
+    </column>
+    <column id="737" parent="57" name="usuario">
+      <Position>3</Position>
+      <DataType>varchar(25)|12s</DataType>
+    </column>
+    <column id="738" parent="57" name="senha">
+      <Position>4</Position>
+      <DataType>varchar(32)|12s</DataType>
+    </column>
+    <column id="739" parent="57" name="dataRegistro">
+      <Position>5</Position>
+      <DataType>date(13)|91s</DataType>
+    </column>
+    <column id="740" parent="57" name="tipoUsuario">
+      <Position>6</Position>
+      <DataType>varchar(80)|12s</DataType>
+    </column>
+    <column id="741" parent="57" name="maxEstabelecimentos">
+      <Position>7</Position>
+      <DataType>int4(10)|4s</DataType>
+    </column>
+    <column id="742" parent="57" name="dataCriacao">
+      <Position>8</Position>
+      <DataType>timetz(21,6)|92s</DataType>
+    </column>
+    <column id="743" parent="57" name="ativo">
+      <Position>9</Position>
+      <DataType>bool(1)|-7s</DataType>
+    </column>
+    <argument id="744" parent="58">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="533" parent="43">
+    <argument id="745" parent="59">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="534" parent="44">
+    <argument id="746" parent="60">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="535" parent="44" name="namespace">
+    <argument id="747" parent="60" name="namespace">
       <Position>1</Position>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="536" parent="44" name="name">
+    <argument id="748" parent="60" name="name">
       <Position>2</Position>
       <DataType>text|12s</DataType>
     </argument>
-    <argument id="537" parent="45">
+    <argument id="749" parent="61">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="538" parent="46">
+    <argument id="750" parent="62">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="539" parent="46" name="namespace">
+    <argument id="751" parent="62" name="namespace">
       <Position>1</Position>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="540" parent="46" name="name">
+    <argument id="752" parent="62" name="name">
       <Position>2</Position>
       <DataType>text|12s</DataType>
     </argument>
-    <argument id="541" parent="47">
+    <argument id="753" parent="63">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="542" parent="48">
+    <argument id="754" parent="64">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="543" parent="49">
+    <argument id="755" parent="65">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="544" parent="50">
+    <argument id="756" parent="66">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>uuid|1111s</DataType>
     </argument>
-    <argument id="545" parent="51">
+    <argument id="757" parent="67">
       <ArgumentDirection>R</ArgumentDirection>
       <DataType>uuid|1111s</DataType>
     </argument>

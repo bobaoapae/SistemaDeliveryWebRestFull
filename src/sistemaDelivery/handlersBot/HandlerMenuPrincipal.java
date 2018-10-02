@@ -61,10 +61,10 @@ public class HandlerMenuPrincipal extends HandlerBotDelivery {
             codigosMenu.add(new HandlerRealizarReserva(chat));
             builder.textNewLine("*" + (codigosMenu.size()) + "* - Realizar Reserva");
         }
-        /*if (!ControleRodizios.getInstance(Db4oGenerico.getInstance("banco")).isEmpty()) {
+        if (!((ChatBotDelivery) chat).getEstabelecimento().getRodizios().isEmpty()) {
             codigosMenu.add(new HandlerMenuRodizios(chat));
             builder.textNewLine("*" + (codigosMenu.size()) + "* - Ver Rodizios");
-        }*/
+        }
         codigosMenu.add(new HandlerAdeus(chat));
         builder.textNewLine("*" + (codigosMenu.size()) + "* - Cancelar Pedido ❌");
         if (((ChatBotDelivery) chat).getPedidoAtual() != null && ((ChatBotDelivery) chat).getPedidoAtual().getProdutos().size() > 0) {

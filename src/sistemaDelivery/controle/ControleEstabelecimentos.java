@@ -45,6 +45,7 @@ public class ControleEstabelecimentos {
                 estabelecimentos.put(uuid, estabelecimento);
             }
             estabelecimento.setCategorias(ControleCategorias.getInstace().getCategoriasEstabelecimento(estabelecimento));
+            estabelecimento.setRodizios(ControleRodizios.getInstace().getRodiziosEstabelecimento(estabelecimento));
             return estabelecimento;
         } catch (SQLException e) {
             e.printStackTrace();

@@ -7,6 +7,13 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
+import modelo.MessageBuilder;
+import sistemaDelivery.modelo.ChatBotDelivery;
+import sistemaDelivery.modelo.Rodizio;
+
+import java.text.DecimalFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * @author jvbor
@@ -14,23 +21,25 @@ import modelo.Message;
 public class HandlerMenuRodizios extends HandlerBotDelivery {
 
     private int lastCodeRodizio;
+    private List<Rodizio> rodiziosDisponives;
 
     public HandlerMenuRodizios(ChatBot chat) {
         super(chat);
+        this.rodiziosDisponives = ((ChatBotDelivery) chat).getEstabelecimento().getRodizios();
     }
 
     @Override
     protected boolean runFirstTime(Message m) {
-       /* MessageBuilder builder = new MessageBuilder();
+        MessageBuilder builder = new MessageBuilder();
         builder.textNewLine("Sobre qual rodizio você gostaria de obter informações?");
         builder.textNewLine("*_Obs: Envie somente o número da sua escolha_*");
         lastCodeRodizio = 0;
-        for (Rodizio r : ControleRodizios.getInstance(Db4oGenerico.getInstance("banco")).carregarTodos()) {
-            builder.textNewLine(r.getCod() + " - *" + r.getNome() + "* - R$" + new DecimalFormat("###,###,###.00").format(r.getValor()));
-            lastCodeRodizio = r.getCod();
+        for (Rodizio r : rodiziosDisponives) {
+            lastCodeRodizio++;
+            builder.textNewLine(lastCodeRodizio + " - *" + r.getNome() + "* - R$" + new DecimalFormat("###,###,###.00").format(r.getValor()));
         }
         builder.textNewLine(lastCodeRodizio + 1 + " - Voltar ao Menu Principal ↩️");
-        chat.getChat().sendMessage(builder.build());*/
+        chat.getChat().sendMessage(builder.build());
         return true;
     }
 
@@ -41,10 +50,10 @@ public class HandlerMenuRodizios extends HandlerBotDelivery {
             chat.setHandler(new HandlerMenuPrincipal(chat), true);
             return true;
         }
-        /*
+
         try {
             int idRodizioInt = Integer.parseInt(escolha);
-            Rodizio r = ControleRodizios.getInstance(Db4oGenerico.getInstance("banco")).pesquisarPorCodigo(idRodizioInt);
+            Rodizio r = rodiziosDisponives.get(idRodizioInt - 1);
             if (r == null) {
                 return false;
             } else {
@@ -76,7 +85,7 @@ public class HandlerMenuRodizios extends HandlerBotDelivery {
                 builder.textNewLine(r.getDescricao());
                 builder.textNewLine("Tudo isso por apenas, R$" + new DecimalFormat("###,###,###.00").format(r.getValor()));
                 builder.textNewLine("Dias da Semana: " + diasSemana);
-                builder.textNewLine("Horario: " + r.getHoraInicio().format(DateTimeFormatter.ofPattern("HH:mm")));
+                builder.textNewLine("Horario: " + r.getHoraInicio().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
                 builder.textNewLine("");
                 builder.textNewLine("");
                 chat.getChat().sendMessage(builder.build());
@@ -84,10 +93,9 @@ public class HandlerMenuRodizios extends HandlerBotDelivery {
                 return true;
             }
         } catch (Exception ex) {
-
+            ex.printStackTrace();
             return false;
-        }*/
-        return false;
+        }
     }
 
     @Override

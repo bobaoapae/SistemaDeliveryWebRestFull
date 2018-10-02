@@ -55,25 +55,6 @@ public class API {
 
 
     @GET
-    @Path("/adicional")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response adicional(@QueryParam("uuid") String uuid) {
-        if (uuid == null || uuid.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        } else {
-            AdicionalProduto adicional = ControleAdicionais.getInstace().getAdicionalByUUID(UUID.fromString(uuid));
-            if (adicional == null) {
-                return Response.status(Response.Status.NOT_FOUND).build();
-            } else if (adicional.getGrupoAdicional().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
-                return Response.status(Response.Status.OK).entity(builder.toJson(adicional)).build();
-            } else {
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            }
-        }
-    }
-
-
-    @GET
     @Path("/estadoWhats")
     @Produces(MediaType.APPLICATION_JSON)
     public Response estadoWhats() {
@@ -191,7 +172,13 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/alterarVisibilidadeCategoria")
     public Response alterarVisibilidadeCategoria(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         Categoria categoria = ControleCategorias.getInstace().getCategoriaByUUID(UUID.fromString(uuid));
+        if (categoria == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         if (!categoria.getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -207,7 +194,13 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/alterarEntregaGratisCategoria")
     public Response alterarEntregaGratisCategoria(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         Categoria categoria = ControleCategorias.getInstace().getCategoriaByUUID(UUID.fromString(uuid));
+        if (categoria == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         if (!categoria.getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -223,7 +216,13 @@ public class API {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/excluirCategoria")
     public Response excluirCategoria(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         Categoria categoria = ControleCategorias.getInstace().getCategoriaByUUID(UUID.fromString(uuid));
+        if (categoria == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         if (!categoria.getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -309,7 +308,13 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/alterarVisibilidadeProduto")
     public Response alterarVisibilidadeProduto(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         Produto produto = ControleProdutos.getInstace().getProdutoByUUID(UUID.fromString(uuid));
+        if (produto == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         if (!produto.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -325,11 +330,69 @@ public class API {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/excluirProduto")
     public Response excluirProduto(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         Produto produto = ControleProdutos.getInstace().getProdutoByUUID(UUID.fromString(uuid));
+        if (produto == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         if (!produto.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         if (ControleProdutos.getInstace().excluirProduto(produto)) {
+            return Response.status(Response.Status.CREATED).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/rodizios")
+    public Response getRodizios(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.OK).entity(builder.toJson(token.getEstabelecimento().getRodizios())).build();
+        } else {
+            Rodizio rodizio = ControleRodizios.getInstace().getRodizioByUUID(UUID.fromString(uuid));
+            if (rodizio == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if (!rodizio.getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            return Response.status(Response.Status.OK).entity(builder.toJson(rodizio)).build();
+        }
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/salvarRodizio")
+    public Response salvarRodizio(@FormParam("rodizio") String rod) {
+        Rodizio rodizio = builder.fromJson(rod, Rodizio.class);
+        rodizio.setEstabelecimento(token.getEstabelecimento());
+        if (ControleRodizios.getInstace().salvarRodizio(rodizio)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleRodizios.getInstace().getRodizioByUUID(rodizio.getUuid()))).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/excluirRodizio")
+    public Response excluirRodizio(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Rodizio rodizio = ControleRodizios.getInstace().getRodizioByUUID(UUID.fromString(uuid));
+        if (rodizio == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (!rodizio.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (ControleRodizios.getInstace().excluirRodizio(rodizio)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -362,10 +425,34 @@ public class API {
     }
 
     @GET
+    @Path("/grupoAdicionais")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getGrupoAdicionais(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } else {
+            GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstace().getGrupoByUUID(UUID.fromString(uuid));
+            if (grupoAdicional == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            } else if (grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.OK).entity(builder.toJson(grupoAdicional)).build();
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        }
+    }
+
+    @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/excluirGrupoAdicional")
     public Response excluirGrupoAdicional(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
         GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstace().getGrupoByUUID(UUID.fromString(uuid));
+        if (grupoAdicional == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         if (grupoAdicional.getCategoria() != null) {
             if (!grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
@@ -388,7 +475,12 @@ public class API {
     @Path("/salvarAdicional")
     public Response salvarAdicional(@FormParam("adicional") String adicional) {
         AdicionalProduto adicionalProduto = builder.fromJson(adicional, AdicionalProduto.class);
-        GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstace().getGrupoByUUID(adicionalProduto.getUuid_grupo_adicional());
+        GrupoAdicional grupoAdicional = null;
+        if (adicionalProduto.getUuid() != null) {
+            grupoAdicional = ControleAdicionais.getInstace().getAdicionalByUUID(adicionalProduto.getUuid()).getGrupoAdicional();
+        } else {
+            ControleGruposAdicionais.getInstace().getGrupoByUUID(adicionalProduto.getUuid_grupo_adicional());
+        }
         if (grupoAdicional.getCategoria() != null) {
             if (!grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
@@ -399,6 +491,52 @@ public class API {
         adicionalProduto.setGrupoAdicional(grupoAdicional);
         if (ControleAdicionais.getInstace().salvarAdicional(adicionalProduto)) {
             return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleAdicionais.getInstace().getAdicionalByUUID(adicionalProduto.getUuid()))).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Path("/adicional")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response adicional(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } else {
+            AdicionalProduto adicional = ControleAdicionais.getInstace().getAdicionalByUUID(UUID.fromString(uuid));
+            if (adicional == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            } else if (adicional.getGrupoAdicional().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.OK).entity(builder.toJson(adicional)).build();
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        }
+    }
+
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/excluirAdicional")
+    public Response excluirAdicional(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        AdicionalProduto adicionalProduto = ControleAdicionais.getInstace().getAdicionalByUUID(UUID.fromString(uuid));
+        if (adicionalProduto == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        GrupoAdicional grupoAdicional = adicionalProduto.getGrupoAdicional();
+        if (grupoAdicional.getCategoria() != null) {
+            if (!grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        } else if (grupoAdicional.getProduto() != null) {
+            if (!grupoAdicional.getProduto().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        }
+        if (ControleAdicionais.getInstace().excluirAdicional(adicionalProduto)) {
+            return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }

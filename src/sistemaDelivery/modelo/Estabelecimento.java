@@ -20,7 +20,17 @@ public class Estabelecimento {
     private double taxaEntregaFixa, taxaEntregaKm, valorSelo;
     @Ignore
     private List<Categoria> categorias;
+    @Ignore
+    private List<Rodizio> rodizios;
     private int maximoSeloPorCompra, validadeSeloFidelidade;
+
+    public List<Rodizio> getRodizios() {
+        return rodizios;
+    }
+
+    public void setRodizios(List<Rodizio> rodizios) {
+        this.rodizios = Collections.synchronizedList(rodizios);
+    }
 
     public boolean isAtivo() {
         return ativo;
