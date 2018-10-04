@@ -223,8 +223,8 @@ public class ControlePedidos {
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!=? and \"estadoPedido\"!=? order by \"dataPedido\" asc");
         ) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
-            preparedStatement.setObject(2, EstadoPedido.Cancelado);
-            preparedStatement.setObject(3, EstadoPedido.Concluido);
+            preparedStatement.setString(2, EstadoPedido.Cancelado.toString());
+            preparedStatement.setString(3, EstadoPedido.Concluido.toString());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));

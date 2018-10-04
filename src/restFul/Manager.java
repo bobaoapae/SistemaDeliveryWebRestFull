@@ -32,10 +32,10 @@ public class Manager {
 
     public Manager() {
         builder = new GsonBuilder().disableHtmlEscaping().
-                registerTypeAdapter(LocalTime.class, new LocalTimeAdapter()).
-                registerTypeAdapter(LocalTime.class, new LocalTimeAdapterDeserialize()).
-                registerTypeAdapter(LocalDate.class, new LocalDateAdapter()).
-                registerTypeAdapter(LocalDate.class, new LocalDateAdapterDeserialize()).
+                registerTypeAdapter(LocalTime.class, new DateAdapterSerialize()).
+                registerTypeAdapter(LocalTime.class, new DateAdapterDeserialize()).
+                registerTypeAdapter(LocalDate.class, new TimestampAdapterSerialize()).
+                registerTypeAdapter(LocalDate.class, new TimestampAdapterDeserialize()).
                 registerTypeAdapter(Time.class, new TimeAdapter()).
                 registerTypeAdapter(Time.class, new TimeAdapterDeserialize()).
                 setDateFormat("dd/MM/yyyy HH:mm:ss").

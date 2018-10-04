@@ -23,6 +23,7 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public class Utilitarios {
                         metodoSet.invoke(x, new Object[]{null});
                         continue;
                     }
-                    if (listaField1.getType().isPrimitive() || listaField1.getType().isEnum() || listaField1.getType().isArray() || listaField1.getType().equals(String.class) || listaField1.getType().equals(Date.class) || listaField1.getType().equals(Time.class)) {
+                    if (listaField1.getType().isPrimitive() || listaField1.getType().isEnum() || listaField1.getType().isArray() || listaField1.getType().equals(String.class) || listaField1.getType().equals(Date.class) || listaField1.getType().equals(Time.class) || listaField1.getType().equals(java.sql.Date.class) || listaField1.getType().equals(Timestamp.class)) {
                         metodoSet.invoke(x, metodoGet.invoke(y));
                     } else {
                         if (metodoGet.invoke(x) == null) {

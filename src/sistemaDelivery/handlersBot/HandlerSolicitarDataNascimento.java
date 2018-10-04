@@ -9,8 +9,10 @@ import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.modelo.ChatBotDelivery;
 
-import java.text.ParseException;
+import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 
 /**
@@ -36,12 +38,10 @@ public class HandlerSolicitarDataNascimento extends HandlerBotDelivery {
     protected boolean runSecondTime(Message m) {
         String dataS = m.getContent().trim().replaceAll(" ", "");
         try {
-            Calendar data = Calendar.getInstance();
-            data.setTime(formatador.parse(dataS));
-            ((ChatBotDelivery) chat).getCliente().setDataAniversario(data.getTime());
+            ((ChatBotDelivery) chat).getCliente().setDataAniversario(Date.valueOf(LocalDate.parse(dataS, DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
             chat.setHandler(new HandlerFinalizarCadastro(chat), true);
             return true;
-        } catch (ParseException ex) {
+        } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }

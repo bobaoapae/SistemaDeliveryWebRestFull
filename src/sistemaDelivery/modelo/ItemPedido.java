@@ -179,6 +179,14 @@ public class ItemPedido implements Comparable<ItemPedido> {
         return false;
     }
 
+    public void setSubTotal(double subTotal) {
+        this.subTotal = subTotal;
+    }
+
+    public void setValorPago(double valorPago) {
+        this.valorPago = valorPago;
+    }
+
     @Override
     public int compareTo(ItemPedido t) {
         Integer otherCategory = t.getProduto().sequenceNr();

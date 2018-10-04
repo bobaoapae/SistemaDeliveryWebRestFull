@@ -81,7 +81,7 @@ public class ControleClientes {
                     preparedStatement.setString(4, cliente.getTelefoneMovel());
                     preparedStatement.setString(5, cliente.getTelefoneFixo());
                     if (cliente.getDataAniversario() != null) {
-                        preparedStatement.setDate(6, new java.sql.Date(cliente.getDataAniversario().getTime()));
+                        preparedStatement.setDate(6, cliente.getDataAniversario());
                     } else {
                         preparedStatement.setDate(6, null);
                     }
@@ -113,7 +113,7 @@ public class ControleClientes {
                     preparedStatement.setString(3, cliente.getTelefoneMovel());
                     preparedStatement.setString(4, cliente.getTelefoneFixo());
                     if (cliente.getDataAniversario() != null) {
-                        preparedStatement.setDate(5, new java.sql.Date(cliente.getDataAniversario().getTime()));
+                        preparedStatement.setDate(5, cliente.getDataAniversario());
                     } else {
                         preparedStatement.setDate(5, null);
                     }

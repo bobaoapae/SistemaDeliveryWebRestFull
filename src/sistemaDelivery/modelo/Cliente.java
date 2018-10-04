@@ -9,7 +9,11 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 import sistemaDelivery.controle.ControlePedidos;
 import sistemaDelivery.controle.ControleRecargas;
 
-import java.util.*;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 /**
  * @author jvbor
@@ -19,9 +23,9 @@ public class Cliente {
     @Ignore
     private UUID uuid;
     private String nome, chatId, telefoneMovel, telefoneFixo;
-    private Date dataAniversario;
-    private Date dataCadastro;
-    private Date dataUltimaCompra;
+    private java.sql.Date dataAniversario;
+    private java.sql.Date dataCadastro;
+    private Timestamp dataUltimaCompra;
     private boolean cadastroRealizado;
     private Endereco endereco;
 
@@ -31,7 +35,7 @@ public class Cliente {
     }
 
     public Cliente() {
-        this.dataCadastro = Calendar.getInstance().getTime();
+        this.dataCadastro = new java.sql.Date(new Date().getTime());
     }
 
     public Endereco getEndereco() {
@@ -106,11 +110,11 @@ public class Cliente {
         this.cadastroRealizado = cadastroRealizado;
     }
 
-    public Date getDataAniversario() {
+    public java.sql.Date getDataAniversario() {
         return dataAniversario;
     }
 
-    public void setDataAniversario(Date dataAniversario) {
+    public void setDataAniversario(java.sql.Date dataAniversario) {
         this.dataAniversario = dataAniversario;
     }
 
@@ -137,19 +141,19 @@ public class Cliente {
     }
 
 
-    public Date getDataCadastro() {
+    public java.sql.Date getDataCadastro() {
         return dataCadastro;
     }
 
-    public void setDataCadastro(Date dataCadastro) {
+    public void setDataCadastro(java.sql.Date dataCadastro) {
         this.dataCadastro = dataCadastro;
     }
 
-    public Date getDataUltimaCompra() {
+    public Timestamp getDataUltimaCompra() {
         return dataUltimaCompra;
     }
 
-    public void setDataUltimaCompra(Date dataUltimaCompra) {
+    public void setDataUltimaCompra(Timestamp dataUltimaCompra) {
         this.dataUltimaCompra = dataUltimaCompra;
     }
 

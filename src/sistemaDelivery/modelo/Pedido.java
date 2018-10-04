@@ -9,6 +9,8 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Time;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -23,7 +25,7 @@ public class Pedido {
     private double troco, desconto, pgCreditos, subTotal, taxaEntrega, total, valorPago, totalRemovido;
     private int numeroMesa;
     private String comentarioPedido;
-    private Date dataPedido;
+    private Timestamp dataPedido;
     private EstadoPedido estadoPedido;
     private String celular, fixo;
     private Time horaAgendamento;
@@ -31,14 +33,14 @@ public class Pedido {
     @Ignore
     private List<ItemPedido> produtos;
     @Ignore
-    private transient Cliente cliente;
+    private Cliente cliente;
     @Ignore
     private transient Estabelecimento estabelecimento;
     private Endereco endereco;
 
     public Pedido(Cliente cliente, Estabelecimento estabelecimento) {
         produtos = Collections.synchronizedList(new ArrayList<>());
-        dataPedido = new Date();
+        dataPedido = Timestamp.valueOf(LocalDateTime.now());
         estadoPedido = EstadoPedido.Novo;
         celular = "";
         fixo = "";
@@ -123,20 +125,22 @@ public class Pedido {
 
     public void setEntrega(boolean entrega) {
         if (entrega) {
-            if (this.getEstabelecimento().getTaxaEntregaFixa() != 0 || this.getEstabelecimento().getTaxaEntregaKm() != 0) {
-                boolean cobrarTaxa = true;
-                for (ItemPedido itemPedido : this.getProdutos()) {
-                    if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
-                        cobrarTaxa = false;
-                        break;
+            if (this.getEstabelecimento() != null) {
+                if (this.getEstabelecimento().getTaxaEntregaFixa() != 0 || this.getEstabelecimento().getTaxaEntregaKm() != 0) {
+                    boolean cobrarTaxa = true;
+                    for (ItemPedido itemPedido : this.getProdutos()) {
+                        if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
+                            cobrarTaxa = false;
+                            break;
+                        }
+                    }
+                    if (cobrarTaxa) {
+                        this.taxaEntrega = this.getEstabelecimento().getTaxaEntregaFixa();
                     }
                 }
-                if (cobrarTaxa) {
-                    this.taxaEntrega = this.getEstabelecimento().getTaxaEntregaFixa();
-                }
+            } else {
+                this.taxaEntrega = 0;
             }
-        } else {
-            this.taxaEntrega = 0;
         }
         this.entrega = entrega;
     }
@@ -200,11 +204,11 @@ public class Pedido {
         this.comentarioPedido = comentarioPedido;
     }
 
-    public Date getDataPedido() {
+    public Timestamp getDataPedido() {
         return dataPedido;
     }
 
-    public void setDataPedido(Date dataPedido) {
+    public void setDataPedido(Timestamp dataPedido) {
         this.dataPedido = dataPedido;
     }
 
@@ -352,6 +356,22 @@ public class Pedido {
             }
             return lista;
         }
+    }
+
+    public void setSubTotal(double subTotal) {
+        this.subTotal = subTotal;
+    }
+
+    public void setTaxaEntrega(double taxaEntrega) {
+        this.taxaEntrega = taxaEntrega;
+    }
+
+    public void setTotal(double total) {
+        this.total = total;
+    }
+
+    public void setTotalRemovido(double totalRemovido) {
+        this.totalRemovido = totalRemovido;
     }
 
     @Override

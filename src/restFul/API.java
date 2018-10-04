@@ -20,9 +20,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,13 +36,12 @@ public class API {
     public API(@Context SecurityContext securityContext) {
         this.token = (Token) securityContext.getUserPrincipal();
         builder = new GsonBuilder().disableHtmlEscaping().
-                registerTypeAdapter(LocalTime.class, new LocalTimeAdapter()).
-                registerTypeAdapter(LocalTime.class, new LocalTimeAdapterDeserialize()).
-                registerTypeAdapter(LocalDate.class, new LocalDateAdapter()).
-                registerTypeAdapter(LocalDate.class, new LocalDateAdapterDeserialize()).
+                registerTypeAdapter(Date.class, new DateAdapterSerialize()).
+                registerTypeAdapter(Date.class, new DateAdapterDeserialize()).
+                registerTypeAdapter(Timestamp.class, new TimestampAdapterSerialize()).
+                registerTypeAdapter(Timestamp.class, new TimestampAdapterDeserialize()).
                 registerTypeAdapter(Time.class, new TimeAdapter()).
                 registerTypeAdapter(Time.class, new TimeAdapterDeserialize()).
-                setDateFormat("dd/MM/yyyy").
                 create();
     }
 
@@ -647,6 +646,108 @@ public class API {
         token.getEstabelecimento().setOpenChatBot(!token.getEstabelecimento().isOpenChatBot());
         if (ControleEstabelecimentos.getInstace().salvarEstabelecimento(token.getEstabelecimento())) {
             return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento())).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Path("/pedidosAtivos")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPedidosAtivos() {
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstace().getPedidosAtivos(token.getEstabelecimento()))).build();
+    }
+
+    @GET
+    @Path("/pedidosImprimir")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getpedidosImprimir() {
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstace().getPedidosNaoImpressos(token.getEstabelecimento()))).build();
+    }
+
+    @GET
+    @Path("/pedidoImpresso")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response pedidoImpresso(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Pedido pedido = ControlePedidos.getInstace().getPedidoByUUID(UUID.fromString(uuid));
+        if (pedido == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (!pedido.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        pedido.setImpresso(true);
+        if (ControlePedidos.getInstace().salvarPedido(pedido)) {
+            return Response.status(Response.Status.CREATED).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Path("/pedidoSaiuEntrega")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response pedidoSaiuEntrega(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Pedido pedido = ControlePedidos.getInstace().getPedidoByUUID(UUID.fromString(uuid));
+        if (pedido == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (!pedido.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        pedido.setEstadoPedido(EstadoPedido.SaiuEntrega);
+        if (ControlePedidos.getInstace().salvarPedido(pedido)) {
+            return Response.status(Response.Status.CREATED).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Path("/pedidoConcluido")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response pedidoConcluido(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Pedido pedido = ControlePedidos.getInstace().getPedidoByUUID(UUID.fromString(uuid));
+        if (pedido == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (!pedido.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        pedido.setEstadoPedido(EstadoPedido.Concluido);
+        if (ControlePedidos.getInstace().salvarPedido(pedido)) {
+            return Response.status(Response.Status.CREATED).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Path("/pedidoCancelado")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response pedidoCancelado(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Pedido pedido = ControlePedidos.getInstace().getPedidoByUUID(UUID.fromString(uuid));
+        if (pedido == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (!pedido.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        pedido.setEstadoPedido(EstadoPedido.Cancelado);
+        if (ControlePedidos.getInstace().salvarPedido(pedido)) {
+            return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
