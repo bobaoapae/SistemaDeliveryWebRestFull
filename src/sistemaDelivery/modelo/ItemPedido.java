@@ -5,6 +5,8 @@
  */
 package sistemaDelivery.modelo;
 
+import jdk.nashorn.internal.ir.annotations.Ignore;
+
 import java.util.*;
 
 /**
@@ -12,18 +14,31 @@ import java.util.*;
  */
 public class ItemPedido implements Comparable<ItemPedido> {
 
+    @Ignore
     private UUID uuid, uuid_pedido, uuid_produto;
+    @Ignore
     private Produto produto;
-    private int qtd;
+    private int qtd, qtdPago;
     private String comentario;
+    @Ignore
     private List<AdicionalProduto> adicionais;
     private boolean removido;
-    private double subTotal;
+    private double subTotal, valorPago;
+    @Ignore
+    private transient Pedido pedido;
 
     public ItemPedido() {
         adicionais = new ArrayList<>();
         comentario = "";
         qtd = 1;
+    }
+
+    public Pedido getPedido() {
+        return pedido;
+    }
+
+    public void setPedido(Pedido pedido) {
+        this.pedido = pedido;
     }
 
     public boolean isRemovido() {
@@ -61,11 +76,11 @@ public class ItemPedido implements Comparable<ItemPedido> {
         this.comentario = comentario;
     }
 
-    public double calcularValor() {
+    public void calcularValor() {
         if (produto == null) {
-            return 0;
+            return;
         }
-        double retorno = produto.getValor() * qtd;
+        double subTotal = produto.getValor() * qtd;
         HashMap<GrupoAdicional, List<AdicionalProduto>> adicionalListHashMap = new HashMap<>();
         for (AdicionalProduto adicionalProduto : adicionais) {
             if (!adicionalListHashMap.containsKey(adicionalProduto.getGrupoAdicional())) {
@@ -75,7 +90,7 @@ public class ItemPedido implements Comparable<ItemPedido> {
         for (Map.Entry<GrupoAdicional, List<AdicionalProduto>> entry : adicionalListHashMap.entrySet()) {
             if (entry.getKey().getFormaCobranca() == GrupoAdicional.FormaCobranca.SOMA) {
                 for (AdicionalProduto adicionalProduto : entry.getValue()) {
-                    retorno += adicionalProduto.getValor() * qtd;
+                    subTotal += adicionalProduto.getValor() * qtd;
                 }
             } else if (entry.getKey().getFormaCobranca() == GrupoAdicional.FormaCobranca.MEDIA) {
                 double temp = 0;
@@ -83,19 +98,27 @@ public class ItemPedido implements Comparable<ItemPedido> {
                     temp += adicionalProduto.getValor() * qtd;
                 }
                 temp /= entry.getValue().size();
-                retorno += temp;
+                subTotal += temp;
             } else if (entry.getKey().getFormaCobranca() == GrupoAdicional.FormaCobranca.MAIOR_VALOR) {
                 double maior = 0;
                 for (AdicionalProduto adicionalProduto : entry.getValue()) {
-                    if (maior < adicionalProduto.getValor()) {
+                    if (adicionalProduto.getValor() > maior) {
                         maior = adicionalProduto.getValor();
                     }
                 }
-                retorno += maior;
+                subTotal += maior;
             }
         }
-        subTotal = retorno;
-        return retorno;
+        this.valorPago = (subTotal * qtdPago);
+        this.subTotal = subTotal;
+    }
+
+    public int getQtdPago() {
+        return qtdPago;
+    }
+
+    public void setQtdPago(int qtdPago) {
+        this.qtdPago = qtdPago;
     }
 
     public UUID getUuid() {
@@ -126,8 +149,8 @@ public class ItemPedido implements Comparable<ItemPedido> {
         return subTotal;
     }
 
-    public void setSubTotal(double subTotal) {
-        this.subTotal = subTotal;
+    public double getValorPago() {
+        return valorPago;
     }
 
     public List<AdicionalProduto> getAdicionais() {

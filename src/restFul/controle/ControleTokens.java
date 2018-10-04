@@ -10,15 +10,17 @@ import sistemaDelivery.controle.ControleEstabelecimentos;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ControleTokens {
 
     private static ControleTokens instace;
-    private HashMap<String, Token> tokens;
+    private Map<String, Token> tokens;
 
     private ControleTokens() {
-        this.tokens = new HashMap<>();
+        this.tokens = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleTokens getInstace() {
@@ -32,21 +34,23 @@ public class ControleTokens {
         if (tokens.containsKey(token)) {
             return tokens.get(token);
         }
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            ResultSetHandler<Token> h = new BeanHandler<Token>(Token.class);
-            Token u = queryRunner.query("select * from \"Tokens\" where token = ?", h, token);
-            if (u == null) {
-                return null;
+        synchronized (tokens) {
+            try {
+                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+                ResultSetHandler<Token> h = new BeanHandler<Token>(Token.class);
+                Token u = queryRunner.query("select * from \"Tokens\" where token = ?", h, token);
+                if (u == null) {
+                    return null;
+                }
+                tokens.put(token, u);
+                u.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(u.getUuid_estabelecimento()));
+                u.setUsuario(ControleUsuarios.getInstace().getUsuarioByUUID(u.getUuid_usuario()));
+                return u;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            tokens.put(token, u);
-            u.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(u.getUuid_estabelecimento()));
-            u.setUsuario(ControleUsuarios.getInstace().getUsuarioByUUID(u.getUuid_usuario()));
-            return u;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public boolean saveToken(Token token) {
@@ -57,7 +61,7 @@ public class ControleTokens {
                 preparedStatement.setObject(2, token.getEstabelecimento().getUuid());
                 preparedStatement.setObject(3, token.getUsuario().getUuid());
                 preparedStatement.setDate(4, new java.sql.Date(token.getValidade().getTime()));
-                int i = preparedStatement.executeUpdate();
+                preparedStatement.executeUpdate();
                 connection.commit();
                 return true;
             } catch (SQLException ex) {

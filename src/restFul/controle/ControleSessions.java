@@ -24,6 +24,12 @@ public class ControleSessions {
         return instance;
     }
 
+    public boolean checkSessionAtiva(Estabelecimento e) {
+        synchronized (sessions) {
+            return sessions.containsKey(e);
+        }
+    }
+
     public SistemaDelivery getSessionForEstabelecimento(Estabelecimento estabelecimento) throws IOException {
         synchronized (sessions) {
             if (!sessions.containsKey(estabelecimento)) {

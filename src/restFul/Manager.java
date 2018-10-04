@@ -127,7 +127,7 @@ public class Manager {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
     @Path("/excluirEstabelecimento")
     public Response excluirEstabelecimento(@QueryParam("login") String login, @QueryParam("senha") String senha, @QueryParam("uuid") String uuid) {
         Usuario usuario = ControleUsuarios.getInstace().getUsuario(login, senha);
@@ -136,10 +136,11 @@ public class Manager {
             if (!usuario.getEstabelecimentos().contains(estabelecimento1)) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
-            estabelecimento1.setAtivo(false);
-            if (ControleEstabelecimentos.getInstace().salvarEstabelecimento(estabelecimento1)) {
-                usuario.getEstabelecimentos().remove(estabelecimento1);
-                return Response.status(Response.Status.CREATED).entity(builder.toJson(estabelecimento1)).build();
+            if (ControleEstabelecimentos.getInstace().excluirEstabelecimento(estabelecimento1)) {
+                synchronized (usuario.getEstabelecimentos()) {
+                    usuario.getEstabelecimentos().remove(estabelecimento1);
+                }
+                return Response.status(Response.Status.OK).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }

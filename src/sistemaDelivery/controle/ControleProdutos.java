@@ -34,24 +34,24 @@ public class ControleProdutos {
         if (produtos.containsKey(uuid)) {
             return produtos.get(uuid);
         }
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            ResultSetHandler<Produto> h = new BeanHandler<Produto>(Produto.class);
-            Produto produto = queryRunner.query("select * from \"Produtos\" where uuid = ?", h, uuid);
-            if (produto == null) {
-                return null;
-            }
-            synchronized (produtos) {
+        synchronized (produtos) {
+            try {
+                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+                ResultSetHandler<Produto> h = new BeanHandler<Produto>(Produto.class);
+                Produto produto = queryRunner.query("select * from \"Produtos\" where uuid = ?", h, uuid);
+                if (produto == null) {
+                    return null;
+                }
                 produtos.put(uuid, produto);
+                produto.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(produto.getUuid_categoria()));
+                produto.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstace().getRestricaoProduto(produto));
+                produto.setGruposAdicionais(ControleGruposAdicionais.getInstace().getGruposProduto(produto));
+                return produto;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            produto.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(produto.getUuid_categoria()));
-            produto.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstace().getRestricaoProduto(produto));
-            produto.setGruposAdicionais(ControleGruposAdicionais.getInstace().getGruposProduto(produto));
-            return produto;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public boolean salvarProduto(Produto prod) {

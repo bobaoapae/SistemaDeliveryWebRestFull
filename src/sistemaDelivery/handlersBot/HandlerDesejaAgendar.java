@@ -22,6 +22,10 @@ public class HandlerDesejaAgendar extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
+        if (!getChatBotDelivery().getEstabelecimento().isAgendamentoDePedidos()) {
+            chat.setHandler(new HandlerConcluirPedido(chat), true);
+            return true;
+        }
         if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
             if (getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomaticamente()) {
                 chat.getChat().sendMessage("Não iniciamos o atendimento ainda, nosso horário de atentimento é das " + getChatBotDelivery().getEstabelecimento().getHoraAutomaticaAbrirPedidos().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " às " + getChatBotDelivery().getEstabelecimento().getHoraAutomaticaFecharPedidos().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você pode agendar o horario do seu pedido.", 1000);

@@ -36,33 +36,33 @@ public class ControleRestricaoVisibilidade {
         if (restricoes.containsKey(uuid)) {
             return restricoes.get(uuid);
         }
-        try (Connection connection = Conexao.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("select * from \"Restricoes_Visibilidade\" where uuid = ?")) {
-            preparedStatement.setObject(1, uuid);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            ResultSetHandler<RestricaoVisibilidade> h = new BeanHandler<RestricaoVisibilidade>(RestricaoVisibilidade.class);
-            RestricaoVisibilidade restricao = h.handle(resultSet);
-            if (restricao == null) {
-                return null;
-            }
-            boolean diasSemana[] = new boolean[7];
-            diasSemana[0] = resultSet.getBoolean("domingo");
-            diasSemana[1] = resultSet.getBoolean("segunda");
-            diasSemana[2] = resultSet.getBoolean("terca");
-            diasSemana[3] = resultSet.getBoolean("quarta");
-            diasSemana[4] = resultSet.getBoolean("quinta");
-            diasSemana[5] = resultSet.getBoolean("sexta");
-            diasSemana[6] = resultSet.getBoolean("sabado");
-            restricao.setDiasSemana(diasSemana);
-            synchronized (restricoes) {
+        synchronized (restricoes) {
+            try (Connection connection = Conexao.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("select * from \"Restricoes_Visibilidade\" where uuid = ?")) {
+                preparedStatement.setObject(1, uuid);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                ResultSetHandler<RestricaoVisibilidade> h = new BeanHandler<RestricaoVisibilidade>(RestricaoVisibilidade.class);
+                RestricaoVisibilidade restricao = h.handle(resultSet);
+                if (restricao == null) {
+                    return null;
+                }
+                boolean diasSemana[] = new boolean[7];
+                diasSemana[0] = resultSet.getBoolean("domingo");
+                diasSemana[1] = resultSet.getBoolean("segunda");
+                diasSemana[2] = resultSet.getBoolean("terca");
+                diasSemana[3] = resultSet.getBoolean("quarta");
+                diasSemana[4] = resultSet.getBoolean("quinta");
+                diasSemana[5] = resultSet.getBoolean("sexta");
+                diasSemana[6] = resultSet.getBoolean("sabado");
+                restricao.setDiasSemana(diasSemana);
                 restricoes.put(uuid, restricao);
+                restricao.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(restricao.getUuid_categoria()));
+                restricao.setProduto(ControleProdutos.getInstace().getProdutoByUUID(restricao.getUuid_produto()));
+                return restricao;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            restricao.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(restricao.getUuid_categoria()));
-            restricao.setProduto(ControleProdutos.getInstace().getProdutoByUUID(restricao.getUuid_produto()));
-            return restricao;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public boolean salvarRestricao(Connection connection, RestricaoVisibilidade restricaoVisibilidade) {

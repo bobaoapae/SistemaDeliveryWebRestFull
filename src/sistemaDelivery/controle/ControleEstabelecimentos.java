@@ -4,6 +4,7 @@ import DAO.Conexao;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
+import restFul.controle.ControleSessions;
 import restFul.modelo.Usuario;
 import sistemaDelivery.modelo.Estabelecimento;
 import utils.Utilitarios;
@@ -34,23 +35,23 @@ public class ControleEstabelecimentos {
         if (estabelecimentos.containsKey(uuid)) {
             return estabelecimentos.get(uuid);
         }
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            ResultSetHandler<Estabelecimento> h = new BeanHandler<Estabelecimento>(Estabelecimento.class);
-            Estabelecimento estabelecimento = queryRunner.query("select * from \"Estabelecimentos\" where uuid = ?", h, uuid);
-            if (estabelecimento == null) {
-                return null;
-            }
-            synchronized (estabelecimentos) {
+        synchronized (estabelecimentos) {
+            try {
+                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+                ResultSetHandler<Estabelecimento> h = new BeanHandler<Estabelecimento>(Estabelecimento.class);
+                Estabelecimento estabelecimento = queryRunner.query("select * from \"Estabelecimentos\" where uuid = ?", h, uuid);
+                if (estabelecimento == null) {
+                    return null;
+                }
                 estabelecimentos.put(uuid, estabelecimento);
+                estabelecimento.setCategorias(ControleCategorias.getInstace().getCategoriasEstabelecimento(estabelecimento));
+                estabelecimento.setRodizios(ControleRodizios.getInstace().getRodiziosEstabelecimento(estabelecimento));
+                return estabelecimento;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            estabelecimento.setCategorias(ControleCategorias.getInstace().getCategoriasEstabelecimento(estabelecimento));
-            estabelecimento.setRodizios(ControleRodizios.getInstace().getRodiziosEstabelecimento(estabelecimento));
-            return estabelecimento;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public boolean criarEstabelecimento(Usuario usuario, Estabelecimento estabelecimento) {
@@ -138,7 +139,7 @@ public class ControleEstabelecimentos {
                         "       \"abrirFecharPedidosAutomatico\"=?, \"agendamentoDePedidos\"=?, \"horaAberturaPedidos\"=?, \n" +
                         "       \"horaAutomaticaAbrirPedidos\"=?, \"horaAutomaticaFecharPedidos\"=?, \n" +
                         "       \"horaInicioReservas\"=?, \"taxaEntregaFixa\"=?, \"taxaEntregaKm\"=?, \n" +
-                        "       \"webHookNovaReserva\"=? , \"webHookNovoPedido\"=?, logo=?,  \"valorSelo\"=?, \"maximoSeloPorCompra\"=?, \"validadeSeloFidelidade\"=?\n, ativo = ?" +
+                        "       \"webHookNovaReserva\"=? , \"webHookNovoPedido\"=?, logo=?,  \"valorSelo\"=?, \"maximoSeloPorCompra\"=?, \"validadeSeloFidelidade\"=?\n" +
                         " WHERE uuid=?;")) {
                     preparedStatement.setString(1, estabelecimento.getNomeEstabelecimento());
                     preparedStatement.setString(2, estabelecimento.getNomeBot());
@@ -172,8 +173,7 @@ public class ControleEstabelecimentos {
                     preparedStatement.setDouble(21, estabelecimento.getValorSelo());
                     preparedStatement.setInt(22, estabelecimento.getMaximoSeloPorCompra());
                     preparedStatement.setInt(23, estabelecimento.getValidadeSeloFidelidade());
-                    preparedStatement.setBoolean(24, estabelecimento.isAtivo());
-                    preparedStatement.setObject(25, estabelecimento.getUuid());
+                    preparedStatement.setObject(24, estabelecimento.getUuid());
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
                     connection.commit();
@@ -189,6 +189,33 @@ public class ControleEstabelecimentos {
                 }
             } else {
                 return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean excluirEstabelecimento(Estabelecimento estabelecimento) {
+        try (Connection connection = Conexao.getConnection()) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Estabelecimentos\" set ativo = ? where uuid = ?")) {
+                preparedStatement.setBoolean(1, false);
+                preparedStatement.setObject(2, estabelecimento.getUuid());
+                preparedStatement.executeUpdate();
+                connection.commit();
+                if (ControleSessions.getInstance().checkSessionAtiva(estabelecimento)) {
+                    ControleSessions.getInstance().finalizarSessionForEstabelecimento(estabelecimento);
+                }
+                synchronized (estabelecimentos) {
+                    estabelecimentos.remove(estabelecimento.getUuid());
+                }
+                return true;
+            } catch (SQLException ex) {
+                connection.rollback();
+                throw ex;
+            } finally {
+                connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
             e.printStackTrace();

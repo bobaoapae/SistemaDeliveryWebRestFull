@@ -34,32 +34,32 @@ public class ControleCategorias {
         if (categorias.containsKey(uuid)) {
             return categorias.get(uuid);
         }
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            ResultSetHandler<Categoria> h = new BeanHandler<Categoria>(Categoria.class);
-            Categoria cat = queryRunner.query("select * from \"Categorias\" where uuid = ?", h, uuid);
-            if (cat == null) {
-                return null;
-            }
-            synchronized (categorias) {
+        synchronized (categorias) {
+            try {
+                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+                ResultSetHandler<Categoria> h = new BeanHandler<Categoria>(Categoria.class);
+                Categoria cat = queryRunner.query("select * from \"Categorias\" where uuid = ?", h, uuid);
+                if (cat == null) {
+                    return null;
+                }
                 categorias.put(uuid, cat);
+                cat.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(cat.getUuid_estabelecimento()));
+                cat.setProdutos(ControleProdutos.getInstace().getProdutosCategoria(cat));
+                if (cat.isPrecisaPedirOutraCategoria()) {
+                    cat.setCategoriasNecessarias(getCategoriasNecessariasEntrega(cat));
+                }
+                cat.setCategoriasFilhas(getCategoriasFilhas(cat));
+                cat.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstace().getRestricaoCategoria(cat));
+                cat.setGruposAdicionais(ControleGruposAdicionais.getInstace().getGruposCategoria(cat));
+                if (cat.getUuid_categoria_pai() != null) {
+                    cat.setCategoriaPai(this.getCategoriaByUUID(cat.getUuid_categoria_pai()));
+                }
+                return cat;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            cat.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(cat.getUuid_estabelecimento()));
-            cat.setProdutos(ControleProdutos.getInstace().getProdutosCategoria(cat));
-            if (cat.isPrecisaPedirOutraCategoria()) {
-                cat.setCategoriasNecessarias(getCategoriasNecessariasEntrega(cat));
-            }
-            cat.setCategoriasFilhas(getCategoriasFilhas(cat));
-            cat.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstace().getRestricaoCategoria(cat));
-            cat.setGruposAdicionais(ControleGruposAdicionais.getInstace().getGruposCategoria(cat));
-            if (cat.getUuid_categoria_pai() != null) {
-                cat.setCategoriaPai(this.getCategoriaByUUID(cat.getUuid_categoria_pai()));
-            }
-            return cat;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public boolean salvarCategoria(Categoria cat) {

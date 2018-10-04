@@ -31,34 +31,37 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
         this.nextHandler = nextHandler;
         nextHandler.reset();
         this.adicionaisEscolhidos = new ArrayList<>();
+        this.adicionaisDisponiveis = new ArrayList<>();
     }
 
     @Override
     protected boolean runFirstTime(Message m) {
-        if (!grupoAtual.getAdicionais().isEmpty()) {
-            chat.getChat().sendMessage("Qual " + grupoAtual.getNomeGrupo() + " você quer?");
-            if (grupoAtual.getQtdMax() > 1) {
-                chat.getChat().sendMessage("*_Obs¹: Você pode escolher no máximo " + grupoAtual.getQtdMax() + ". Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*");
-            } else if (grupoAtual.getQtdMax() == 1) {
-                chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha._*");
-            } else {
-                chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*");
-            }
-            if (grupoAtual.getQtdMin() == 0) {
-                chat.getChat().sendMessage("*_Obs²: Caso não deseje nada, basta enviar NÃO._*");
-            }
-            String adicionais = "";
-            for (AdicionalProduto ad : grupoAtual.getAdicionais()) {
-                adicionaisDisponiveis.add(ad);
-                if (ad.getValor() > 0) {
-                    adicionais += "*" + adicionaisDisponiveis.size() + "* - " + ad.getNome() + " - R$ " + moneyFormat.format(ad.getValor()) + "\n";
+        synchronized (grupoAtual.getAdicionais()) {
+            if (!grupoAtual.getAdicionais().isEmpty()) {
+                chat.getChat().sendMessage("Quais " + grupoAtual.getNomeGrupo() + " você quer?");
+                if (grupoAtual.getQtdMax() > 1) {
+                    chat.getChat().sendMessage("*_Obs¹: Você pode escolher no máximo " + grupoAtual.getQtdMax() + ". Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*");
+                } else if (grupoAtual.getQtdMax() == 1) {
+                    chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha._*");
                 } else {
-                    adicionais += "*" + adicionaisDisponiveis.size() + "* - " + ad.getNome() + "\n";
+                    chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*");
                 }
+                if (grupoAtual.getQtdMin() == 0) {
+                    chat.getChat().sendMessage("*_Obs²: Caso não deseje nada, basta enviar NÃO._*");
+                }
+                String adicionais = "";
+                for (AdicionalProduto ad : grupoAtual.getAdicionais()) {
+                    adicionaisDisponiveis.add(ad);
+                    if (ad.getValor() > 0) {
+                        adicionais += "*" + adicionaisDisponiveis.size() + "* - " + ad.getNome() + " - R$ " + moneyFormat.format(ad.getValor()) + "\n";
+                    } else {
+                        adicionais += "*" + adicionaisDisponiveis.size() + "* - " + ad.getNome() + "\n";
+                    }
+                }
+                chat.getChat().sendMessage(adicionais);
+            } else {
+                chat.setHandler(nextHandler, true);
             }
-            chat.getChat().sendMessage(adicionais);
-        } else {
-            chat.setHandler(nextHandler, true);
         }
         return true;
     }
@@ -119,6 +122,9 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
         } else {
             int escolha = Integer.parseInt(msg.getContent().trim());
             if (escolha == 1) {
+                for (AdicionalProduto adicionalProduto : adicionaisEscolhidos) {
+                    getChatBotDelivery().getLastPedido().addAdicional(adicionalProduto);
+                }
                 chat.setHandler(nextHandler, true);
             } else {
                 confirmandoAdicionais = false;

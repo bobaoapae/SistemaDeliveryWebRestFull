@@ -34,23 +34,23 @@ public class ControleRecargas {
         if (recargas.containsKey(uuid)) {
             return recargas.get(uuid);
         }
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            ResultSetHandler<RecargaCliente> h = new BeanHandler<RecargaCliente>(RecargaCliente.class);
-            RecargaCliente recargaCliente = queryRunner.query("select * from \"Recargas_Clientes\" where uuid = ?", h, uuid);
-            if (recargaCliente == null) {
-                return null;
-            }
-            synchronized (recargas) {
+        synchronized (recargas) {
+            try {
+                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+                ResultSetHandler<RecargaCliente> h = new BeanHandler<RecargaCliente>(RecargaCliente.class);
+                RecargaCliente recargaCliente = queryRunner.query("select * from \"Recargas_Clientes\" where uuid = ?", h, uuid);
+                if (recargaCliente == null) {
+                    return null;
+                }
                 recargas.put(uuid, recargaCliente);
+                recargaCliente.setCliente(ControleClientes.getInstace().getClienteByUUID(recargaCliente.getUuid_cliente()));
+                recargaCliente.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(recargaCliente.getUuid_estabelecimento()));
+                return recargaCliente;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            recargaCliente.setCliente(ControleClientes.getInstace().getClienteByUUID(recargaCliente.getUuid_cliente()));
-            recargaCliente.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(recargaCliente.getUuid_estabelecimento()));
-            return recargaCliente;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public boolean salvarRecarga(RecargaCliente recargaCliente) {

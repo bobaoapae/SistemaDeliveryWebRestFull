@@ -54,7 +54,7 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
             if (c.getProdutos().isEmpty() && c.getCategoriasFilhas().isEmpty()) {
                 continue;
             }
-            if (!c.isAtivo()) {
+            if (!c.isVisivel()) {
                 continue;
             }
             if (c.getRestricaoVisibilidade() != null) {
@@ -72,8 +72,10 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
             categoriasDisponiveis += c.getNomeCategoria() + ", ";
         }
         categoriasDisponiveis = categoriasDisponiveis.trim().substring(0, categoriasDisponiveis.lastIndexOf(","));
-        String catWithOu = categoriasDisponiveis.substring(0, categoriasDisponiveis.lastIndexOf(",")) + " ou" + categoriasDisponiveis.substring(categoriasDisponiveis.lastIndexOf(",") + 1);
-        chat.getChat().sendMessage("*_Obs²: Não use esse campo para pedir " + catWithOu + " aguarde as próximas opções para isso_*");
+        if (categoriasDisponiveis.contains(", ")) {
+            categoriasDisponiveis = categoriasDisponiveis.substring(0, categoriasDisponiveis.lastIndexOf(",")) + " ou" + categoriasDisponiveis.substring(categoriasDisponiveis.lastIndexOf(",") + 1);
+        }
+        chat.getChat().sendMessage("*_Obs²: Não use esse campo para pedir " + categoriasDisponiveis + " aguarde as próximas opções para isso_*");
         return true;
     }
 

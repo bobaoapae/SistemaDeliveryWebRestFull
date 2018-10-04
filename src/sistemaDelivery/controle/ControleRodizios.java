@@ -33,32 +33,32 @@ public class ControleRodizios {
         if (rodizios.containsKey(uuid)) {
             return rodizios.get(uuid);
         }
-        try (Connection connection = Conexao.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("select * from \"Rodizios\" where uuid = ?")) {
-            preparedStatement.setObject(1, uuid);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            ResultSetHandler<Rodizio> h = new BeanHandler<Rodizio>(Rodizio.class);
-            Rodizio rodizio = h.handle(resultSet);
-            if (rodizio == null) {
-                return null;
-            }
-            boolean diasSemana[] = new boolean[7];
-            diasSemana[0] = resultSet.getBoolean("domingo");
-            diasSemana[1] = resultSet.getBoolean("segunda");
-            diasSemana[2] = resultSet.getBoolean("terca");
-            diasSemana[3] = resultSet.getBoolean("quarta");
-            diasSemana[4] = resultSet.getBoolean("quinta");
-            diasSemana[5] = resultSet.getBoolean("sexta");
-            diasSemana[6] = resultSet.getBoolean("sabado");
-            rodizio.setDiasSemana(diasSemana);
-            synchronized (rodizios) {
+        synchronized (rodizios) {
+            try (Connection connection = Conexao.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("select * from \"Rodizios\" where uuid = ?")) {
+                preparedStatement.setObject(1, uuid);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                ResultSetHandler<Rodizio> h = new BeanHandler<Rodizio>(Rodizio.class);
+                Rodizio rodizio = h.handle(resultSet);
+                if (rodizio == null) {
+                    return null;
+                }
+                boolean diasSemana[] = new boolean[7];
+                diasSemana[0] = resultSet.getBoolean("domingo");
+                diasSemana[1] = resultSet.getBoolean("segunda");
+                diasSemana[2] = resultSet.getBoolean("terca");
+                diasSemana[3] = resultSet.getBoolean("quarta");
+                diasSemana[4] = resultSet.getBoolean("quinta");
+                diasSemana[5] = resultSet.getBoolean("sexta");
+                diasSemana[6] = resultSet.getBoolean("sabado");
+                rodizio.setDiasSemana(diasSemana);
                 rodizios.put(uuid, rodizio);
+                rodizio.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(rodizio.getUuid_estabelecimento()));
+                return rodizio;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            rodizio.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(rodizio.getUuid_estabelecimento()));
-            return rodizio;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public boolean salvarRodizio(Rodizio rodizio) {

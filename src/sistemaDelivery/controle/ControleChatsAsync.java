@@ -10,17 +10,14 @@ import modelo.UserChat;
 import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Estabelecimento;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author jvbor
  */
 public class ControleChatsAsync {
 
-    private static HashMap<Estabelecimento, ControleChatsAsync> instaces;
+    private static Map<Estabelecimento, ControleChatsAsync> instaces = Collections.synchronizedMap(new HashMap<>());
     private final List<ChatBotDelivery> chats;
     private Estabelecimento estabelecimento;
 
@@ -31,15 +28,13 @@ public class ControleChatsAsync {
 
 
     public static ControleChatsAsync getInstance(Estabelecimento e) {
-        if (instaces == null) {
-            instaces = new HashMap<>();
-            instaces.put(e, new ControleChatsAsync(e));
-            return instaces.get(e);
-        } else if (instaces.containsKey(e)) {
-            return instaces.get(e);
-        } else {
-            instaces.put(e, new ControleChatsAsync(e));
-            return instaces.get(e);
+        synchronized (instaces) {
+            if (instaces.containsKey(e)) {
+                return instaces.get(e);
+            } else {
+                instaces.put(e, new ControleChatsAsync(e));
+                return instaces.get(e);
+            }
         }
     }
 
@@ -64,12 +59,14 @@ public class ControleChatsAsync {
     }
 
     public ChatBotDelivery getChatAsyncByChat(Chat chat) {
-        for (ChatBotDelivery chatt : chats) {
-            if (chatt.getChat().equals(chat)) {
-                return chatt;
+        synchronized (chats) {
+            for (ChatBotDelivery chatt : chats) {
+                if (chatt.getChat().equals(chat)) {
+                    return chatt;
+                }
             }
+            return null;
         }
-        return null;
     }
 
     public ChatBotDelivery getChatAsyncByChat(String chatid) {

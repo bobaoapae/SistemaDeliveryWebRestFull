@@ -41,7 +41,7 @@ public class HandlerComecarNovoPedido extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message msg) {
         if (msg.getContent().trim().equals("1") || msg.getContent().toLowerCase().trim().equals("sim") || msg.getContent().toLowerCase().trim().equals("s")) {
-            ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(getChatBotDelivery().getEstabelecimento()));
+            ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(((ChatBotDelivery) chat).getCliente(), getChatBotDelivery().getEstabelecimento()));
             if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
                 if (!getChatBotDelivery().getEstabelecimento().isAgendamentoDePedidos()) {
                     if (!getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomaticamente()) {

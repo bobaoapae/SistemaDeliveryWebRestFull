@@ -6,7 +6,6 @@
 package sistemaDelivery.modelo;
 
 import jdk.nashorn.internal.ir.annotations.Ignore;
-import modelo.ChatBot;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Time;
@@ -17,36 +16,58 @@ import java.util.*;
  */
 public class Pedido {
 
+    @Ignore
     private UUID uuid, uuid_estabelecimento, uuid_cliente;
     private String nomeCliente;
-    private boolean entrega, cartao, impresso, incluirNoRelatorio;
-    private double troco, desconto, pgCreditos, subTotal, taxaEntrega, total;
+    private boolean entrega, cartao, impresso;
+    private double troco, desconto, pgCreditos, subTotal, taxaEntrega, total, valorPago, totalRemovido;
     private int numeroMesa;
-    private String chatId, comentarioPedido;
+    private String comentarioPedido;
     private Date dataPedido;
     private EstadoPedido estadoPedido;
     private String celular, fixo;
     private Time horaAgendamento;
+    private long cod;
+    @Ignore
     private List<ItemPedido> produtos;
     @Ignore
-    private Cliente cliente;
+    private transient Cliente cliente;
     @Ignore
-    private Estabelecimento estabelecimento;
+    private transient Estabelecimento estabelecimento;
     private Endereco endereco;
 
-    public Pedido(Estabelecimento estabelecimento) {
+    public Pedido(Cliente cliente, Estabelecimento estabelecimento) {
         produtos = Collections.synchronizedList(new ArrayList<>());
-        incluirNoRelatorio = true;
         dataPedido = new Date();
         estadoPedido = EstadoPedido.Novo;
         celular = "";
         fixo = "";
         comentarioPedido = "";
         this.estabelecimento = estabelecimento;
+        this.cliente = cliente;
     }
 
-    public void setChat(ChatBot bot) {
-        this.chatId = bot.getChat().getId();
+    public Pedido() {
+    }
+
+    public long getCod() {
+        return cod;
+    }
+
+    public void setCod(long cod) {
+        this.cod = cod;
+    }
+
+    public double getValorPago() {
+        return valorPago;
+    }
+
+    public void setValorPago(double valorPago) {
+        this.valorPago = valorPago;
+    }
+
+    public double getTotalRemovido() {
+        return totalRemovido;
     }
 
     public UUID getUuid() {
@@ -75,10 +96,6 @@ public class Pedido {
 
     public double getTaxaEntrega() {
         return taxaEntrega;
-    }
-
-    public void setTaxaEntrega(double taxaEntrega) {
-        this.taxaEntrega = taxaEntrega;
     }
 
     public Endereco getEndereco() {
@@ -110,7 +127,7 @@ public class Pedido {
                 boolean cobrarTaxa = true;
                 for (ItemPedido itemPedido : this.getProdutos()) {
                     if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
-                        cobrarTaxa = true;
+                        cobrarTaxa = false;
                         break;
                     }
                 }
@@ -140,14 +157,6 @@ public class Pedido {
         this.impresso = impresso;
     }
 
-    public boolean isIncluirNoRelatorio() {
-        return incluirNoRelatorio;
-    }
-
-    public void setIncluirNoRelatorio(boolean incluirNoRelatorio) {
-        this.incluirNoRelatorio = incluirNoRelatorio;
-    }
-
     public double getTroco() {
         return troco;
     }
@@ -168,16 +177,8 @@ public class Pedido {
         return subTotal;
     }
 
-    public void setSubTotal(double subTotal) {
-        this.subTotal = subTotal;
-    }
-
     public double getTotal() {
         return total;
-    }
-
-    public void setTotal(double total) {
-        this.total = total;
     }
 
     public int getNumeroMesa() {
@@ -186,17 +187,6 @@ public class Pedido {
 
     public void setNumeroMesa(int numeroMesa) {
         this.numeroMesa = numeroMesa;
-    }
-
-    public String getChatId() {
-        if (chatId == null) {
-            return "";
-        }
-        return chatId;
-    }
-
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
     }
 
     public String getComentarioPedido() {
@@ -274,16 +264,23 @@ public class Pedido {
 
     public void calcularValor() {
         double subTotal = 0;
+        double totalRemovido = 0;
+        double valorPago = 0;
         synchronized (getProdutos()) {
             for (ItemPedido p : getProdutos()) {
+                p.calcularValor();
                 if (p.isRemovido()) {
-                    continue;
+                    totalRemovido += p.getSubTotal();
+                } else {
+                    subTotal += p.getSubTotal();
+                    valorPago += p.getValorPago();
                 }
-                subTotal += p.getSubTotal();
             }
         }
+        this.totalRemovido = totalRemovido;
         this.subTotal = subTotal;
-        this.total = subTotal + taxaEntrega - desconto - pgCreditos;
+        this.valorPago = valorPago;
+        this.total = subTotal + taxaEntrega - desconto - pgCreditos - totalRemovido;
     }
 
     public void addItemPedido(ItemPedido item) {
@@ -368,10 +365,6 @@ public class Pedido {
     @Override
     public int hashCode() {
         return Objects.hash(uuid);
-    }
-
-    public enum EstadoPedido {
-        Concluido, Cancelado, SaiuEntrega, EmProducao, Novo, AguardandoRetirada
     }
 
 }

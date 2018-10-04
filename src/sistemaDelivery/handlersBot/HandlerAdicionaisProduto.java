@@ -41,9 +41,11 @@ public class HandlerAdicionaisProduto extends HandlerBotDelivery {
                     continue;
                 }
                 gruposJaForam.add(grupo);
-                if (grupo.getAdicionais().size() <= grupo.getQtdMin()) {
-                    ((ChatBotDelivery) chat).getLastPedido().getAdicionais().addAll(grupo.getAdicionais());
-                    continue;
+                synchronized (grupo.getAdicionais()) {
+                    if (grupo.getAdicionais().size() <= grupo.getQtdMin()) {
+                        ((ChatBotDelivery) chat).getLastPedido().getAdicionais().addAll(grupo.getAdicionais());
+                        continue;
+                    }
                 }
                 chat.setHandler(new HandlerEscolhaAdicionalDoGrupo(grupo, this, chat), true);
                 return true;

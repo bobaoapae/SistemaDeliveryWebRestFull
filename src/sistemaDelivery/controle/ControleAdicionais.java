@@ -35,22 +35,22 @@ public class ControleAdicionais {
         if (adicionais.containsKey(uuid)) {
             return adicionais.get(uuid);
         }
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            ResultSetHandler<AdicionalProduto> h = new BeanHandler<AdicionalProduto>(AdicionalProduto.class);
-            AdicionalProduto adicional = queryRunner.query("select * from \"Adicionais\" where uuid = ?", h, uuid);
-            if (adicional == null) {
-                return null;
-            }
-            synchronized (adicionais) {
+        synchronized (adicionais) {
+            try {
+                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+                ResultSetHandler<AdicionalProduto> h = new BeanHandler<AdicionalProduto>(AdicionalProduto.class);
+                AdicionalProduto adicional = queryRunner.query("select * from \"Adicionais\" where uuid = ?", h, uuid);
+                if (adicional == null) {
+                    return null;
+                }
                 adicionais.put(uuid, adicional);
+                adicional.setGrupoAdicional(ControleGruposAdicionais.getInstace().getGrupoByUUID(adicional.getUuid_grupo_adicional()));
+                return adicional;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            adicional.setGrupoAdicional(ControleGruposAdicionais.getInstace().getGrupoByUUID(adicional.getUuid_grupo_adicional()));
-            return adicional;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public boolean salvarAdicional(AdicionalProduto adicionalProduto) {
@@ -66,7 +66,9 @@ public class ControleAdicionais {
                     preparedStatement.setDouble(5, adicionalProduto.getValor());
                     preparedStatement.executeUpdate();
                     connection.commit();
-                    adicionalProduto.getGrupoAdicional().getAdicionais().add(getAdicionalByUUID(adicionalProduto.getUuid()));
+                    synchronized (adicionalProduto.getGrupoAdicional().getAdicionais()) {
+                        adicionalProduto.getGrupoAdicional().getAdicionais().add(getAdicionalByUUID(adicionalProduto.getUuid()));
+                    }
                     return true;
                 } catch (SQLException ex) {
                     connection.rollback();

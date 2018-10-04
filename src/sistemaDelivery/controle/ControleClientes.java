@@ -5,7 +5,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import sistemaDelivery.modelo.Cliente;
-import sistemaDelivery.modelo.Endereco;
+import utils.ClienteHandlerRowProcessor;
 import utils.Utilitarios;
 
 import java.sql.Connection;
@@ -34,23 +34,23 @@ public class ControleClientes {
         if (clientes.containsKey(uuid)) {
             return clientes.get(uuid);
         }
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            ResultSetHandler<Cliente> h = new BeanHandler<Cliente>(Cliente.class);
-            ResultSetHandler<Endereco> h1 = new BeanHandler<Endereco>(Endereco.class);
-            Cliente cliente = queryRunner.query("select * from \"Clientes\" where uuid = ?", h, uuid);
-            if (cliente == null) {
-                return null;
-            }
-            cliente.setEndereco(queryRunner.query("select * from \"Clientes\" where uuid = ?", h1, uuid));
-            synchronized (clientes) {
+        synchronized (clientes) {
+            try {
+                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+                ResultSetHandler<Cliente> h = new BeanHandler<Cliente>(Cliente.class, new ClienteHandlerRowProcessor());
+                //ResultSetHandler<Endereco> h1 = new BeanHandler<Endereco>(Endereco.class);
+                Cliente cliente = queryRunner.query("select * from \"Clientes\" where uuid = ?", h, uuid);
+                if (cliente == null) {
+                    return null;
+                }
+                //cliente.setEndereco(queryRunner.query("select * from \"Clientes\" where uuid = ?", h1, uuid));
                 clientes.put(uuid, cliente);
+                return cliente;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            return cliente;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public Cliente getClienteChatId(String chatid) {
@@ -80,11 +80,22 @@ public class ControleClientes {
                     preparedStatement.setString(3, cliente.getNome());
                     preparedStatement.setString(4, cliente.getTelefoneMovel());
                     preparedStatement.setString(5, cliente.getTelefoneFixo());
-                    preparedStatement.setDate(6, new java.sql.Date(cliente.getDataAniversario().getTime()));
-                    preparedStatement.setString(7, cliente.getEndereco().getLogradouro());
-                    preparedStatement.setString(8, cliente.getEndereco().getBairro());
-                    preparedStatement.setString(9, cliente.getEndereco().getReferencia());
-                    preparedStatement.setString(10, cliente.getEndereco().getNumero());
+                    if (cliente.getDataAniversario() != null) {
+                        preparedStatement.setDate(6, new java.sql.Date(cliente.getDataAniversario().getTime()));
+                    } else {
+                        preparedStatement.setDate(6, null);
+                    }
+                    if (cliente.getEndereco() != null) {
+                        preparedStatement.setString(7, cliente.getEndereco().getLogradouro());
+                        preparedStatement.setString(8, cliente.getEndereco().getBairro());
+                        preparedStatement.setString(9, cliente.getEndereco().getReferencia());
+                        preparedStatement.setString(10, cliente.getEndereco().getNumero());
+                    } else {
+                        preparedStatement.setString(7, "");
+                        preparedStatement.setString(8, "");
+                        preparedStatement.setString(9, "");
+                        preparedStatement.setString(10, "");
+                    }
                     preparedStatement.setBoolean(11, cliente.isCadastroRealizado());
                     preparedStatement.executeUpdate();
                     connection.commit();
@@ -101,11 +112,22 @@ public class ControleClientes {
                     preparedStatement.setString(2, cliente.getNome());
                     preparedStatement.setString(3, cliente.getTelefoneMovel());
                     preparedStatement.setString(4, cliente.getTelefoneFixo());
-                    preparedStatement.setDate(5, new java.sql.Date(cliente.getDataAniversario().getTime()));
-                    preparedStatement.setString(6, cliente.getEndereco().getLogradouro());
-                    preparedStatement.setString(7, cliente.getEndereco().getBairro());
-                    preparedStatement.setString(8, cliente.getEndereco().getReferencia());
-                    preparedStatement.setString(9, cliente.getEndereco().getNumero());
+                    if (cliente.getDataAniversario() != null) {
+                        preparedStatement.setDate(5, new java.sql.Date(cliente.getDataAniversario().getTime()));
+                    } else {
+                        preparedStatement.setDate(5, null);
+                    }
+                    if (cliente.getEndereco() != null) {
+                        preparedStatement.setString(6, cliente.getEndereco().getLogradouro());
+                        preparedStatement.setString(7, cliente.getEndereco().getBairro());
+                        preparedStatement.setString(8, cliente.getEndereco().getReferencia());
+                        preparedStatement.setString(9, cliente.getEndereco().getNumero());
+                    } else {
+                        preparedStatement.setString(6, "");
+                        preparedStatement.setString(7, "");
+                        preparedStatement.setString(8, "");
+                        preparedStatement.setString(9, "");
+                    }
                     preparedStatement.setBoolean(10, cliente.isCadastroRealizado());
                     preparedStatement.setObject(11, cliente.getUuid());
                     preparedStatement.executeUpdate();

@@ -49,15 +49,16 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
                 }
                 builder.textNewLine("Adicionais: " + adicionais);
             }
-            builder.textNewLine("Total: R$" + moneyFormat.format(p.getTotal()) + " 💵");
-            chat.getChat().sendMessage(builder.build(), 4000);
-            chat.getChat().sendMessage("Está tudo certo? 🤞");
-            chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-            builder = new MessageBuilder();
-            builder.textNewLine("*1* - Sim").
-                    textNewLine("*2* - Não  (Inicia o Pedido Novamente)");
-            chat.getChat().sendMessage(builder.build());
         }
+        p.calcularValor();
+        builder.textNewLine("Total: R$" + moneyFormat.format(p.getTotal()) + " 💵");
+        chat.getChat().sendMessage(builder.build(), 4000);
+        chat.getChat().sendMessage("Está tudo certo? 🤞");
+        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
+        builder = new MessageBuilder();
+        builder.textNewLine("*1* - Sim").
+                textNewLine("*2* - Não  (Inicia o Pedido Novamente)");
+        chat.getChat().sendMessage(builder.build());
         return true;
     }
 

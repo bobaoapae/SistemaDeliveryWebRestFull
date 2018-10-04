@@ -10,7 +10,6 @@ import modelo.Message;
 import modelo.MessageBuilder;
 import sistemaDelivery.controle.ControleClientes;
 import sistemaDelivery.modelo.ChatBotDelivery;
-import sistemaDelivery.modelo.Endereco;
 
 /**
  * @author jvbor
@@ -38,9 +37,7 @@ public class HandlerConfirmarEndereco extends HandlerBotDelivery {
     protected boolean runSecondTime(Message msg) {
         if (msg.getContent().trim().equals("1") || msg.getContent().toLowerCase().trim().equals("sim") || msg.getContent().toLowerCase().trim().equals("s")) {
             chat.getChat().sendMessage("Blz");
-            Endereco endereco = new Endereco();
-            endereco.setLogradouro(msg.getContent().trim());
-            ((ChatBotDelivery) chat).getCliente().setEndereco(endereco);
+            ((ChatBotDelivery) chat).getCliente().setEndereco(getChatBotDelivery().getPedidoAtual().getEndereco());
             try {
                 ControleClientes.getInstace().salvarCliente(((ChatBotDelivery) chat).getCliente());
             } catch (Exception ex) {

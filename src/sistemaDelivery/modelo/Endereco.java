@@ -46,4 +46,13 @@ public class Endereco {
     public void setReferencia(String referencia) {
         this.referencia = referencia;
     }
+
+    @Override
+    public String toString() {
+        if ((getBairro().isEmpty() || getNumero().isEmpty()) && !getLogradouro().isEmpty()) {
+            return getLogradouro();
+        } else {
+            return "Bairro:" + getBairro() + "\nLogradouro: " + getLogradouro() + "\nNumero:" + getNumero() + "\nReferencia:" + getReferencia();
+        }
+    }
 }

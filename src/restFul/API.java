@@ -434,10 +434,19 @@ public class API {
             GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstace().getGrupoByUUID(UUID.fromString(uuid));
             if (grupoAdicional == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
-            } else if (grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
-                return Response.status(Response.Status.OK).entity(builder.toJson(grupoAdicional)).build();
+            }
+            if (grupoAdicional.getCategoria() != null) {
+                if (grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                    return Response.status(Response.Status.OK).entity(builder.toJson(grupoAdicional)).build();
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
             } else {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                if (grupoAdicional.getProduto().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                    return Response.status(Response.Status.OK).entity(builder.toJson(grupoAdicional)).build();
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
             }
         }
     }
@@ -479,7 +488,7 @@ public class API {
         if (adicionalProduto.getUuid() != null) {
             grupoAdicional = ControleAdicionais.getInstace().getAdicionalByUUID(adicionalProduto.getUuid()).getGrupoAdicional();
         } else {
-            ControleGruposAdicionais.getInstace().getGrupoByUUID(adicionalProduto.getUuid_grupo_adicional());
+            grupoAdicional = ControleGruposAdicionais.getInstace().getGrupoByUUID(adicionalProduto.getUuid_grupo_adicional());
         }
         if (grupoAdicional.getCategoria() != null) {
             if (!grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
@@ -506,10 +515,19 @@ public class API {
             AdicionalProduto adicional = ControleAdicionais.getInstace().getAdicionalByUUID(UUID.fromString(uuid));
             if (adicional == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
-            } else if (adicional.getGrupoAdicional().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
-                return Response.status(Response.Status.OK).entity(builder.toJson(adicional)).build();
+            }
+            if (adicional.getGrupoAdicional().getCategoria() != null) {
+                if (adicional.getGrupoAdicional().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                    return Response.status(Response.Status.OK).entity(builder.toJson(adicional)).build();
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
             } else {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                if (adicional.getGrupoAdicional().getProduto().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                    return Response.status(Response.Status.OK).entity(builder.toJson(adicional)).build();
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
             }
         }
     }

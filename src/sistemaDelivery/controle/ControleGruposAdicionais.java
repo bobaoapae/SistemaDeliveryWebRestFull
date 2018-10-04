@@ -35,24 +35,24 @@ public class ControleGruposAdicionais {
         if (grupos.containsKey(uuid)) {
             return grupos.get(uuid);
         }
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            ResultSetHandler<GrupoAdicional> h = new BeanHandler<GrupoAdicional>(GrupoAdicional.class);
-            GrupoAdicional grupo = queryRunner.query("select * from \"Grupos_Adicionais\" where uuid = ?", h, uuid);
-            if (grupo == null) {
-                return null;
-            }
-            synchronized (grupos) {
+        synchronized (grupos) {
+            try {
+                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+                ResultSetHandler<GrupoAdicional> h = new BeanHandler<GrupoAdicional>(GrupoAdicional.class);
+                GrupoAdicional grupo = queryRunner.query("select * from \"Grupos_Adicionais\" where uuid = ?", h, uuid);
+                if (grupo == null) {
+                    return null;
+                }
                 grupos.put(uuid, grupo);
+                grupo.setAdicionais(ControleAdicionais.getInstace().getAdicionaisGrupo(grupo));
+                grupo.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(grupo.getUuid_categoria()));
+                grupo.setProduto(ControleProdutos.getInstace().getProdutoByUUID(grupo.getUuid_produto()));
+                return grupo;
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            grupo.setAdicionais(ControleAdicionais.getInstace().getAdicionaisGrupo(grupo));
-            grupo.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(grupo.getUuid_categoria()));
-            grupo.setProduto(ControleProdutos.getInstace().getProdutoByUUID(grupo.getUuid_produto()));
-            return grupo;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public boolean salvarGrupoAdicional(GrupoAdicional grupo) {
@@ -72,9 +72,13 @@ public class ControleGruposAdicionais {
                     preparedStatement.executeUpdate();
                     connection.commit();
                     if (grupo.getCategoria() != null) {
-                        grupo.getCategoria().getGruposAdicionais().add(getGrupoByUUID(grupo.getUuid()));
+                        synchronized (grupo.getCategoria().getGruposAdicionais()) {
+                            grupo.getCategoria().getGruposAdicionais().add(getGrupoByUUID(grupo.getUuid()));
+                        }
                     } else if (grupo.getProduto() != null) {
-                        grupo.getProduto().getGruposAdicionais().add(getGrupoByUUID(grupo.getUuid()));
+                        synchronized (grupo.getProduto().getGruposAdicionais()) {
+                            grupo.getProduto().getGruposAdicionais().add(getGrupoByUUID(grupo.getUuid()));
+                        }
                     }
                     return true;
                 } catch (SQLException ex) {
