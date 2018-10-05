@@ -5,6 +5,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import sistemaDelivery.modelo.Categoria;
+import sistemaDelivery.modelo.Estabelecimento;
 import sistemaDelivery.modelo.Produto;
 import utils.Utilitarios;
 
@@ -166,6 +167,23 @@ public class ControleProdutos {
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Produtos\" where uuid_categoria = ? and ativo");
         ) {
             preparedStatement.setObject(1, cat.getUuid());
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    produtos.add(getProdutoByUUID(UUID.fromString(resultSet.getString("uuid"))));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return produtos;
+    }
+
+    public List<Produto> getProdutosEstabelecimento(Estabelecimento estabelecimento) {
+        List<Produto> produtos = new ArrayList<>();
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement("select a.uuid from \"Produtos\" as a inner join \"Categorias\" as b on a.uuid_categoria = b.uuid where b.uuid_estabelecimento = ?");
+        ) {
+            preparedStatement.setObject(1, estabelecimento.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     produtos.add(getProdutoByUUID(UUID.fromString(resultSet.getString("uuid"))));

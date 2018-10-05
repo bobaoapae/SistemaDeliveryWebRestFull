@@ -131,7 +131,7 @@ public class ControlePedidos {
                         "       entrega=?, cartao=?, impresso=?, \"valorPago\"=?, desconto=?, \"pgCreditos\"=?, \n" +
                         "       \"subTotal\"=?, total=?, \"horaAgendamento\"=?, \"estadoPedido\"=?, \n" +
                         "       troco=?, \"totalRemovido\"=?, logradouro=?, bairro=?, referencia=?, \n" +
-                        "       numero=?, taxaEntrega = ?\n" +
+                        "       numero=?, \"taxaEntrega\" = ?\n" +
                         " WHERE uuid=? and uuid_estabelecimento=?;\n")) {
                     pedido.calcularValor();
                     preparedStatement.setString(1, pedido.getComentarioPedido());

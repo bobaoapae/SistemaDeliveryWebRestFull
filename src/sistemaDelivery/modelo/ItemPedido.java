@@ -103,7 +103,7 @@ public class ItemPedido implements Comparable<ItemPedido> {
                 double maior = 0;
                 for (AdicionalProduto adicionalProduto : entry.getValue()) {
                     if (adicionalProduto.getValor() > maior) {
-                        maior = adicionalProduto.getValor();
+                        maior = adicionalProduto.getValor() * qtd;
                     }
                 }
                 subTotal += maior;

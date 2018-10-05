@@ -23,7 +23,10 @@ import java.io.IOException;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.time.LocalTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 @Path("/api")
@@ -652,6 +655,23 @@ public class API {
     }
 
     @GET
+    @Path("/pedido")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPedido(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Pedido pedido = ControlePedidos.getInstace().getPedidoByUUID(UUID.fromString(uuid));
+        if (pedido == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (!pedido.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        return Response.status(Response.Status.OK).entity(builder.toJson(pedido)).build();
+    }
+
+    @GET
     @Path("/pedidosAtivos")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPedidosAtivos() {
@@ -748,6 +768,55 @@ public class API {
         pedido.setEstadoPedido(EstadoPedido.Cancelado);
         if (ControlePedidos.getInstace().salvarPedido(pedido)) {
             return Response.status(Response.Status.CREATED).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Path("/criarPedidoTeste")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response pedidoTeste() {
+        Pedido p = new Pedido(ControleClientes.getInstace().getClienteChatId("554491050665@c.us"), token.getEstabelecimento());
+        ItemPedido itemPedido = new ItemPedido();
+        List<Produto> produtosDisponiveis = ControleProdutos.getInstace().getProdutosEstabelecimento(token.getEstabelecimento());
+        if (produtosDisponiveis.size() > 0) {
+            p.setEntrega(new Random().nextInt() % 2 == 0);
+            if (p.isEntrega()) {
+                Endereco endereco = new Endereco();
+                endereco.setLogradouro("Rua dos Alfineiros");
+                endereco.setNumero("4");
+                endereco.setBairro("Quarto embaixo da escada");
+                p.setEndereco(endereco);
+            }
+            if (new Random().nextInt() % 2 == 0) {
+                p.setHoraAgendamento(Time.valueOf(LocalTime.now()));
+            }
+            p.setCartao(new Random().nextInt() % 2 == 0);
+            p.getProdutos().add(itemPedido);
+            Collections.shuffle(produtosDisponiveis);
+            Produto produto = produtosDisponiveis.get(0);
+            itemPedido.setProduto(produto);
+            List<GrupoAdicional> grupoAdicionals = produto.getAllGruposAdicionais();
+            if (grupoAdicionals.size() > 0) {
+                Collections.shuffle(grupoAdicionals);
+                GrupoAdicional grupoAdicional = grupoAdicionals.get(0);
+                List<AdicionalProduto> adicionalProdutos = grupoAdicional.getAdicionais();
+                if (adicionalProdutos.size() > 0) {
+                    Collections.shuffle(adicionalProdutos);
+                    itemPedido.addAdicional(adicionalProdutos.get(0));
+                }
+            }
+            itemPedido.setQtd(new Random().nextInt(10));
+            if (!p.isCartao()) {
+                p.calcularValor();
+                p.setTroco(p.getTotal() + new Random().nextInt());
+            }
+            if (ControlePedidos.getInstace().salvarPedido(p)) {
+                return Response.status(Response.Status.CREATED).entity(builder.toJson(ControlePedidos.getInstace().getPedidoByUUID(p.getUuid()))).build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
