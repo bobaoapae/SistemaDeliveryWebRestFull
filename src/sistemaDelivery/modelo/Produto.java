@@ -1,9 +1,11 @@
 package sistemaDelivery.modelo;
 
+import adapters.ExposeGetter;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import java.util.*;
 
+@ExposeGetter(methodName = "getNomeWithCategories", nameExpose = "nomeWithCategories")
 public class Produto implements Comparable<Produto> {
 
     @Ignore
@@ -56,11 +58,10 @@ public class Produto implements Comparable<Produto> {
                 break;
             }
         }
-        Collections.reverse(categorias);
+        adicionais.addAll(this.getGruposAdicionais());
         for (Categoria c : categorias) {
             adicionais.addAll(c.getGruposAdicionais());
         }
-        adicionais.addAll(this.getGruposAdicionais());
         return adicionais;
     }
 

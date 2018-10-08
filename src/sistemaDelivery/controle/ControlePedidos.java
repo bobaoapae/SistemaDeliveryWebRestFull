@@ -18,16 +18,19 @@ public class ControlePedidos {
 
     private static ControlePedidos instace;
     private Map<UUID, Pedido> pedidos;
+    private static final Object syncronizeGetSession = new Object();
 
     private ControlePedidos() {
         this.pedidos = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControlePedidos getInstace() {
-        if (instace == null) {
-            instace = new ControlePedidos();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControlePedidos();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public Pedido getPedidoByUUID(UUID uuid) {
@@ -232,6 +235,59 @@ public class ControlePedidos {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+        return pedidos;
+    }
+
+    public List<Pedido> getPedidosDoMes(Estabelecimento estabelecimento) {
+        List<Pedido> pedidos = new ArrayList<>();
+        try (Connection connection = Conexao.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!='Cancelado'")
+        ) {
+            preparedStatement.setObject(1, estabelecimento.getUuid());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return pedidos;
+    }
+
+    public HashMap<String, Integer> getDadosDeliveryHoje(Estabelecimento estabelecimento) {
+        HashMap<String, Integer> map = new HashMap<>();
+        map.put("Concluido", 0);
+        map.put("Novo", 0);
+        map.put("Cancelado", 0);
+        try (Connection connection = Conexao.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("select \"estadoPedido\",count(\"estadoPedido\") from \"Pedidos\" as a inner join \"Estabelecimentos\" as b on a.uuid_estabelecimento=b.uuid  where uuid_estabelecimento = ? and \"dataPedido\" >=\"horaAberturaPedidos\" group by \"estadoPedido\" ")) {
+            preparedStatement.setObject(1, estabelecimento.getUuid());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                map.put(resultSet.getString(1), resultSet.getInt(2));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return map;
+    }
+
+    public List<Pedido> getPedidosComProduto(Produto produto) {
+        List<Pedido> pedidos = new ArrayList<>();
+        try (Connection connection = Conexao.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("select distinct(b.uuid) from \"Items_Pedidos\" as a \n" +
+                     "inner join \"Pedidos\" as b on a.uuid_pedido = b.uuid\n" +
+                     "inner join \"Produtos\" as d on a.uuid_produto = d.uuid\n" +
+                     "where b.uuid_estabelecimento = ? and d.uuid = ? AND \"estadoPedido\"!='Cancelado' and \"dataPedido\" >=date_trunc('MONTH',now())::DATE  ")) {
+            preparedStatement.setObject(1, produto.getCategoria().getEstabelecimento().getUuid());
+            preparedStatement.setObject(2, produto.getUuid());
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
         }
         return pedidos;
     }

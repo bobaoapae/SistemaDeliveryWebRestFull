@@ -36,7 +36,7 @@ public class HandlerMenuRodizios extends HandlerBotDelivery {
         lastCodeRodizio = 0;
         for (Rodizio r : rodiziosDisponives) {
             lastCodeRodizio++;
-            builder.textNewLine(lastCodeRodizio + " - *" + r.getNome() + "* - R$" + new DecimalFormat("###,###,###.00").format(r.getValor()));
+            builder.textNewLine(lastCodeRodizio + " - *" + r.getNome() + "*");
         }
         builder.textNewLine(lastCodeRodizio + 1 + " - Voltar ao Menu Principal ↩️");
         chat.getChat().sendMessage(builder.build());

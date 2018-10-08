@@ -18,16 +18,18 @@ public class ControleCategorias {
 
     private static ControleCategorias instace;
     private Map<UUID, Categoria> categorias;
-
+    private static final Object syncronizeGetSession = new Object();
     private ControleCategorias() {
         this.categorias = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleCategorias getInstace() {
-        if (instace == null) {
-            instace = new ControleCategorias();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleCategorias();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public Categoria getCategoriaByUUID(UUID uuid) {
@@ -203,7 +205,7 @@ public class ControleCategorias {
                         cat.getCategoriaPai().getCategoriasFilhas().remove(cat);
                     }
                 } else {
-                    synchronized (cat.getCategoriaPai().getCategoriasFilhas()) {
+                    synchronized (cat.getEstabelecimento().getCategorias()) {
                         cat.getEstabelecimento().getCategorias().remove(cat);
                     }
                 }
@@ -228,7 +230,7 @@ public class ControleCategorias {
     public List<Categoria> getCategoriasFilhas(Categoria cat) {
         List<Categoria> categorias = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Categorias\" where uuid_categoria_pai = ? and ativo");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Categorias\" where uuid_categoria_pai = ? and ativo order by \"dataCriacao\" ");
         ) {
             preparedStatement.setObject(1, cat.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

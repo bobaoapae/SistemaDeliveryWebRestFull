@@ -19,16 +19,19 @@ public class ControleItensPedidos {
 
     private static ControleItensPedidos instace;
     private Map<UUID, ItemPedido> itensPedidos;
+    private static final Object syncronizeGetSession = new Object();
 
     private ControleItensPedidos() {
         this.itensPedidos = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleItensPedidos getInstace() {
-        if (instace == null) {
-            instace = new ControleItensPedidos();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleItensPedidos();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public ItemPedido getItemByUUID(UUID uuid) {
@@ -89,7 +92,7 @@ public class ControleItensPedidos {
         return false;
     }
 
-    public boolean salvarPedido(ItemPedido itemPedido) {
+    public boolean salvarItemPedido(ItemPedido itemPedido) {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             if (itemPedido.getUuid() == null) {
@@ -129,6 +132,7 @@ public class ControleItensPedidos {
                 preparedStatement.setObject(2, itemPedido.getUuid());
                 preparedStatement.executeUpdate();
                 connection.commit();
+                itemPedido.setRemovido(true);
                 if (itensPedidos.containsKey(itemPedido.getUuid())) {
                     Utilitarios.atualizarObjeto(itensPedidos.get(itemPedido.getUuid()), itemPedido);
                 }

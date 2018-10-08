@@ -85,7 +85,7 @@ public class Manager {
                         ControleSessions.getInstance().getSessionForEstabelecimento(esta);
                         JsonObject object = new JsonObject();
                         object.addProperty("token", token.getToken());
-                        NewCookie cookie = new NewCookie("token", token.getToken(), "/", "", "", 7 * 24 * 60 * 60, false);
+                        NewCookie cookie = new NewCookie("token", token.getToken(), null, null, null, 7 * 24 * 60 * 60, false);
                         return Response.status(Response.Status.CREATED).cookie(cookie).entity(builder.toJson(object)).build();
                     } catch (IOException e1) {
                         e1.printStackTrace();

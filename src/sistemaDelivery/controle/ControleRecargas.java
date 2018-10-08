@@ -18,16 +18,19 @@ public class ControleRecargas {
 
     private static ControleRecargas instace;
     private Map<UUID, RecargaCliente> recargas;
+    private static final Object syncronizeGetSession = new Object();
 
     private ControleRecargas() {
         this.recargas = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleRecargas getInstace() {
-        if (instace == null) {
-            instace = new ControleRecargas();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleRecargas();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public RecargaCliente getRecargaByUUID(UUID uuid) {

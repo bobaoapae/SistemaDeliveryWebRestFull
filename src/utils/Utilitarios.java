@@ -5,6 +5,8 @@
  */
 package utils;
 
+import adapters.*;
+import com.google.gson.GsonBuilder;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import javax.crypto.KeyGenerator;
@@ -39,6 +41,16 @@ public class Utilitarios {
         Thread t = new Thread(r);
         t.start();
         return t;
+    }
+
+    public static GsonBuilder getDefaultGsonBuilder() {
+        return new GsonBuilder().disableHtmlEscaping().
+                registerTypeAdapter(java.sql.Date.class, new DateAdapterSerialize()).
+                registerTypeAdapter(java.sql.Date.class, new DateAdapterDeserialize()).
+                registerTypeAdapter(Timestamp.class, new TimestampAdapterSerialize()).
+                registerTypeAdapter(Timestamp.class, new TimestampAdapterDeserialize()).
+                registerTypeAdapter(Time.class, new TimeAdapter()).
+                registerTypeAdapter(Time.class, new TimeAdapterDeserialize());
     }
 
     public static void atualizarObjeto(Object x, Object y) {

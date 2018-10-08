@@ -19,16 +19,19 @@ public class ControleEstabelecimentos {
 
     private static ControleEstabelecimentos instace;
     private Map<UUID, Estabelecimento> estabelecimentos;
+    private static final Object syncronizeGetSession = new Object();
 
     private ControleEstabelecimentos() {
         this.estabelecimentos = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleEstabelecimentos getInstace() {
-        if (instace == null) {
-            instace = new ControleEstabelecimentos();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleEstabelecimentos();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public Estabelecimento getEstabelecimentoByUUID(UUID uuid) {
@@ -226,7 +229,7 @@ public class ControleEstabelecimentos {
     public List<Estabelecimento> getEstabelecimentosUsuario(Usuario u) {
         List<Estabelecimento> estabelecimentos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid_estabelecimento from \"Estabelecimentos_Usuario\" as a inner join \"Estabelecimentos\" as b on a.uuid_estabelecimento=b.uuid where uuid_usuario = ? and ativo");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid_estabelecimento from \"Estabelecimentos_Usuario\" as a inner join \"Estabelecimentos\" as b on a.uuid_estabelecimento=b.uuid where uuid_usuario = ? and ativo order by b.\"dataCriacao\"");
         ) {
             preparedStatement.setObject(1, u.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

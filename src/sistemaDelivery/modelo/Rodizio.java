@@ -13,26 +13,14 @@ import java.util.UUID;
 /**
  * @author SYSTEM
  */
-public class Rodizio {
+public class Rodizio extends Produto {
 
     @Ignore
-    private UUID uuid, uuid_estabelecimento;
-    private String nome, descricao;
-    private double valor;
-    private boolean ativo;
+    private UUID uuid_estabelecimento;
     private Time horaInicio;
     private boolean diasSemana[];
     @Ignore
     private transient Estabelecimento estabelecimento;
-
-
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
 
     public UUID getUuid_estabelecimento() {
         return uuid_estabelecimento;
@@ -40,33 +28,6 @@ public class Rodizio {
 
     public void setUuid_estabelecimento(UUID uuid_estabelecimento) {
         this.uuid_estabelecimento = uuid_estabelecimento;
-    }
-
-    public String getDescricao() {
-        if (descricao == null) {
-            return "";
-        }
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public double getValor() {
-        return valor;
-    }
-
-    public void setValor(double valor) {
-        this.valor = valor;
-    }
-
-    public boolean isAtivo() {
-        return ativo;
-    }
-
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
     }
 
     public Estabelecimento getEstabelecimento() {
@@ -77,14 +38,12 @@ public class Rodizio {
         this.estabelecimento = estabelecimento;
     }
 
+    @Override
     public String getNome() {
-        if (nome == null) {
-            return "";
-        }
-        if (!nome.contains("Rodizio")) {
-            return "Rodizio - " + nome; //To change body of generated methods, choose Tools | Templates.
+        if (!super.getNome().contains("Rodizio")) {
+            return "Rodizio - " + super.getNome(); //To change body of generated methods, choose Tools | Templates.
         } else {
-            return nome;
+            return super.getNome();
         }
     }
 
@@ -162,10 +121,6 @@ public class Rodizio {
 
     public void setDiasSemana(boolean[] diasSemana) {
         this.diasSemana = diasSemana;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
     }
 
 }

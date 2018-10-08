@@ -5,6 +5,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import sistemaDelivery.modelo.Cliente;
+import sistemaDelivery.modelo.Estabelecimento;
 import utils.ClienteHandlerRowProcessor;
 import utils.Utilitarios;
 
@@ -18,16 +19,19 @@ public class ControleClientes {
 
     private static ControleClientes instace;
     private Map<UUID, Cliente> clientes;
+    private static final Object syncronizeGetSession = new Object();
 
     private ControleClientes() {
         this.clientes = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleClientes getInstace() {
-        if (instace == null) {
-            instace = new ControleClientes();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleClientes();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public Cliente getClienteByUUID(UUID uuid) {
@@ -153,6 +157,23 @@ public class ControleClientes {
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Clientes\"");
         ) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    clientes.add(getClienteByUUID(UUID.fromString(resultSet.getString("uuid"))));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return clientes;
+    }
+
+    public List<Cliente> getClientesCompraramEstabelecimento(Estabelecimento estabelecimento) {
+        List<Cliente> clientes = new ArrayList<>();
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Clientes\" where uuid in (select uuid_cliente from \"Pedidos\" where uuid_estabelecimento = ?)");
+        ) {
+            preparedStatement.setObject(1, estabelecimento.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     clientes.add(getClienteByUUID(UUID.fromString(resultSet.getString("uuid"))));

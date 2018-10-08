@@ -5,13 +5,16 @@
  */
 package sistemaDelivery.modelo;
 
+import adapters.ExposeGetter;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author jvbor
  */
+@ExposeGetter(methodName = "getAdicionaisGroupByGrupo", nameExpose = "adicionaisPorGrupo")
 public class ItemPedido implements Comparable<ItemPedido> {
 
     @Ignore
@@ -31,6 +34,12 @@ public class ItemPedido implements Comparable<ItemPedido> {
         adicionais = new ArrayList<>();
         comentario = "";
         qtd = 1;
+    }
+
+    public Map<GrupoAdicional, List<AdicionalProduto>> getAdicionaisGroupByGrupo() {
+        Map<GrupoAdicional, List<AdicionalProduto>> retorno =
+                adicionais.stream().collect(Collectors.groupingBy(w -> w.getGrupoAdicional()));
+        return retorno;
     }
 
     public Pedido getPedido() {

@@ -19,16 +19,18 @@ public class ControleAdicionais {
 
     private static ControleAdicionais instace;
     private Map<UUID, AdicionalProduto> adicionais;
-
+    private static final Object syncronizeGetSession = new Object();
     private ControleAdicionais() {
         this.adicionais = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleAdicionais getInstace() {
-        if (instace == null) {
-            instace = new ControleAdicionais();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleAdicionais();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public AdicionalProduto getAdicionalByUUID(UUID uuid) {
@@ -132,7 +134,7 @@ public class ControleAdicionais {
     public List<AdicionalProduto> getAdicionaisGrupo(GrupoAdicional grupo) {
         List<AdicionalProduto> adicionais = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Adicionais\" where uuid_grupo_adicional = ? and ativo");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Adicionais\" where uuid_grupo_adicional = ? and ativo order by \"dataCriacao\" ");
         ) {
             preparedStatement.setObject(1, grupo.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

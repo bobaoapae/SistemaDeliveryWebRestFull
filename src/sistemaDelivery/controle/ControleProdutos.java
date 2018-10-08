@@ -19,16 +19,19 @@ public class ControleProdutos {
 
     private static ControleProdutos instace;
     private Map<UUID, Produto> produtos;
+    private static final Object syncronizeGetSession = new Object();
 
     private ControleProdutos() {
         this.produtos = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleProdutos getInstace() {
-        if (instace == null) {
-            instace = new ControleProdutos();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleProdutos();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public Produto getProdutoByUUID(UUID uuid) {
@@ -161,10 +164,11 @@ public class ControleProdutos {
         return false;
     }
 
+
     public List<Produto> getProdutosCategoria(Categoria cat) {
         List<Produto> produtos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Produtos\" where uuid_categoria = ? and ativo");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Produtos\" where uuid_categoria = ? and ativo order by \"dataCriacao\" ");
         ) {
             preparedStatement.setObject(1, cat.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -181,7 +185,7 @@ public class ControleProdutos {
     public List<Produto> getProdutosEstabelecimento(Estabelecimento estabelecimento) {
         List<Produto> produtos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select a.uuid from \"Produtos\" as a inner join \"Categorias\" as b on a.uuid_categoria = b.uuid where b.uuid_estabelecimento = ?");
+             PreparedStatement preparedStatement = conn.prepareStatement("select a.uuid from \"Produtos\" as a inner join \"Categorias\" as b on a.uuid_categoria = b.uuid where b.uuid_estabelecimento = ? order by a.\"dataCriacao\" ");
         ) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

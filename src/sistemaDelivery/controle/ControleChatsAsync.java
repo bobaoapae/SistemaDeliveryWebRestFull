@@ -20,7 +20,6 @@ public class ControleChatsAsync {
     private static Map<Estabelecimento, ControleChatsAsync> instaces = Collections.synchronizedMap(new HashMap<>());
     private final List<ChatBotDelivery> chats;
     private Estabelecimento estabelecimento;
-
     public ControleChatsAsync(Estabelecimento estabelecimento) {
         this.estabelecimento = estabelecimento;
         this.chats = Collections.synchronizedList(new ArrayList<>());
@@ -39,10 +38,12 @@ public class ControleChatsAsync {
     }
 
     public void finalizar() {
-        for (ChatBotDelivery chatt : chats) {
-            chatt.finalizar();
+        synchronized (instaces) {
+            for (ChatBotDelivery chatt : chats) {
+                chatt.finalizar();
+            }
+            ControleChatsAsync.instaces.remove(this.estabelecimento);
         }
-        ControleChatsAsync.instaces.remove(this.estabelecimento);
     }
 
     public void addChat(Chat chat) {

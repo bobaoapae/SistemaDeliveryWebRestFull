@@ -51,9 +51,9 @@ public class HandlerConcluirPedido extends HandlerBotDelivery {
                 chat.getChat().sendMessage("Pronto, " + p.getNomeCliente() + ". Seu pedido de numero #" + p.getCod() + " foi registrado e já está em produção\nCaso deseje realizar um novo pedido, basta me enviar uma mensagem");
                 if (p.getHoraAgendamento() == null) {
                     if (!p.isEntrega()) {
-                        chat.getChat().sendMessage("Em cerca de 10 à 15 minutos você já pode vir busca-lo.");
+                        chat.getChat().sendMessage("Em cerca de " + getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos você já pode vir busca-lo.");
                     } else {
-                        chat.getChat().sendMessage("Em cerca de 30 à 45 minutos ele sera entrege no endereço informado.");
+                        chat.getChat().sendMessage("Em cerca de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos ele sera entrege no endereço informado.");
                     }
                 } else {
                     if (!p.isEntrega()) {

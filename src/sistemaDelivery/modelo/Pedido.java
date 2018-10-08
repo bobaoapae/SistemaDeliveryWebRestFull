@@ -124,24 +124,6 @@ public class Pedido {
     }
 
     public void setEntrega(boolean entrega) {
-        if (entrega) {
-            if (this.getEstabelecimento() != null) {
-                if (this.getEstabelecimento().getTaxaEntregaFixa() != 0 || this.getEstabelecimento().getTaxaEntregaKm() != 0) {
-                    boolean cobrarTaxa = true;
-                    for (ItemPedido itemPedido : this.getProdutos()) {
-                        if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
-                            cobrarTaxa = false;
-                            break;
-                        }
-                    }
-                    if (cobrarTaxa) {
-                        this.taxaEntrega = this.getEstabelecimento().getTaxaEntregaFixa();
-                    }
-                }
-            } else {
-                this.taxaEntrega = 0;
-            }
-        }
         this.entrega = entrega;
     }
 
@@ -276,10 +258,26 @@ public class Pedido {
                 if (p.isRemovido()) {
                     totalRemovido += p.getSubTotal();
                 } else {
-                    subTotal += p.getSubTotal();
                     valorPago += p.getValorPago();
                 }
+                subTotal += p.getSubTotal();
             }
+        }
+        if (this.entrega) {
+            if (this.getEstabelecimento().getTaxaEntregaFixa() != 0 || this.getEstabelecimento().getTaxaEntregaKm() != 0) {
+                boolean cobrarTaxa = true;
+                for (ItemPedido itemPedido : this.getProdutos()) {
+                    if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
+                        cobrarTaxa = false;
+                        break;
+                    }
+                }
+                if (cobrarTaxa) {
+                    this.taxaEntrega = this.getEstabelecimento().getTaxaEntregaFixa();
+                }
+            }
+        } else {
+            this.taxaEntrega = 0;
         }
         this.totalRemovido = totalRemovido;
         this.subTotal = subTotal;

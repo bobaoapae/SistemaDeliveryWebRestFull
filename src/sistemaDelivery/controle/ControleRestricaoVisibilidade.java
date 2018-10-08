@@ -20,16 +20,19 @@ public class ControleRestricaoVisibilidade {
 
     private static ControleRestricaoVisibilidade instace;
     private Map<UUID, RestricaoVisibilidade> restricoes;
+    private static final Object syncronizeGetSession = new Object();
 
     private ControleRestricaoVisibilidade() {
         this.restricoes = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleRestricaoVisibilidade getInstace() {
-        if (instace == null) {
-            instace = new ControleRestricaoVisibilidade();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleRestricaoVisibilidade();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public RestricaoVisibilidade getRestricaoByUUID(UUID uuid) {

@@ -19,16 +19,19 @@ public class ControleGruposAdicionais {
 
     private static ControleGruposAdicionais instace;
     private Map<UUID, GrupoAdicional> grupos;
+    private static final Object syncronizeGetSession = new Object();
 
     private ControleGruposAdicionais() {
         this.grupos = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleGruposAdicionais getInstace() {
-        if (instace == null) {
-            instace = new ControleGruposAdicionais();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleGruposAdicionais();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public GrupoAdicional getGrupoByUUID(UUID uuid) {
@@ -150,7 +153,7 @@ public class ControleGruposAdicionais {
     public List<GrupoAdicional> getGruposCategoria(Categoria cat) {
         List<GrupoAdicional> grupos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Grupos_Adicionais\" where uuid_categoria = ? and ativo");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Grupos_Adicionais\" where uuid_categoria = ? and ativo order by \"dataCriacao\" ");
         ) {
             preparedStatement.setObject(1, cat.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -167,7 +170,7 @@ public class ControleGruposAdicionais {
     public List<GrupoAdicional> getGruposProduto(Produto produto) {
         List<GrupoAdicional> grupos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Grupos_Adicionais\" where uuid_produto = ? and ativo");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Grupos_Adicionais\" where uuid_produto = ? and ativo order by \"dataCriacao\" ");
         ) {
             preparedStatement.setObject(1, produto.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

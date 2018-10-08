@@ -18,16 +18,18 @@ public class ControleTokens {
 
     private static ControleTokens instace;
     private Map<String, Token> tokens;
-
+    private static final Object syncronizeGetSession = new Object();
     private ControleTokens() {
         this.tokens = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleTokens getInstace() {
-        if (instace == null) {
-            instace = new ControleTokens();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleTokens();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public Token getToken(String token) {

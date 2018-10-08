@@ -12,16 +12,18 @@ public class ControleSessions {
 
     private static ControleSessions instance;
     private Map<Estabelecimento, SistemaDelivery> sessions;
-
+    private static final Object syncronizeGetSession = new Object();
     private ControleSessions() {
         this.sessions = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleSessions getInstance() {
-        if (instance == null) {
-            instance = new ControleSessions();
+        synchronized (syncronizeGetSession) {
+            if (instance == null) {
+                instance = new ControleSessions();
+            }
+            return instance;
         }
-        return instance;
     }
 
     public boolean checkSessionAtiva(Estabelecimento e) {
@@ -36,6 +38,15 @@ public class ControleSessions {
                 sessions.put(estabelecimento, new SistemaDelivery(estabelecimento));
             }
             return sessions.get(estabelecimento);
+        }
+    }
+
+    public void finalizar() {
+        synchronized (sessions) {
+            for (Map.Entry<Estabelecimento, SistemaDelivery> entry : sessions.entrySet()) {
+                entry.getValue().finalizar();
+            }
+            sessions.clear();
         }
     }
 

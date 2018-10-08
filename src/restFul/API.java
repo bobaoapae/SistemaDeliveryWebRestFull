@@ -1,8 +1,8 @@
 package restFul;
 
-import adapters.*;
+import adapters.UseGetterAdapterSerialize;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -13,39 +13,63 @@ import restFul.controle.ControleSessions;
 import restFul.modelo.Token;
 import sistemaDelivery.controle.*;
 import sistemaDelivery.modelo.*;
+import utils.Utilitarios;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
-import java.sql.Date;
+import java.nio.charset.Charset;
 import java.sql.Time;
-import java.sql.Timestamp;
 import java.time.LocalTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Path("/api")
 public class API {
 
     private Gson builder;
-
     private Token token;
+    private List<Pedido> pedidosSendoCriados;
 
-    public API(@Context SecurityContext securityContext) {
+    public API(@Context HttpServletRequest session, @Context SecurityContext securityContext) {
         this.token = (Token) securityContext.getUserPrincipal();
-        builder = new GsonBuilder().disableHtmlEscaping().
-                registerTypeAdapter(Date.class, new DateAdapterSerialize()).
-                registerTypeAdapter(Date.class, new DateAdapterDeserialize()).
-                registerTypeAdapter(Timestamp.class, new TimestampAdapterSerialize()).
-                registerTypeAdapter(Timestamp.class, new TimestampAdapterDeserialize()).
-                registerTypeAdapter(Time.class, new TimeAdapter()).
-                registerTypeAdapter(Time.class, new TimeAdapterDeserialize()).
-                create();
+        builder = Utilitarios.getDefaultGsonBuilder().registerTypeAdapter(Produto.class, new UseGetterAdapterSerialize()).create();
+        if (session.getSession(true).getAttribute("pedidosSendoCriados") == null) {
+            session.getSession().setAttribute("pedidosSendoCriados", Collections.synchronizedList(new ArrayList<>()));
+        }
+        pedidosSendoCriados = ((List<Pedido>) session.getSession().getAttribute("pedidosSendoCriados"));
+    }
+
+
+    @GET
+    @Path("/iniciarNovoPedido")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response iniciarNovoPedido() {
+        Pedido pedido = new Pedido();
+        pedido.setEstabelecimento(token.getEstabelecimento());
+        pedido.setUuid(UUID.randomUUID());
+        synchronized (pedidosSendoCriados) {
+            pedidosSendoCriados.add(pedido);
+        }
+        return Response.status(Response.Status.CREATED).entity(builder.toJson(pedido)).build();
+    }
+
+    @GET
+    @Path("/infoPedidoSendoCriado")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response infoPedidoSendoCriado(@QueryParam("uuid") String uuid) {
+        synchronized (pedidosSendoCriados) {
+            for (Pedido pedido : pedidosSendoCriados) {
+                if (pedido.getUuid().equals(UUID.fromString(uuid))) {
+                    return Response.status(Response.Status.CREATED).entity(builder.toJson(pedido)).build();
+                }
+            }
+        }
+        return Response.status(Response.Status.NOT_FOUND).build();
     }
 
     @GET
@@ -257,7 +281,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProdutos(@QueryParam("uuid") String uuid) {
         if (uuid == null || uuid.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Response.Status.OK).entity(builder.toJson(ControleProdutos.getInstace().getProdutosEstabelecimento(token.getEstabelecimento()))).build();
         } else {
             Categoria categoria = ControleCategorias.getInstace().getCategoriaByUUID(UUID.fromString(uuid));
             if (categoria == null) {
@@ -480,6 +504,35 @@ public class API {
         }
     }
 
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/exportarGrupoAdicional")
+    public Response exportarGrupoAdicional(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstace().getGrupoByUUID(UUID.fromString(uuid));
+        if (grupoAdicional == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (grupoAdicional.getCategoria() != null) {
+            if (!grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        } else if (grupoAdicional.getProduto() != null) {
+            if (!grupoAdicional.getProduto().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        }
+        String exportacao = "Nome Gruopo; Qtd Min; Qtd Max; Forma Cobrança\r\n" + grupoAdicional.getNomeGrupo() + ";" + grupoAdicional.getQtdMin() + ";" + grupoAdicional.getQtdMax() + ";" + grupoAdicional.getFormaCobranca().toString() + "\r\nNome;Descrição;Valor\r\n";
+        for (int linha = 0; linha < grupoAdicional.getAdicionais().size(); linha++) {
+            exportacao += grupoAdicional.getAdicionais().get(linha).getNome() + ";";
+            exportacao += grupoAdicional.getAdicionais().get(linha).getDescricao() + ";";
+            exportacao += grupoAdicional.getAdicionais().get(linha).getValor() + "\r\n";
+        }
+        return Response.status(Response.Status.OK).entity(Base64.getEncoder().encodeToString(exportacao.getBytes(Charset.forName("UTF-8")))).build();
+    }
+
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -672,6 +725,27 @@ public class API {
     }
 
     @GET
+    @Path("/pedidosClientes")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPedidosCliente(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Cliente cliente = ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid));
+        if (cliente == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstace().getPedidosCliente(cliente, token.getEstabelecimento()))).build();
+    }
+
+    @GET
+    @Path("/pedidosEstabelecimento")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getPedidosEstabelecimento() {
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstace().getPedidos(token.getEstabelecimento()))).build();
+    }
+
+    @GET
     @Path("/pedidosAtivos")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPedidosAtivos() {
@@ -774,13 +848,38 @@ public class API {
     }
 
     @GET
+    @Path("/removerItemPedido")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response removerItemPedido(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        ItemPedido itemPedido = ControleItensPedidos.getInstace().getItemByUUID(UUID.fromString(uuid));
+        if (itemPedido == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (!itemPedido.getPedido().getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (itemPedido.getPedido().getEstadoPedido() == EstadoPedido.Concluido) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (ControleItensPedidos.getInstace().excluirPedido(itemPedido) && ControlePedidos.getInstace().salvarPedido(itemPedido.getPedido())) {
+            return Response.status(Response.Status.CREATED).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
     @Path("/criarPedidoTeste")
     @Produces(MediaType.APPLICATION_JSON)
     public Response pedidoTeste() {
         Pedido p = new Pedido(ControleClientes.getInstace().getClienteChatId("554491050665@c.us"), token.getEstabelecimento());
-        ItemPedido itemPedido = new ItemPedido();
+
         List<Produto> produtosDisponiveis = ControleProdutos.getInstace().getProdutosEstabelecimento(token.getEstabelecimento());
         if (produtosDisponiveis.size() > 0) {
+            Collections.shuffle(produtosDisponiveis);
             p.setEntrega(new Random().nextInt() % 2 == 0);
             if (p.isEntrega()) {
                 Endereco endereco = new Endereco();
@@ -793,24 +892,33 @@ public class API {
                 p.setHoraAgendamento(Time.valueOf(LocalTime.now()));
             }
             p.setCartao(new Random().nextInt() % 2 == 0);
-            p.getProdutos().add(itemPedido);
-            Collections.shuffle(produtosDisponiveis);
-            Produto produto = produtosDisponiveis.get(0);
-            itemPedido.setProduto(produto);
-            List<GrupoAdicional> grupoAdicionals = produto.getAllGruposAdicionais();
-            if (grupoAdicionals.size() > 0) {
-                Collections.shuffle(grupoAdicionals);
-                GrupoAdicional grupoAdicional = grupoAdicionals.get(0);
-                List<AdicionalProduto> adicionalProdutos = grupoAdicional.getAdicionais();
-                if (adicionalProdutos.size() > 0) {
-                    Collections.shuffle(adicionalProdutos);
-                    itemPedido.addAdicional(adicionalProdutos.get(0));
+            for (int x = 0; x < new Random().nextInt(30) + 1; x++) {
+                for (Produto produto : produtosDisponiveis) {
+                    ItemPedido itemPedido = new ItemPedido();
+                    p.getProdutos().add(itemPedido);
+                    itemPedido.setProduto(produto);
+                    List<GrupoAdicional> grupoAdicionals = produto.getAllGruposAdicionais();
+                    if (grupoAdicionals.size() > 0) {
+                        Collections.shuffle(grupoAdicionals);
+                        for (GrupoAdicional grupoAdicional : grupoAdicionals) {
+                            List<AdicionalProduto> adicionalProdutos = grupoAdicional.getAdicionais();
+                            if (adicionalProdutos.size() > 0) {
+                                Collections.shuffle(adicionalProdutos);
+                                for (AdicionalProduto adicionalProduto : adicionalProdutos) {
+                                    itemPedido.addAdicional(adicionalProduto);
+                                }
+                            }
+                        }
+                    }
+                    itemPedido.setQtd(new Random().nextInt(10) + 1);
+                    if (new Random().nextInt() % 2 == 0) {
+                        itemPedido.setComentario("Sem salada");
+                    }
                 }
             }
-            itemPedido.setQtd(new Random().nextInt(10));
             if (!p.isCartao()) {
                 p.calcularValor();
-                p.setTroco(p.getTotal() + new Random().nextInt());
+                p.setTroco(p.getTotal() + new Random().nextInt(((int) p.getTotal())));
             }
             if (ControlePedidos.getInstace().salvarPedido(p)) {
                 return Response.status(Response.Status.CREATED).entity(builder.toJson(ControlePedidos.getInstace().getPedidoByUUID(p.getUuid()))).build();
@@ -820,6 +928,54 @@ public class API {
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GET
+    @Path("/dadosDashboard")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response dadosDashboard() {
+        HashMap<String, Integer> dadosDeliveryDia = ControlePedidos.getInstace().getDadosDeliveryHoje(token.getEstabelecimento());
+        HashMap<String, Integer> top5VendidosMes = new HashMap<>();
+        List<Pedido> pedidosMes = ControlePedidos.getInstace().getPedidosDoMes(token.getEstabelecimento());
+        for (Pedido pedido : pedidosMes) {
+            for (ItemPedido itemPedido : pedido.getProdutos()) {
+                if (itemPedido.isRemovido()) {
+                    continue;
+                }
+                String stringAtual = itemPedido.getProduto().getNomeWithCategories() + "";
+                if (!itemPedido.getAdicionais().isEmpty()) {
+                    stringAtual += " - ";
+                    for (Map.Entry<GrupoAdicional, List<AdicionalProduto>> entry : itemPedido.getAdicionaisGroupByGrupo().entrySet()) {
+                        if (entry.getValue().isEmpty()) {
+                            continue;
+                        }
+                        stringAtual += entry.getKey().getNomeGrupo() + ": ";
+                        for (AdicionalProduto adicionalProduto : entry.getValue()) {
+                            stringAtual += adicionalProduto.getNome() + ", ";
+                        }
+                        stringAtual = stringAtual.substring(0, stringAtual.lastIndexOf(",")).trim() + ". ";
+                    }
+                }
+                stringAtual = stringAtual.trim();
+                if (top5VendidosMes.containsKey(stringAtual)) {
+                    top5VendidosMes.put(stringAtual, top5VendidosMes.get(stringAtual) + itemPedido.getQtd());
+                } else {
+                    top5VendidosMes.put(stringAtual, itemPedido.getQtd());
+                }
+            }
+        }
+        LinkedHashMap<String, Integer> sortedMap = top5VendidosMes.entrySet().stream().sorted(Map.Entry.comparingByValue((t, t1) -> Integer.compare(t1, t))).limit(5).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        JsonObject object = new JsonObject();
+        object.add("dadosDeliveryDia", builder.toJsonTree(dadosDeliveryDia));
+        JsonArray array = new JsonArray();
+        for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
+            JsonObject object1 = new JsonObject();
+            object1.addProperty("nome", entry.getKey());
+            object1.addProperty("qtd", entry.getValue());
+            array.add(object1);
+        }
+        object.add("top5Vendidos", builder.toJsonTree(array));
+        return Response.status(Response.Status.OK).entity(builder.toJson(object)).build();
     }
 
     @GET

@@ -17,16 +17,19 @@ public class ControleRodizios {
 
     private static ControleRodizios instace;
     private Map<UUID, Rodizio> rodizios;
+    private static final Object syncronizeGetSession = new Object();
 
     private ControleRodizios() {
         this.rodizios = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleRodizios getInstace() {
-        if (instace == null) {
-            instace = new ControleRodizios();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleRodizios();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public Rodizio getRodizioByUUID(UUID uuid) {
@@ -156,7 +159,7 @@ public class ControleRodizios {
     public List<Rodizio> getRodiziosEstabelecimento(Estabelecimento estabelecimento) {
         List<Rodizio> rodizios = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Rodizios\" where uuid_estabelecimento = ? and ativo");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Rodizios\" where uuid_estabelecimento = ? and ativo order by \"dataCriacao\" ");
         ) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

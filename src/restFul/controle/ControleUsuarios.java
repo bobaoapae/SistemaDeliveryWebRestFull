@@ -18,16 +18,18 @@ public class ControleUsuarios {
 
     private static ControleUsuarios instace;
     private HashMap<UUID, Usuario> usuarios;
-
+    private static final Object syncronizeGetSession = new Object();
     private ControleUsuarios() {
         this.usuarios = new HashMap<>();
     }
 
     public static ControleUsuarios getInstace() {
-        if (instace == null) {
-            instace = new ControleUsuarios();
+        synchronized (syncronizeGetSession) {
+            if (instace == null) {
+                instace = new ControleUsuarios();
+            }
+            return instace;
         }
-        return instace;
     }
 
     public Usuario getUsuarioByUUID(UUID uuid) {

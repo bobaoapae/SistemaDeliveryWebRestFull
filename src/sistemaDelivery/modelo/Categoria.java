@@ -79,9 +79,6 @@ public class Categoria {
     }
 
     public List<Produto> getProdutos() {
-        synchronized (produtos) {
-            Collections.sort(produtos, Comparator.comparing(Produto::getNome).thenComparingDouble(Produto::getValor));
-        }
         return produtos;
     }
 
