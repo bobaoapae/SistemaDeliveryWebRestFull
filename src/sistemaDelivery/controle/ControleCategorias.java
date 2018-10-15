@@ -16,19 +16,20 @@ import java.util.*;
 
 public class ControleCategorias {
 
-    private static ControleCategorias instace;
+    private static final Object syncronizeGetInstance = new Object();
     private Map<UUID, Categoria> categorias;
-    private static final Object syncronizeGetSession = new Object();
+    private static ControleCategorias instance;
+
     private ControleCategorias() {
         this.categorias = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleCategorias getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleCategorias();
+    public static ControleCategorias getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleCategorias();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -44,19 +45,19 @@ public class ControleCategorias {
                 if (cat == null) {
                     return null;
                 }
-                categorias.put(uuid, cat);
-                cat.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(cat.getUuid_estabelecimento()));
-                cat.setProdutos(ControleProdutos.getInstace().getProdutosCategoria(cat));
+                categorias.putIfAbsent(uuid, cat);
+                cat.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(cat.getUuid_estabelecimento()));
+                cat.setProdutos(ControleProdutos.getInstance().getProdutosCategoria(cat));
                 if (cat.isPrecisaPedirOutraCategoria()) {
                     cat.setCategoriasNecessarias(getCategoriasNecessariasEntrega(cat));
                 }
                 cat.setCategoriasFilhas(getCategoriasFilhas(cat));
-                cat.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstace().getRestricaoCategoria(cat));
-                cat.setGruposAdicionais(ControleGruposAdicionais.getInstace().getGruposCategoria(cat));
+                cat.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstance().getRestricaoCategoria(cat));
+                cat.setGruposAdicionais(ControleGruposAdicionais.getInstance().getGruposCategoria(cat));
                 if (cat.getUuid_categoria_pai() != null) {
                     cat.setCategoriaPai(this.getCategoriaByUUID(cat.getUuid_categoria_pai()));
                 }
-                return cat;
+                return categorias.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -67,12 +68,14 @@ public class ControleCategorias {
     public boolean salvarCategoria(Categoria cat) {
         try (Connection connection = Conexao.getConnection();) {
             connection.setAutoCommit(false);
-            if (cat.getUuid() == null) {
+            if (cat.getUuid() == null || this.getCategoriaByUUID(cat.getUuid()) == null) {
                 try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Categorias\"" +
                         " (uuid, uuid_estabelecimento, uuid_categoria_pai, \"nomeCategoria\", \"exemplosComentarioPedido\", " +
                         "\"qtdMinEntrega\", \"ordemExibicao\", \"fazEntrega\", \"precisaPedirOutraCategoria\", \"entregaGratis\") " +
                         "VALUES (?,?,?,?,?,?,?,?,?,?)")) {
-                    cat.setUuid(UUID.randomUUID());
+                    if (cat.getUuid() == null) {
+                        cat.setUuid(UUID.randomUUID());
+                    }
                     preparedStatement.setObject(1, cat.getUuid());
                     preparedStatement.setObject(2, cat.getEstabelecimento().getUuid());
                     if (cat.getCategoriaPai() != null) {
@@ -90,7 +93,7 @@ public class ControleCategorias {
                     preparedStatement.executeUpdate();
                     if (cat.getRestricaoVisibilidade() != null) {
                         cat.getRestricaoVisibilidade().setCategoria(cat);
-                        if (!ControleRestricaoVisibilidade.getInstace().salvarRestricao(connection, cat.getRestricaoVisibilidade())) {
+                        if (!ControleRestricaoVisibilidade.getInstance().salvarRestricao(connection, cat.getRestricaoVisibilidade())) {
                             throw new SQLException("Falha ao salvar restrição");
                         }
                     }
@@ -134,12 +137,12 @@ public class ControleCategorias {
                     if (preparedStatement.executeUpdate() != 1) {
                         throw new SQLException("Falha ao atualizar");
                     }
-                    if (ControleRestricaoVisibilidade.getInstace().getRestricaoCategoria(cat) != null && !ControleRestricaoVisibilidade.getInstace().excluirRestricao(cat)) {
+                    if (ControleRestricaoVisibilidade.getInstance().getRestricaoCategoria(cat) != null && !ControleRestricaoVisibilidade.getInstance().excluirRestricao(cat)) {
                         throw new SQLException("Falha ao remover restrição");
                     }
                     if (cat.getRestricaoVisibilidade() != null) {
                         cat.getRestricaoVisibilidade().setCategoria(cat);
-                        if (!ControleRestricaoVisibilidade.getInstace().salvarRestricao(connection, cat.getRestricaoVisibilidade())) {
+                        if (!ControleRestricaoVisibilidade.getInstance().salvarRestricao(connection, cat.getRestricaoVisibilidade())) {
                             throw new SQLException("Falha ao salvar restrição");
                         }
                     }

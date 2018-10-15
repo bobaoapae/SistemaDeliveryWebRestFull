@@ -17,20 +17,20 @@ import java.util.*;
 
 public class ControleItensPedidos {
 
-    private static ControleItensPedidos instace;
+    private static final Object syncronizeGetInstance = new Object();
     private Map<UUID, ItemPedido> itensPedidos;
-    private static final Object syncronizeGetSession = new Object();
+    private static ControleItensPedidos instance;
 
     private ControleItensPedidos() {
         this.itensPedidos = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleItensPedidos getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleItensPedidos();
+    public static ControleItensPedidos getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleItensPedidos();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -46,11 +46,11 @@ public class ControleItensPedidos {
                 if (item == null) {
                     return null;
                 }
-                itensPedidos.put(uuid, item);
-                item.setProduto(ControleProdutos.getInstace().getProdutoByUUID(item.getUuid_produto()));
-                item.setAdicionais(ControleAdicionais.getInstace().getAdicionaisItemPedido(item));
-                item.setPedido(ControlePedidos.getInstace().getPedidoByUUID(item.getUuid_pedido()));
-                return item;
+                itensPedidos.putIfAbsent(uuid, item);
+                item.setProduto(ControleProdutos.getInstance().getProdutoByUUID(item.getUuid_produto()));
+                item.setAdicionais(ControleAdicionais.getInstance().getAdicionaisItemPedido(item));
+                item.setPedido(ControlePedidos.getInstance().getPedidoByUUID(item.getUuid_pedido()));
+                return itensPedidos.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -60,12 +60,12 @@ public class ControleItensPedidos {
 
     public boolean salvarItemPedido(Connection connection, ItemPedido itemPedido) throws SQLException {
         if (itemPedido.getUuid() == null) {
-            itemPedido.setUuid(UUID.randomUUID());
             try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO \"Items_Pedidos\"(\n" +
                     "            uuid, uuid_pedido, uuid_produto, comentario, qtd, \"subTotal\", \n" +
                     "            \"qtdPago\", \"valorPago\")\n" +
                     "    VALUES (?, ?, ?, ?, ?, ?, \n" +
                     "            ?, ?);\n")) {
+                itemPedido.setUuid(UUID.randomUUID());
                 preparedStatement.setObject(1, itemPedido.getUuid());
                 preparedStatement.setObject(2, itemPedido.getPedido().getUuid());
                 preparedStatement.setObject(3, itemPedido.getProduto().getUuid());

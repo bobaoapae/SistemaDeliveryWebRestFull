@@ -55,11 +55,11 @@ public class Cliente {
     }
 
     public void realizarRecarga(Estabelecimento e, double valorRecarga, TipoRecarga tipoRecarga) {
-        ControleRecargas.getInstace().salvarRecarga(new RecargaCliente(e, this, valorRecarga, tipoRecarga));
+        ControleRecargas.getInstance().salvarRecarga(new RecargaCliente(e, this, valorRecarga, tipoRecarga));
     }
 
     public List<RecargaCliente> getRegargas(Estabelecimento e) {
-        return ControleRecargas.getInstace().getRecargasCliente(this, e);
+        return ControleRecargas.getInstance().getRecargasCliente(this, e);
     }
 
 
@@ -158,7 +158,7 @@ public class Cliente {
     }
 
     public List<Pedido> getPedidosCliente(Estabelecimento estabelecimento) {
-        return ControlePedidos.getInstace().getPedidosCliente(this, estabelecimento);
+        return ControlePedidos.getInstance().getPedidosCliente(this, estabelecimento);
     }
 
     @Override

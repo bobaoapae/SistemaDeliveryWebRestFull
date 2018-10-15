@@ -30,7 +30,7 @@ public class HandlerConcluirPedido extends HandlerBotDelivery {
         p.setNomeCliente(((ChatBotDelivery) chat).getNome());
         p.setCelular(((ChatBotDelivery) chat).getCliente().getTelefoneMovel());
         try {
-            if (ControlePedidos.getInstace().salvarPedido(p)) {
+            if (ControlePedidos.getInstance().salvarPedido(p)) {
                 chat.getChat().sendMessage("Tudo certo então!");
                 chat.getChat().sendMessage("Já tenho todas as informações do seu pedido aqui, vou imprimir ele para a nossa àrea de produção e já te aviso.");
                 chat.getChat().sendMessage("😉");

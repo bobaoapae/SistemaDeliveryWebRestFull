@@ -36,7 +36,7 @@ public class ChatBotDelivery extends ChatBot {
     public ChatBotDelivery(Chat chat, Estabelecimento estabelecimento, boolean autoPause) {
         super(chat, autoPause);
         this.estabelecimento = estabelecimento;
-        Cliente cliente = ControleClientes.getInstace().getClienteChatId(chat.getId());
+        Cliente cliente = ControleClientes.getInstance().getClienteChatId(chat.getId());
         if (cliente != null) {
             this.cliente = cliente;
             if (cliente.getTelefoneMovel().isEmpty()) {
@@ -46,8 +46,8 @@ public class ChatBotDelivery extends ChatBot {
             this.cliente = new Cliente(chat.getId());
             this.cliente.setTelefoneMovel(((UserChat) chat).getContact().getPhoneNumber());
             this.cliente.setNome(chat.getContact().getSafeName());
-            ControleClientes.getInstace().salvarCliente(this.cliente);
-            this.cliente = ControleClientes.getInstace().getClienteByUUID(this.cliente.getUuid());
+            ControleClientes.getInstance().salvarCliente(this.cliente);
+            this.cliente = ControleClientes.getInstance().getClienteByUUID(this.cliente.getUuid());
         }
         this.handler = new HandlerBoasVindas(this);
     }

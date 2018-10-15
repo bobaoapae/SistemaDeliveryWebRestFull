@@ -46,7 +46,7 @@ public class Manager {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/login")
     public Response login(@QueryParam("login") String login, @QueryParam("senha") String senha) {
-        Usuario usuario = ControleUsuarios.getInstace().getUsuario(login, senha);
+        Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
         if (usuario != null) {
             return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).entity(builder.toJson(usuario)).build();
         } else {
@@ -59,9 +59,9 @@ public class Manager {
     @Path("/generateToken")
     public Response generateToken(@QueryParam("login") String login, @QueryParam("senha") String senha, @QueryParam("estabelecimento") String estabelecimento) {
         try {
-            Usuario usuario = ControleUsuarios.getInstace().getUsuario(login, senha);
+            Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
             if (usuario != null) {
-                Estabelecimento esta = ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(UUID.fromString(estabelecimento));
+                Estabelecimento esta = ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(estabelecimento));
                 if (esta == null) {
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
@@ -78,7 +78,7 @@ public class Manager {
                         e1.printStackTrace();
                         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
                     }
-                    if (!ControleTokens.getInstace().saveToken(token)) {
+                    if (!ControleTokens.getInstance().saveToken(token)) {
                         return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
                     }
                     try {
@@ -108,14 +108,14 @@ public class Manager {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/criarEstabelecimento")
     public Response criarEstabelecimento(@QueryParam("login") String login, @QueryParam("senha") String senha, @FormParam("estabelecimento") String estabelecimento) {
-        Usuario usuario = ControleUsuarios.getInstace().getUsuario(login, senha);
+        Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
         if (usuario != null) {
             Estabelecimento estabelecimento1 = builder.fromJson(estabelecimento, Estabelecimento.class);
             if (estabelecimento1.getUuid() != null && !usuario.getEstabelecimentos().contains(estabelecimento1)) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
-            if (ControleEstabelecimentos.getInstace().criarEstabelecimento(usuario, estabelecimento1)) {
-                estabelecimento1 = ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(estabelecimento1.getUuid());
+            if (ControleEstabelecimentos.getInstance().criarEstabelecimento(usuario, estabelecimento1)) {
+                estabelecimento1 = ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(estabelecimento1.getUuid());
                 usuario.getEstabelecimentos().add(estabelecimento1);
                 return Response.status(Response.Status.CREATED).entity(builder.toJson(estabelecimento1)).build();
             } else {
@@ -130,13 +130,13 @@ public class Manager {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/excluirEstabelecimento")
     public Response excluirEstabelecimento(@QueryParam("login") String login, @QueryParam("senha") String senha, @QueryParam("uuid") String uuid) {
-        Usuario usuario = ControleUsuarios.getInstace().getUsuario(login, senha);
+        Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
         if (usuario != null) {
-            Estabelecimento estabelecimento1 = ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(UUID.fromString(uuid));
+            Estabelecimento estabelecimento1 = ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(uuid));
             if (!usuario.getEstabelecimentos().contains(estabelecimento1)) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
-            if (ControleEstabelecimentos.getInstace().excluirEstabelecimento(estabelecimento1)) {
+            if (ControleEstabelecimentos.getInstance().excluirEstabelecimento(estabelecimento1)) {
                 synchronized (usuario.getEstabelecimentos()) {
                     usuario.getEstabelecimentos().remove(estabelecimento1);
                 }

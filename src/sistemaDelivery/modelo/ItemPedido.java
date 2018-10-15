@@ -6,7 +6,11 @@
 package sistemaDelivery.modelo;
 
 import adapters.ExposeGetter;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Utilitarios;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * @author jvbor
  */
-@ExposeGetter(methodName = "getAdicionaisGroupByGrupo", nameExpose = "adicionaisPorGrupo")
+@ExposeGetter(methodName = "getAdicionaisGroupByGrupoJson", nameExpose = "adicionaisPorGrupo")
 public class ItemPedido implements Comparable<ItemPedido> {
 
     @Ignore
@@ -36,10 +40,28 @@ public class ItemPedido implements Comparable<ItemPedido> {
         qtd = 1;
     }
 
+    public JsonArray getAdicionaisGroupByGrupoJson() {
+        Gson gson = Utilitarios.getDefaultGsonBuilder(null).create();
+        synchronized (adicionais) {
+            Map<GrupoAdicional, List<AdicionalProduto>> retorno =
+                    adicionais.stream().collect(Collectors.groupingBy(w -> w.getGrupoAdicional(), LinkedHashMap::new, Collectors.toList()));
+            JsonArray array = new JsonArray();
+            for (Map.Entry<GrupoAdicional, List<AdicionalProduto>> entry : retorno.entrySet()) {
+                JsonObject object = new JsonObject();
+                object.addProperty("nomeGrupo", entry.getKey().getNomeGrupo());
+                object.add("adicionais", gson.toJsonTree(entry.getValue()));
+                array.add(object);
+            }
+            return array;
+        }
+    }
+
     public Map<GrupoAdicional, List<AdicionalProduto>> getAdicionaisGroupByGrupo() {
-        Map<GrupoAdicional, List<AdicionalProduto>> retorno =
-                adicionais.stream().collect(Collectors.groupingBy(w -> w.getGrupoAdicional()));
-        return retorno;
+        synchronized (adicionais) {
+            Map<GrupoAdicional, List<AdicionalProduto>> retorno =
+                    adicionais.stream().collect(Collectors.groupingBy(w -> w.getGrupoAdicional(), LinkedHashMap::new, Collectors.toList()));
+            return retorno;
+        }
     }
 
     public Pedido getPedido() {

@@ -17,20 +17,20 @@ import java.util.*;
 
 public class ControleClientes {
 
-    private static ControleClientes instace;
+    private static final Object syncronizeGetInstance = new Object();
     private Map<UUID, Cliente> clientes;
-    private static final Object syncronizeGetSession = new Object();
+    private static ControleClientes instance;
 
     private ControleClientes() {
         this.clientes = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleClientes getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleClientes();
+    public static ControleClientes getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleClientes();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -42,14 +42,12 @@ public class ControleClientes {
             try {
                 QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
                 ResultSetHandler<Cliente> h = new BeanHandler<Cliente>(Cliente.class, new ClienteHandlerRowProcessor());
-                //ResultSetHandler<Endereco> h1 = new BeanHandler<Endereco>(Endereco.class);
                 Cliente cliente = queryRunner.query("select * from \"Clientes\" where uuid = ?", h, uuid);
                 if (cliente == null) {
                     return null;
                 }
-                //cliente.setEndereco(queryRunner.query("select * from \"Clientes\" where uuid = ?", h1, uuid));
-                clientes.put(uuid, cliente);
-                return cliente;
+                clientes.putIfAbsent(uuid, cliente);
+                return clientes.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -75,10 +73,10 @@ public class ControleClientes {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             if (cliente.getUuid() == null || getClienteByUUID(cliente.getUuid()) == null) {
-                if (cliente.getUuid() == null) {
-                    cliente.setUuid(UUID.randomUUID());
-                }
                 try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Clientes\" (uuid,\"chatId\", nome, \"telefoneMovel\", \"telefoneFixo\", \"dataAniversario\", logradouro, bairro,referencia,numero,\"cadastroRealizado\") values(?,?,?,?,?,?,?,?,?,?,?)")) {
+                    if (cliente.getUuid() == null) {
+                        cliente.setUuid(UUID.randomUUID());
+                    }
                     preparedStatement.setObject(1, cliente.getUuid());
                     preparedStatement.setString(2, cliente.getChatId());
                     preparedStatement.setString(3, cliente.getNome());

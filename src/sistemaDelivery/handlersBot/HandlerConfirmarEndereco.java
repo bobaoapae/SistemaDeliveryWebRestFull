@@ -39,7 +39,7 @@ public class HandlerConfirmarEndereco extends HandlerBotDelivery {
             chat.getChat().sendMessage("Blz");
             ((ChatBotDelivery) chat).getCliente().setEndereco(getChatBotDelivery().getPedidoAtual().getEndereco());
             try {
-                ControleClientes.getInstace().salvarCliente(((ChatBotDelivery) chat).getCliente());
+                ControleClientes.getInstance().salvarCliente(((ChatBotDelivery) chat).getCliente());
             } catch (Exception ex) {
                 chat.getChat().getDriver().onError(ex);
             }

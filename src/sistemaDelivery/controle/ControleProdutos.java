@@ -17,20 +17,20 @@ import java.util.*;
 
 public class ControleProdutos {
 
-    private static ControleProdutos instace;
+    private static final Object syncronizeGetInstance = new Object();
     private Map<UUID, Produto> produtos;
-    private static final Object syncronizeGetSession = new Object();
+    private static ControleProdutos instance;
 
     private ControleProdutos() {
         this.produtos = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleProdutos getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleProdutos();
+    public static ControleProdutos getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleProdutos();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -46,11 +46,11 @@ public class ControleProdutos {
                 if (produto == null) {
                     return null;
                 }
-                produtos.put(uuid, produto);
-                produto.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(produto.getUuid_categoria()));
-                produto.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstace().getRestricaoProduto(produto));
-                produto.setGruposAdicionais(ControleGruposAdicionais.getInstace().getGruposProduto(produto));
-                return produto;
+                produtos.putIfAbsent(uuid, produto);
+                produto.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(produto.getUuid_categoria()));
+                produto.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstance().getRestricaoProduto(produto));
+                produto.setGruposAdicionais(ControleGruposAdicionais.getInstance().getGruposProduto(produto));
+                return produtos.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -61,11 +61,13 @@ public class ControleProdutos {
     public boolean salvarProduto(Produto prod) {
         try (Connection connection = Conexao.getConnection();) {
             connection.setAutoCommit(false);
-            if (prod.getUuid() == null) {
+            if (prod.getUuid() == null || this.getProdutoByUUID(prod.getUuid()) == null) {
                 try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO \"Produtos\"(\n" +
                         "            uuid, uuid_categoria, nome, descricao, foto, valor, \"onlyLocal\")\n" +
                         "    VALUES (?, ?, ?, ?, ?, ?,?);\n")) {
-                    prod.setUuid(UUID.randomUUID());
+                    if (prod.getUuid() == null) {
+                        prod.setUuid(UUID.randomUUID());
+                    }
                     preparedStatement.setObject(1, prod.getUuid());
                     preparedStatement.setObject(2, prod.getCategoria().getUuid());
                     preparedStatement.setString(3, prod.getNome());
@@ -76,14 +78,14 @@ public class ControleProdutos {
                     preparedStatement.executeUpdate();
                     if (prod.getRestricaoVisibilidade() != null) {
                         prod.getRestricaoVisibilidade().setProduto(prod);
-                        if (!ControleRestricaoVisibilidade.getInstace().salvarRestricao(connection, prod.getRestricaoVisibilidade())) {
+                        if (!ControleRestricaoVisibilidade.getInstance().salvarRestricao(connection, prod.getRestricaoVisibilidade())) {
                             throw new SQLException("Falha ao salvar restrição");
                         }
                     }
                     connection.commit();
-                    Categoria cat = ControleCategorias.getInstace().getCategoriaByUUID(prod.getCategoria().getUuid());
+                    Categoria cat = ControleCategorias.getInstance().getCategoriaByUUID(prod.getCategoria().getUuid());
                     synchronized (cat.getProdutos()) {
-                        cat.getProdutos().add(ControleProdutos.getInstace().getProdutoByUUID(prod.getUuid()));
+                        cat.getProdutos().add(ControleProdutos.getInstance().getProdutoByUUID(prod.getUuid()));
                     }
                     return true;
                 } catch (SQLException ex) {
@@ -105,12 +107,12 @@ public class ControleProdutos {
                     preparedStatement.setBoolean(6, prod.isVisivel());
                     preparedStatement.setObject(7, prod.getUuid());
                     preparedStatement.executeUpdate();
-                    if (ControleRestricaoVisibilidade.getInstace().getRestricaoProduto(prod) != null && !ControleRestricaoVisibilidade.getInstace().excluirRestricao(prod)) {
+                    if (ControleRestricaoVisibilidade.getInstance().getRestricaoProduto(prod) != null && !ControleRestricaoVisibilidade.getInstance().excluirRestricao(prod)) {
                         throw new SQLException("Falha ao remover restrição");
                     }
                     if (prod.getRestricaoVisibilidade() != null) {
                         prod.getRestricaoVisibilidade().setProduto(prod);
-                        if (!ControleRestricaoVisibilidade.getInstace().salvarRestricao(connection, prod.getRestricaoVisibilidade())) {
+                        if (!ControleRestricaoVisibilidade.getInstance().salvarRestricao(connection, prod.getRestricaoVisibilidade())) {
                             throw new SQLException("Falha ao salvar restrição");
                         }
                     }
@@ -185,7 +187,7 @@ public class ControleProdutos {
     public List<Produto> getProdutosEstabelecimento(Estabelecimento estabelecimento) {
         List<Produto> produtos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select a.uuid from \"Produtos\" as a inner join \"Categorias\" as b on a.uuid_categoria = b.uuid where b.uuid_estabelecimento = ? order by a.\"dataCriacao\" ");
+             PreparedStatement preparedStatement = conn.prepareStatement("select a.uuid from \"Produtos\" as a inner join \"Categorias\" as b on a.uuid_categoria = b.uuid where b.uuid_estabelecimento = ? and a.ativo and b.ativo order by a.\"dataCriacao\" ");
         ) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

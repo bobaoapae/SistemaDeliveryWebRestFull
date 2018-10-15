@@ -35,7 +35,7 @@ public class AuthenticationToken implements ContainerRequestFilter {
                 } else {
                     token = containerRequestContext.getCookies().get("token").getValue();
                 }
-                Token k = ControleTokens.getInstace().getToken(token);
+                Token k = ControleTokens.getInstance().getToken(token);
                 if (k != null) {
                     if (DateUtils.isAfterDay(k.getValidade(), new Date())) {
                         TokenSecurityContext securityContext = new TokenSecurityContext(k);

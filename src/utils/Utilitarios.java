@@ -8,6 +8,8 @@ package utils;
 import adapters.*;
 import com.google.gson.GsonBuilder;
 import jdk.nashorn.internal.ir.annotations.Ignore;
+import sistemaDelivery.modelo.ItemPedido;
+import sistemaDelivery.modelo.Produto;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -18,6 +20,7 @@ import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
@@ -28,9 +31,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
+import java.util.*;
 
 /**
  * @author BOV-INOS
@@ -43,14 +44,24 @@ public class Utilitarios {
         return t;
     }
 
-    public static GsonBuilder getDefaultGsonBuilder() {
-        return new GsonBuilder().disableHtmlEscaping().
+    public static GsonBuilder getDefaultGsonBuilder(Type type) {
+        GsonBuilder builder = new GsonBuilder().disableHtmlEscaping().
                 registerTypeAdapter(java.sql.Date.class, new DateAdapterSerialize()).
                 registerTypeAdapter(java.sql.Date.class, new DateAdapterDeserialize()).
                 registerTypeAdapter(Timestamp.class, new TimestampAdapterSerialize()).
                 registerTypeAdapter(Timestamp.class, new TimestampAdapterDeserialize()).
                 registerTypeAdapter(Time.class, new TimeAdapter()).
                 registerTypeAdapter(Time.class, new TimeAdapterDeserialize());
+        HashMap<Type, Object> adapters = new HashMap<>();
+        adapters.put(ItemPedido.class, new UseGetterAdapterSerialize<>());
+        adapters.put(Produto.class, new UseGetterAdapterSerialize<>());
+        for (Map.Entry<Type, Object> entry : adapters.entrySet()) {
+            if (entry.getKey().equals(type)) {
+                continue;
+            }
+            builder.registerTypeAdapter(entry.getKey(), entry.getValue());
+        }
+        return builder;
     }
 
     public static void atualizarObjeto(Object x, Object y) {

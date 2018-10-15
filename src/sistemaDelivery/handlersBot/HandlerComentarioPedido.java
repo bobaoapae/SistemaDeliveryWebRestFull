@@ -50,7 +50,7 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
         LocalTime horaAtual = LocalTime.now();
         String categoriasDisponiveis = "";
-        for (Categoria c : ControleCategorias.getInstace().getCategoriasEstabelecimento(getChatBotDelivery().getEstabelecimento())) {
+        for (Categoria c : ControleCategorias.getInstance().getCategoriasEstabelecimento(getChatBotDelivery().getEstabelecimento())) {
             if (c.getProdutos().isEmpty() && c.getCategoriasFilhas().isEmpty()) {
                 continue;
             }

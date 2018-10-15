@@ -11,24 +11,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class ControleUsuarios {
 
-    private static ControleUsuarios instace;
-    private HashMap<UUID, Usuario> usuarios;
-    private static final Object syncronizeGetSession = new Object();
+    private static final Object syncronizeGetInstance = new Object();
+    private static ControleUsuarios instance;
+    private Map<UUID, Usuario> usuarios;
     private ControleUsuarios() {
-        this.usuarios = new HashMap<>();
+        this.usuarios = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleUsuarios getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleUsuarios();
+    public static ControleUsuarios getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleUsuarios();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -36,20 +38,22 @@ public class ControleUsuarios {
         if (usuarios.containsKey(uuid)) {
             return usuarios.get(uuid);
         }
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            ResultSetHandler<Usuario> h = new BeanHandler<Usuario>(Usuario.class);
-            Usuario u = queryRunner.query("select * from \"Usuarios\" where uuid = ?", h, uuid);
-            if (u == null) {
-                return null;
+        synchronized (usuarios) {
+            try {
+                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+                ResultSetHandler<Usuario> h = new BeanHandler<Usuario>(Usuario.class);
+                Usuario u = queryRunner.query("select * from \"Usuarios\" where uuid = ?", h, uuid);
+                if (u == null) {
+                    return null;
+                }
+                usuarios.putIfAbsent(uuid, u);
+                u.setEstabelecimentos(ControleEstabelecimentos.getInstance().getEstabelecimentosUsuario(u));
+                return usuarios.get(uuid);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
-            usuarios.put(uuid, u);
-            u.setEstabelecimentos(ControleEstabelecimentos.getInstace().getEstabelecimentosUsuario(u));
-            return u;
-        } catch (SQLException e) {
-            e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     public Usuario getUsuario(String login, String senha) {

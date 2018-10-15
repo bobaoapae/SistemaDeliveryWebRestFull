@@ -17,20 +17,20 @@ import java.util.*;
 
 public class ControleEstabelecimentos {
 
-    private static ControleEstabelecimentos instace;
+    private static final Object syncronizeGetInstance = new Object();
     private Map<UUID, Estabelecimento> estabelecimentos;
-    private static final Object syncronizeGetSession = new Object();
+    private static ControleEstabelecimentos instance;
 
     private ControleEstabelecimentos() {
         this.estabelecimentos = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleEstabelecimentos getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleEstabelecimentos();
+    public static ControleEstabelecimentos getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleEstabelecimentos();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -46,10 +46,10 @@ public class ControleEstabelecimentos {
                 if (estabelecimento == null) {
                     return null;
                 }
-                estabelecimentos.put(uuid, estabelecimento);
-                estabelecimento.setCategorias(ControleCategorias.getInstace().getCategoriasEstabelecimento(estabelecimento));
+                estabelecimentos.putIfAbsent(uuid, estabelecimento);
+                estabelecimento.setCategorias(ControleCategorias.getInstance().getCategoriasEstabelecimento(estabelecimento));
                 estabelecimento.setRodizios(ControleRodizios.getInstace().getRodiziosEstabelecimento(estabelecimento));
-                return estabelecimento;
+                return estabelecimentos.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

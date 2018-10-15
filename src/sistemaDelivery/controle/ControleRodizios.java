@@ -54,9 +54,9 @@ public class ControleRodizios {
                 diasSemana[5] = resultSet.getBoolean("sexta");
                 diasSemana[6] = resultSet.getBoolean("sabado");
                 rodizio.setDiasSemana(diasSemana);
-                rodizios.put(uuid, rodizio);
-                rodizio.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(rodizio.getUuid_estabelecimento()));
-                return rodizio;
+                rodizios.putIfAbsent(uuid, rodizio);
+                rodizio.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(rodizio.getUuid_estabelecimento()));
+                return rodizios.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

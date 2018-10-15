@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class ControleChatsAsync {
 
-    private static Map<Estabelecimento, ControleChatsAsync> instaces = Collections.synchronizedMap(new HashMap<>());
+    private static Map<Estabelecimento, ControleChatsAsync> instances = Collections.synchronizedMap(new HashMap<>());
     private final List<ChatBotDelivery> chats;
     private Estabelecimento estabelecimento;
     public ControleChatsAsync(Estabelecimento estabelecimento) {
@@ -27,22 +27,22 @@ public class ControleChatsAsync {
 
 
     public static ControleChatsAsync getInstance(Estabelecimento e) {
-        synchronized (instaces) {
-            if (instaces.containsKey(e)) {
-                return instaces.get(e);
+        synchronized (instances) {
+            if (instances.containsKey(e)) {
+                return instances.get(e);
             } else {
-                instaces.put(e, new ControleChatsAsync(e));
-                return instaces.get(e);
+                instances.put(e, new ControleChatsAsync(e));
+                return instances.get(e);
             }
         }
     }
 
     public void finalizar() {
-        synchronized (instaces) {
+        synchronized (instances) {
             for (ChatBotDelivery chatt : chats) {
                 chatt.finalizar();
             }
-            ControleChatsAsync.instaces.remove(this.estabelecimento);
+            ControleChatsAsync.instances.remove(this.estabelecimento);
         }
     }
 

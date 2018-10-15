@@ -1,6 +1,5 @@
 package restFul;
 
-import adapters.UseGetterAdapterSerialize;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -11,6 +10,7 @@ import modelo.Chat;
 import modelo.EstadoDriver;
 import restFul.controle.ControleSessions;
 import restFul.modelo.Token;
+import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.*;
 import sistemaDelivery.modelo.*;
 import utils.Utilitarios;
@@ -21,6 +21,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
+import javax.ws.rs.sse.Sse;
+import javax.ws.rs.sse.SseEventSink;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.Time;
@@ -37,11 +39,30 @@ public class API {
 
     public API(@Context HttpServletRequest session, @Context SecurityContext securityContext) {
         this.token = (Token) securityContext.getUserPrincipal();
-        builder = Utilitarios.getDefaultGsonBuilder().registerTypeAdapter(Produto.class, new UseGetterAdapterSerialize()).create();
+        builder = Utilitarios.getDefaultGsonBuilder(null).create();
         if (session.getSession(true).getAttribute("pedidosSendoCriados") == null) {
             session.getSession().setAttribute("pedidosSendoCriados", Collections.synchronizedList(new ArrayList<>()));
         }
         pedidosSendoCriados = ((List<Pedido>) session.getSession().getAttribute("pedidosSendoCriados"));
+    }
+
+    @GET
+    @Path("/eventoNovoPedido")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void eventoNovoPedido(@Context SseEventSink sink, @Context Sse sse) {
+        try {
+            SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
+            if (sistemaDelivery.getBroadcaster() != null) {
+                sistemaDelivery.getBroadcaster().register(sink);
+            } else {
+                sistemaDelivery.setSse(sse);
+                sistemaDelivery.setBroadcaster(sse.newBroadcaster());
+                sistemaDelivery.getBroadcaster().register(sink);
+            }
+            sink.send(sse.newEvent("ok"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -121,7 +142,7 @@ public class API {
         token.getEstabelecimento().setValidadeSeloFidelidade(novosValoresEstabelecimento.getValidadeSeloFidelidade());
         token.getEstabelecimento().setValorSelo(novosValoresEstabelecimento.getValorSelo());
         token.getEstabelecimento().setMaximoSeloPorCompra(novosValoresEstabelecimento.getMaximoSeloPorCompra());
-        if (ControleEstabelecimentos.getInstace().salvarEstabelecimento(token.getEstabelecimento())) {
+        if (ControleEstabelecimentos.getInstance().salvarEstabelecimento(token.getEstabelecimento())) {
             return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento())).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -134,11 +155,11 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCategorias(@QueryParam("uuid") String uuid) {
         if (uuid == null || uuid.isEmpty()) {
-            List<Categoria> categorias = ControleCategorias.getInstace().getCategoriasEstabelecimento(token.getEstabelecimento());
+            List<Categoria> categorias = ControleCategorias.getInstance().getCategoriasEstabelecimento(token.getEstabelecimento());
             String json = builder.toJson(categorias);
             return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).entity(json).build();
         } else {
-            Categoria categoria = ControleCategorias.getInstace().getCategoriaByUUID(UUID.fromString(uuid));
+            Categoria categoria = ControleCategorias.getInstance().getCategoriaByUUID(UUID.fromString(uuid));
             if (categoria == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             } else if (categoria.getEstabelecimento().equals(token.getEstabelecimento())) {
@@ -156,7 +177,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else {
-            Categoria categoria = ControleCategorias.getInstace().getCategoriaByUUID(UUID.fromString(uuid));
+            Categoria categoria = ControleCategorias.getInstance().getCategoriaByUUID(UUID.fromString(uuid));
             if (categoria == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             } else if (categoria.getEstabelecimento().equals(token.getEstabelecimento())) {
@@ -173,9 +194,9 @@ public class API {
     public Response salvarCategoria(@FormParam("categoria") String cat) {
         Categoria categoria = builder.fromJson(cat, Categoria.class);
         categoria.setEstabelecimento(token.getEstabelecimento());
-        categoria.setCategoriaPai(ControleCategorias.getInstace().getCategoriaByUUID(categoria.getUuid_categoria_pai()));
+        categoria.setCategoriaPai(ControleCategorias.getInstance().getCategoriaByUUID(categoria.getUuid_categoria_pai()));
         for (UUID uuidCat : categoria.getUuidsCategoriasNecessarias()) {
-            Categoria catNecessaria = ControleCategorias.getInstace().getCategoriaByUUID(uuidCat);
+            Categoria catNecessaria = ControleCategorias.getInstance().getCategoriaByUUID(uuidCat);
             if (catNecessaria == null) {
                 return Response.status(Response.Status.BAD_REQUEST).entity(uuidCat + " - uuid invalido").build();
             }
@@ -187,8 +208,8 @@ public class API {
         if (categoria.getCategoriaPai() != null && !categoria.getCategoriaPai().getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (ControleCategorias.getInstace().salvarCategoria(categoria)) {
-            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleCategorias.getInstace().getCategoriaByUUID(categoria.getUuid()))).build();
+        if (ControleCategorias.getInstance().salvarCategoria(categoria)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleCategorias.getInstance().getCategoriaByUUID(categoria.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -201,7 +222,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Categoria categoria = ControleCategorias.getInstace().getCategoriaByUUID(UUID.fromString(uuid));
+        Categoria categoria = ControleCategorias.getInstance().getCategoriaByUUID(UUID.fromString(uuid));
         if (categoria == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -209,8 +230,8 @@ public class API {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         categoria.setVisivel(!categoria.isVisivel());
-        if (ControleCategorias.getInstace().salvarCategoria(categoria)) {
-            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleCategorias.getInstace().getCategoriaByUUID(categoria.getUuid()))).build();
+        if (ControleCategorias.getInstance().salvarCategoria(categoria)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleCategorias.getInstance().getCategoriaByUUID(categoria.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -223,7 +244,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Categoria categoria = ControleCategorias.getInstace().getCategoriaByUUID(UUID.fromString(uuid));
+        Categoria categoria = ControleCategorias.getInstance().getCategoriaByUUID(UUID.fromString(uuid));
         if (categoria == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -231,8 +252,8 @@ public class API {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         categoria.setEntregaGratis(!categoria.isEntregaGratis());
-        if (ControleCategorias.getInstace().salvarCategoria(categoria)) {
-            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleCategorias.getInstace().getCategoriaByUUID(categoria.getUuid()))).build();
+        if (ControleCategorias.getInstance().salvarCategoria(categoria)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleCategorias.getInstance().getCategoriaByUUID(categoria.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -245,14 +266,14 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Categoria categoria = ControleCategorias.getInstace().getCategoriaByUUID(UUID.fromString(uuid));
+        Categoria categoria = ControleCategorias.getInstance().getCategoriaByUUID(UUID.fromString(uuid));
         if (categoria == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         if (!categoria.getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (ControleCategorias.getInstace().excluirCategoria(categoria)) {
+        if (ControleCategorias.getInstance().excluirCategoria(categoria)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -265,12 +286,12 @@ public class API {
     @Path("/salvarProduto")
     public Response salvarProduto(@FormParam("produto") String prod) {
         Produto produto = builder.fromJson(prod, Produto.class);
-        produto.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(produto.getUuid_categoria()));
+        produto.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(produto.getUuid_categoria()));
         if (!produto.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (ControleProdutos.getInstace().salvarProduto(produto)) {
-            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleProdutos.getInstace().getProdutoByUUID(produto.getUuid()))).build();
+        if (ControleProdutos.getInstance().salvarProduto(produto)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleProdutos.getInstance().getProdutoByUUID(produto.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -281,9 +302,9 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getProdutos(@QueryParam("uuid") String uuid) {
         if (uuid == null || uuid.isEmpty()) {
-            return Response.status(Response.Status.OK).entity(builder.toJson(ControleProdutos.getInstace().getProdutosEstabelecimento(token.getEstabelecimento()))).build();
+            return Response.status(Response.Status.OK).entity(builder.toJson(ControleProdutos.getInstance().getProdutosEstabelecimento(token.getEstabelecimento()))).build();
         } else {
-            Categoria categoria = ControleCategorias.getInstace().getCategoriaByUUID(UUID.fromString(uuid));
+            Categoria categoria = ControleCategorias.getInstance().getCategoriaByUUID(UUID.fromString(uuid));
             if (categoria == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             } else if (categoria.getEstabelecimento().equals(token.getEstabelecimento())) {
@@ -301,7 +322,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else {
-            Produto produto = ControleProdutos.getInstace().getProdutoByUUID(UUID.fromString(uuid));
+            Produto produto = ControleProdutos.getInstance().getProdutoByUUID(UUID.fromString(uuid));
             if (produto == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             } else if (produto.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
@@ -319,7 +340,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else {
-            Produto produto = ControleProdutos.getInstace().getProdutoByUUID(UUID.fromString(uuid));
+            Produto produto = ControleProdutos.getInstance().getProdutoByUUID(UUID.fromString(uuid));
             if (produto == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             } else if (produto.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
@@ -337,7 +358,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Produto produto = ControleProdutos.getInstace().getProdutoByUUID(UUID.fromString(uuid));
+        Produto produto = ControleProdutos.getInstance().getProdutoByUUID(UUID.fromString(uuid));
         if (produto == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -345,8 +366,8 @@ public class API {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         produto.setVisivel(!produto.isVisivel());
-        if (ControleProdutos.getInstace().salvarProduto(produto)) {
-            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleProdutos.getInstace().getProdutoByUUID(produto.getUuid()))).build();
+        if (ControleProdutos.getInstance().salvarProduto(produto)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleProdutos.getInstance().getProdutoByUUID(produto.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -359,14 +380,14 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Produto produto = ControleProdutos.getInstace().getProdutoByUUID(UUID.fromString(uuid));
+        Produto produto = ControleProdutos.getInstance().getProdutoByUUID(UUID.fromString(uuid));
         if (produto == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         if (!produto.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (ControleProdutos.getInstace().excluirProduto(produto)) {
+        if (ControleProdutos.getInstance().excluirProduto(produto)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -431,20 +452,20 @@ public class API {
     public Response salvarGrupoAdicional(@FormParam("grupo") String grupo) {
         GrupoAdicional grupoAdicional = builder.fromJson(grupo, GrupoAdicional.class);
         if (grupoAdicional.getUuid_categoria() != null) {
-            grupoAdicional.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(grupoAdicional.getUuid_categoria()));
+            grupoAdicional.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(grupoAdicional.getUuid_categoria()));
             if (!grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         } else if (grupoAdicional.getUuid_produto() != null) {
-            grupoAdicional.setProduto(ControleProdutos.getInstace().getProdutoByUUID(grupoAdicional.getUuid_produto()));
+            grupoAdicional.setProduto(ControleProdutos.getInstance().getProdutoByUUID(grupoAdicional.getUuid_produto()));
             if (!grupoAdicional.getProduto().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         } else {
             return Response.status(Response.Status.BAD_REQUEST).entity("uuid categoria ou produto faltando").build();
         }
-        if (ControleGruposAdicionais.getInstace().salvarGrupoAdicional(grupoAdicional)) {
-            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleGruposAdicionais.getInstace().getGrupoByUUID(grupoAdicional.getUuid()))).build();
+        if (ControleGruposAdicionais.getInstance().salvarGrupoAdicional(grupoAdicional)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleGruposAdicionais.getInstance().getGrupoByUUID(grupoAdicional.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -457,7 +478,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else {
-            GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstace().getGrupoByUUID(UUID.fromString(uuid));
+            GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstance().getGrupoByUUID(UUID.fromString(uuid));
             if (grupoAdicional == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -484,7 +505,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstace().getGrupoByUUID(UUID.fromString(uuid));
+        GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstance().getGrupoByUUID(UUID.fromString(uuid));
         if (grupoAdicional == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -497,7 +518,7 @@ public class API {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         }
-        if (ControleGruposAdicionais.getInstace().excluirGrupo(grupoAdicional)) {
+        if (ControleGruposAdicionais.getInstance().excluirGrupo(grupoAdicional)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -511,7 +532,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstace().getGrupoByUUID(UUID.fromString(uuid));
+        GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstance().getGrupoByUUID(UUID.fromString(uuid));
         if (grupoAdicional == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -524,13 +545,113 @@ public class API {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         }
-        String exportacao = "Nome Gruopo; Qtd Min; Qtd Max; Forma Cobrança\r\n" + grupoAdicional.getNomeGrupo() + ";" + grupoAdicional.getQtdMin() + ";" + grupoAdicional.getQtdMax() + ";" + grupoAdicional.getFormaCobranca().toString() + "\r\nNome;Descrição;Valor\r\n";
+        String exportacao = "Nome Grupo; Qtd Min; Qtd Max; Forma Cobrança\r\n" + grupoAdicional.getNomeGrupo() + ";" + grupoAdicional.getQtdMin() + ";" + grupoAdicional.getQtdMax() + ";" + grupoAdicional.getFormaCobranca().toString() + "\r\nNome;Descrição;Valor\r\n";
         for (int linha = 0; linha < grupoAdicional.getAdicionais().size(); linha++) {
             exportacao += grupoAdicional.getAdicionais().get(linha).getNome() + ";";
             exportacao += grupoAdicional.getAdicionais().get(linha).getDescricao() + ";";
-            exportacao += grupoAdicional.getAdicionais().get(linha).getValor() + "\r\n";
+            exportacao += grupoAdicional.getAdicionais().get(linha).getValor() + ";\r\n";
         }
         return Response.status(Response.Status.OK).entity(Base64.getEncoder().encodeToString(exportacao.getBytes(Charset.forName("UTF-8")))).build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/importarGrupoAdicionalCategoria")
+    public Response importarGrupoCategoria(@QueryParam("uuid") String uuid, @FormParam("arquivo") String arquivo) {
+        try {
+            String decoded = new String(Base64.getDecoder().decode(arquivo), Charset.forName("UTF-8"));
+            decoded = decoded.replaceAll("\t", ";").replace("\uFEFF", "");
+            ;
+            String linhas[] = decoded.split("\r\n");
+            GrupoAdicional grupoAdicional = new GrupoAdicional();
+            grupoAdicional.setNomeGrupo(linhas[1].split(";")[0]);
+            grupoAdicional.setQtdMin(Integer.parseInt(linhas[1].split(";")[1]));
+            grupoAdicional.setQtdMax(Integer.parseInt(linhas[1].split(";")[2]));
+            grupoAdicional.setFormaCobranca(GrupoAdicional.FormaCobranca.valueOf(linhas[1].split(";")[3]));
+            List<AdicionalProduto> adicionalProdutos = new ArrayList<>();
+            for (int x = 3; x < linhas.length; x++) {
+                String linhaAtual[] = linhas[x].split(";");
+                AdicionalProduto adicionalProduto = new AdicionalProduto();
+                adicionalProduto.setNome(linhaAtual[0]);
+                adicionalProduto.setDescricao(linhaAtual[1]);
+                adicionalProduto.setValor(Double.parseDouble(linhaAtual[2]));
+                adicionalProdutos.add(adicionalProduto);
+            }
+            Categoria categoria = ControleCategorias.getInstance().getCategoriaByUUID(UUID.fromString(uuid));
+            if (categoria == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if (!categoria.getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            grupoAdicional.setCategoria(categoria);
+            grupoAdicional.setUuid_categoria(categoria.getUuid());
+            if (ControleGruposAdicionais.getInstance().salvarGrupoAdicional(grupoAdicional)) {
+                for (AdicionalProduto adicionalProduto : adicionalProdutos) {
+                    adicionalProduto.setGrupoAdicional(ControleGruposAdicionais.getInstance().getGrupoByUUID(grupoAdicional.getUuid()));
+                    if (!ControleAdicionais.getInstance().salvarAdicional(adicionalProduto)) {
+                        ControleGruposAdicionais.getInstance().excluirGrupo(grupoAdicional);
+                        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                    }
+                }
+                return Response.status(Response.Status.OK).entity(builder.toJson(ControleGruposAdicionais.getInstance().getGrupoByUUID(grupoAdicional.getUuid()))).build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/importarGrupoAdicionalProduto")
+    public Response importarGrupoProduto(@QueryParam("uuid") String uuid, @FormParam("arquivo") String arquivo) {
+        try {
+            String decoded = new String(Base64.getDecoder().decode(arquivo), Charset.forName("UTF-8"));
+            decoded = decoded.replaceAll("\t", ";").replace("\uFEFF", "");
+            ;
+            String linhas[] = decoded.split("\r\n");
+            GrupoAdicional grupoAdicional = new GrupoAdicional();
+            grupoAdicional.setNomeGrupo(linhas[1].split(";")[0]);
+            grupoAdicional.setQtdMin(Integer.parseInt(linhas[1].split(";")[1]));
+            grupoAdicional.setQtdMax(Integer.parseInt(linhas[1].split(";")[2]));
+            grupoAdicional.setFormaCobranca(GrupoAdicional.FormaCobranca.valueOf(linhas[1].split(";")[3]));
+            List<AdicionalProduto> adicionalProdutos = new ArrayList<>();
+            for (int x = 3; x < linhas.length; x++) {
+                String linhaAtual[] = linhas[x].split(";");
+                AdicionalProduto adicionalProduto = new AdicionalProduto();
+                adicionalProduto.setNome(linhaAtual[0]);
+                adicionalProduto.setDescricao(linhaAtual[1]);
+                adicionalProduto.setValor(Double.parseDouble(linhaAtual[2]));
+                adicionalProdutos.add(adicionalProduto);
+            }
+            Produto produto = ControleProdutos.getInstance().getProdutoByUUID(UUID.fromString(uuid));
+            if (produto == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if (!produto.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            grupoAdicional.setProduto(produto);
+            grupoAdicional.setUuid_produto(produto.getUuid());
+            if (ControleGruposAdicionais.getInstance().salvarGrupoAdicional(grupoAdicional)) {
+                for (AdicionalProduto adicionalProduto : adicionalProdutos) {
+                    adicionalProduto.setGrupoAdicional(ControleGruposAdicionais.getInstance().getGrupoByUUID(grupoAdicional.getUuid()));
+                    if (!ControleAdicionais.getInstance().salvarAdicional(adicionalProduto)) {
+                        ControleGruposAdicionais.getInstance().excluirGrupo(grupoAdicional);
+                        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                    }
+                }
+                return Response.status(Response.Status.OK).entity(builder.toJson(ControleGruposAdicionais.getInstance().getGrupoByUUID(grupoAdicional.getUuid()))).build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 
@@ -541,9 +662,9 @@ public class API {
         AdicionalProduto adicionalProduto = builder.fromJson(adicional, AdicionalProduto.class);
         GrupoAdicional grupoAdicional = null;
         if (adicionalProduto.getUuid() != null) {
-            grupoAdicional = ControleAdicionais.getInstace().getAdicionalByUUID(adicionalProduto.getUuid()).getGrupoAdicional();
+            grupoAdicional = ControleAdicionais.getInstance().getAdicionalByUUID(adicionalProduto.getUuid()).getGrupoAdicional();
         } else {
-            grupoAdicional = ControleGruposAdicionais.getInstace().getGrupoByUUID(adicionalProduto.getUuid_grupo_adicional());
+            grupoAdicional = ControleGruposAdicionais.getInstance().getGrupoByUUID(adicionalProduto.getUuid_grupo_adicional());
         }
         if (grupoAdicional.getCategoria() != null) {
             if (!grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
@@ -553,8 +674,8 @@ public class API {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         adicionalProduto.setGrupoAdicional(grupoAdicional);
-        if (ControleAdicionais.getInstace().salvarAdicional(adicionalProduto)) {
-            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleAdicionais.getInstace().getAdicionalByUUID(adicionalProduto.getUuid()))).build();
+        if (ControleAdicionais.getInstance().salvarAdicional(adicionalProduto)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleAdicionais.getInstance().getAdicionalByUUID(adicionalProduto.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -567,7 +688,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         } else {
-            AdicionalProduto adicional = ControleAdicionais.getInstace().getAdicionalByUUID(UUID.fromString(uuid));
+            AdicionalProduto adicional = ControleAdicionais.getInstance().getAdicionalByUUID(UUID.fromString(uuid));
             if (adicional == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
@@ -594,7 +715,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        AdicionalProduto adicionalProduto = ControleAdicionais.getInstace().getAdicionalByUUID(UUID.fromString(uuid));
+        AdicionalProduto adicionalProduto = ControleAdicionais.getInstance().getAdicionalByUUID(UUID.fromString(uuid));
         if (adicionalProduto == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -608,7 +729,7 @@ public class API {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
         }
-        if (ControleAdicionais.getInstace().excluirAdicional(adicionalProduto)) {
+        if (ControleAdicionais.getInstance().excluirAdicional(adicionalProduto)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -620,9 +741,9 @@ public class API {
     @Path("/clientes")
     public Response getClientes(@QueryParam("uuid") String uuid) {
         if (uuid == null || uuid.isEmpty()) {
-            return Response.status(Response.Status.OK).entity(builder.toJson(ControleClientes.getInstace().getClientes())).build();
+            return Response.status(Response.Status.OK).entity(builder.toJson(ControleClientes.getInstance().getClientes())).build();
         } else {
-            return Response.status(Response.Status.OK).entity(builder.toJson(ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid)))).build();
+            return Response.status(Response.Status.OK).entity(builder.toJson(ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)))).build();
         }
     }
 
@@ -642,8 +763,8 @@ public class API {
             }
         }
         cliente.setCadastroRealizado(true);
-        if (ControleClientes.getInstace().salvarCliente(cliente)) {
-            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleClientes.getInstace().getClienteByUUID(cliente.getUuid()))).build();
+        if (ControleClientes.getInstance().salvarCliente(cliente)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleClientes.getInstance().getClienteByUUID(cliente.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -654,7 +775,7 @@ public class API {
     @Path("/salvarRecarga")
     public Response salvarRecarga(@FormParam("recarga") String recarga) {
         RecargaCliente recargaCliente = builder.fromJson(recarga, RecargaCliente.class);
-        recargaCliente.setCliente(ControleClientes.getInstace().getClienteByUUID(recargaCliente.getUuid_cliente()));
+        recargaCliente.setCliente(ControleClientes.getInstance().getClienteByUUID(recargaCliente.getUuid_cliente()));
         recargaCliente.setEstabelecimento(token.getEstabelecimento());
         if (recargaCliente.getValor() < 0) {
             recargaCliente.setValor(recargaCliente.getValor() * -1);
@@ -662,8 +783,8 @@ public class API {
         } else {
             recargaCliente.setTipoRecarga(TipoRecarga.DEPOSITO);
         }
-        if (ControleRecargas.getInstace().salvarRecarga(recargaCliente)) {
-            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleRecargas.getInstace().getRecargaByUUID(recargaCliente.getUuid()))).build();
+        if (ControleRecargas.getInstance().salvarRecarga(recargaCliente)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleRecargas.getInstance().getRecargaByUUID(recargaCliente.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -673,10 +794,10 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/recargasCliente")
     public Response getRecargasClientes(@QueryParam("uuid") String uuid) {
-        List<RecargaCliente> recargaClientes = ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid)).getRegargas(token.getEstabelecimento());
+        List<RecargaCliente> recargaClientes = ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)).getRegargas(token.getEstabelecimento());
         JsonObject object = new JsonObject();
-        object.addProperty("saldo", ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid)).getCreditosDisponiveis(token.getEstabelecimento()));
-        JsonElement element = builder.toJsonTree(ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid)).getRegargas(token.getEstabelecimento()), new TypeToken<List<RecargaCliente>>() {
+        object.addProperty("saldo", ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)).getCreditosDisponiveis(token.getEstabelecimento()));
+        JsonElement element = builder.toJsonTree(ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)).getRegargas(token.getEstabelecimento()), new TypeToken<List<RecargaCliente>>() {
         }.getType());
         object.add("recargas", element);
         return Response.status(Response.Status.OK).entity(builder.toJson(object)).build();
@@ -688,7 +809,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response alterarEstadoPedidos() {
         token.getEstabelecimento().setOpenPedidos(!token.getEstabelecimento().isOpenPedidos());
-        if (ControleEstabelecimentos.getInstace().salvarEstabelecimento(token.getEstabelecimento())) {
+        if (ControleEstabelecimentos.getInstance().salvarEstabelecimento(token.getEstabelecimento())) {
             return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento())).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -700,7 +821,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response alterarEstadoChatBot() {
         token.getEstabelecimento().setOpenChatBot(!token.getEstabelecimento().isOpenChatBot());
-        if (ControleEstabelecimentos.getInstace().salvarEstabelecimento(token.getEstabelecimento())) {
+        if (ControleEstabelecimentos.getInstance().salvarEstabelecimento(token.getEstabelecimento())) {
             return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento())).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -714,7 +835,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Pedido pedido = ControlePedidos.getInstace().getPedidoByUUID(UUID.fromString(uuid));
+        Pedido pedido = ControlePedidos.getInstance().getPedidoByUUID(UUID.fromString(uuid));
         if (pedido == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -731,32 +852,32 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Cliente cliente = ControleClientes.getInstace().getClienteByUUID(UUID.fromString(uuid));
+        Cliente cliente = ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid));
         if (cliente == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstace().getPedidosCliente(cliente, token.getEstabelecimento()))).build();
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstance().getPedidosCliente(cliente, token.getEstabelecimento()))).build();
     }
 
     @GET
     @Path("/pedidosEstabelecimento")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPedidosEstabelecimento() {
-        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstace().getPedidos(token.getEstabelecimento()))).build();
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstance().getPedidos(token.getEstabelecimento()))).build();
     }
 
     @GET
     @Path("/pedidosAtivos")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPedidosAtivos() {
-        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstace().getPedidosAtivos(token.getEstabelecimento()))).build();
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstance().getPedidosAtivos(token.getEstabelecimento()))).build();
     }
 
     @GET
     @Path("/pedidosImprimir")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getpedidosImprimir() {
-        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstace().getPedidosNaoImpressos(token.getEstabelecimento()))).build();
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstance().getPedidosNaoImpressos(token.getEstabelecimento()))).build();
     }
 
     @GET
@@ -766,7 +887,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Pedido pedido = ControlePedidos.getInstace().getPedidoByUUID(UUID.fromString(uuid));
+        Pedido pedido = ControlePedidos.getInstance().getPedidoByUUID(UUID.fromString(uuid));
         if (pedido == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -774,7 +895,7 @@ public class API {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         pedido.setImpresso(true);
-        if (ControlePedidos.getInstace().salvarPedido(pedido)) {
+        if (ControlePedidos.getInstance().salvarPedido(pedido)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -788,7 +909,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Pedido pedido = ControlePedidos.getInstace().getPedidoByUUID(UUID.fromString(uuid));
+        Pedido pedido = ControlePedidos.getInstance().getPedidoByUUID(UUID.fromString(uuid));
         if (pedido == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -796,7 +917,7 @@ public class API {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         pedido.setEstadoPedido(EstadoPedido.SaiuEntrega);
-        if (ControlePedidos.getInstace().salvarPedido(pedido)) {
+        if (ControlePedidos.getInstance().salvarPedido(pedido)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -810,7 +931,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Pedido pedido = ControlePedidos.getInstace().getPedidoByUUID(UUID.fromString(uuid));
+        Pedido pedido = ControlePedidos.getInstance().getPedidoByUUID(UUID.fromString(uuid));
         if (pedido == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -818,7 +939,7 @@ public class API {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         pedido.setEstadoPedido(EstadoPedido.Concluido);
-        if (ControlePedidos.getInstace().salvarPedido(pedido)) {
+        if (ControlePedidos.getInstance().salvarPedido(pedido)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -832,7 +953,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        Pedido pedido = ControlePedidos.getInstace().getPedidoByUUID(UUID.fromString(uuid));
+        Pedido pedido = ControlePedidos.getInstance().getPedidoByUUID(UUID.fromString(uuid));
         if (pedido == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -840,7 +961,7 @@ public class API {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         pedido.setEstadoPedido(EstadoPedido.Cancelado);
-        if (ControlePedidos.getInstace().salvarPedido(pedido)) {
+        if (ControlePedidos.getInstance().salvarPedido(pedido)) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -854,7 +975,7 @@ public class API {
         if (uuid == null || uuid.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        ItemPedido itemPedido = ControleItensPedidos.getInstace().getItemByUUID(UUID.fromString(uuid));
+        ItemPedido itemPedido = ControleItensPedidos.getInstance().getItemByUUID(UUID.fromString(uuid));
         if (itemPedido == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
@@ -864,7 +985,7 @@ public class API {
         if (itemPedido.getPedido().getEstadoPedido() == EstadoPedido.Concluido) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (ControleItensPedidos.getInstace().excluirPedido(itemPedido) && ControlePedidos.getInstace().salvarPedido(itemPedido.getPedido())) {
+        if (ControleItensPedidos.getInstance().excluirPedido(itemPedido) && ControlePedidos.getInstance().salvarPedido(itemPedido.getPedido())) {
             return Response.status(Response.Status.CREATED).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -875,9 +996,9 @@ public class API {
     @Path("/criarPedidoTeste")
     @Produces(MediaType.APPLICATION_JSON)
     public Response pedidoTeste() {
-        Pedido p = new Pedido(ControleClientes.getInstace().getClienteChatId("554491050665@c.us"), token.getEstabelecimento());
+        Pedido p = new Pedido(ControleClientes.getInstance().getClienteChatId("554491050665@c.us"), token.getEstabelecimento());
 
-        List<Produto> produtosDisponiveis = ControleProdutos.getInstace().getProdutosEstabelecimento(token.getEstabelecimento());
+        List<Produto> produtosDisponiveis = ControleProdutos.getInstance().getProdutosEstabelecimento(token.getEstabelecimento());
         if (produtosDisponiveis.size() > 0) {
             Collections.shuffle(produtosDisponiveis);
             p.setEntrega(new Random().nextInt() % 2 == 0);
@@ -899,7 +1020,6 @@ public class API {
                     itemPedido.setProduto(produto);
                     List<GrupoAdicional> grupoAdicionals = produto.getAllGruposAdicionais();
                     if (grupoAdicionals.size() > 0) {
-                        Collections.shuffle(grupoAdicionals);
                         for (GrupoAdicional grupoAdicional : grupoAdicionals) {
                             List<AdicionalProduto> adicionalProdutos = grupoAdicional.getAdicionais();
                             if (adicionalProdutos.size() > 0) {
@@ -920,8 +1040,8 @@ public class API {
                 p.calcularValor();
                 p.setTroco(p.getTotal() + new Random().nextInt(((int) p.getTotal())));
             }
-            if (ControlePedidos.getInstace().salvarPedido(p)) {
-                return Response.status(Response.Status.CREATED).entity(builder.toJson(ControlePedidos.getInstace().getPedidoByUUID(p.getUuid()))).build();
+            if (ControlePedidos.getInstance().salvarPedido(p)) {
+                return Response.status(Response.Status.CREATED).entity(builder.toJson(ControlePedidos.getInstance().getPedidoByUUID(p.getUuid()))).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
@@ -934,33 +1054,35 @@ public class API {
     @Path("/dadosDashboard")
     @Produces(MediaType.APPLICATION_JSON)
     public Response dadosDashboard() {
-        HashMap<String, Integer> dadosDeliveryDia = ControlePedidos.getInstace().getDadosDeliveryHoje(token.getEstabelecimento());
+        HashMap<String, Integer> dadosDeliveryDia = ControlePedidos.getInstance().getDadosDeliveryHoje(token.getEstabelecimento());
         HashMap<String, Integer> top5VendidosMes = new HashMap<>();
-        List<Pedido> pedidosMes = ControlePedidos.getInstace().getPedidosDoMes(token.getEstabelecimento());
+        List<Pedido> pedidosMes = ControlePedidos.getInstance().getPedidosDoMes(token.getEstabelecimento());
         for (Pedido pedido : pedidosMes) {
-            for (ItemPedido itemPedido : pedido.getProdutos()) {
-                if (itemPedido.isRemovido()) {
-                    continue;
-                }
-                String stringAtual = itemPedido.getProduto().getNomeWithCategories() + "";
-                if (!itemPedido.getAdicionais().isEmpty()) {
-                    stringAtual += " - ";
-                    for (Map.Entry<GrupoAdicional, List<AdicionalProduto>> entry : itemPedido.getAdicionaisGroupByGrupo().entrySet()) {
-                        if (entry.getValue().isEmpty()) {
-                            continue;
-                        }
-                        stringAtual += entry.getKey().getNomeGrupo() + ": ";
-                        for (AdicionalProduto adicionalProduto : entry.getValue()) {
-                            stringAtual += adicionalProduto.getNome() + ", ";
-                        }
-                        stringAtual = stringAtual.substring(0, stringAtual.lastIndexOf(",")).trim() + ". ";
+            synchronized (pedido.getProdutos()) {
+                for (ItemPedido itemPedido : pedido.getProdutos()) {
+                    if (itemPedido.isRemovido()) {
+                        continue;
                     }
-                }
-                stringAtual = stringAtual.trim();
-                if (top5VendidosMes.containsKey(stringAtual)) {
-                    top5VendidosMes.put(stringAtual, top5VendidosMes.get(stringAtual) + itemPedido.getQtd());
-                } else {
-                    top5VendidosMes.put(stringAtual, itemPedido.getQtd());
+                    String stringAtual = itemPedido.getProduto().getNomeWithCategories() + "";
+                    if (!itemPedido.getAdicionais().isEmpty()) {
+                        stringAtual += " - ";
+                        for (Map.Entry<GrupoAdicional, List<AdicionalProduto>> entry : itemPedido.getAdicionaisGroupByGrupo().entrySet()) {
+                            if (entry.getValue().isEmpty()) {
+                                continue;
+                            }
+                            stringAtual += entry.getKey().getNomeGrupo() + ": ";
+                            for (AdicionalProduto adicionalProduto : entry.getValue()) {
+                                stringAtual += adicionalProduto.getNome() + ", ";
+                            }
+                            stringAtual = stringAtual.substring(0, stringAtual.lastIndexOf(",")).trim() + ". ";
+                        }
+                    }
+                    stringAtual = stringAtual.trim();
+                    if (top5VendidosMes.containsKey(stringAtual)) {
+                        top5VendidosMes.put(stringAtual, top5VendidosMes.get(stringAtual) + itemPedido.getQtd());
+                    } else {
+                        top5VendidosMes.put(stringAtual, itemPedido.getQtd());
+                    }
                 }
             }
         }

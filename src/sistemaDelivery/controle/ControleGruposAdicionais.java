@@ -17,20 +17,20 @@ import java.util.*;
 
 public class ControleGruposAdicionais {
 
-    private static ControleGruposAdicionais instace;
+    private static final Object syncronizeGetInstance = new Object();
     private Map<UUID, GrupoAdicional> grupos;
-    private static final Object syncronizeGetSession = new Object();
+    private static ControleGruposAdicionais instance;
 
     private ControleGruposAdicionais() {
         this.grupos = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleGruposAdicionais getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleGruposAdicionais();
+    public static ControleGruposAdicionais getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleGruposAdicionais();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -46,11 +46,11 @@ public class ControleGruposAdicionais {
                 if (grupo == null) {
                     return null;
                 }
-                grupos.put(uuid, grupo);
-                grupo.setAdicionais(ControleAdicionais.getInstace().getAdicionaisGrupo(grupo));
-                grupo.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(grupo.getUuid_categoria()));
-                grupo.setProduto(ControleProdutos.getInstace().getProdutoByUUID(grupo.getUuid_produto()));
-                return grupo;
+                grupos.putIfAbsent(uuid, grupo);
+                grupo.setAdicionais(ControleAdicionais.getInstance().getAdicionaisGrupo(grupo));
+                grupo.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(grupo.getUuid_categoria()));
+                grupo.setProduto(ControleProdutos.getInstance().getProdutoByUUID(grupo.getUuid_produto()));
+                return grupos.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -61,9 +61,11 @@ public class ControleGruposAdicionais {
     public boolean salvarGrupoAdicional(GrupoAdicional grupo) {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
-            if (grupo.getUuid() == null) {
-                grupo.setUuid(UUID.randomUUID());
+            if (grupo.getUuid() == null || this.getGrupoByUUID(grupo.getUuid()) == null) {
                 try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Grupos_Adicionais\" (uuid, uuid_categoria, uuid_produto, \"nomeGrupo\", \"descricaoGrupo\", \"qtdMin\", \"qtdMax\", \"formaCobranca\") values(?,?,?,?,?,?,?,?)")) {
+                    if (grupo.getUuid() == null) {
+                        grupo.setUuid(UUID.randomUUID());
+                    }
                     preparedStatement.setObject(1, grupo.getUuid());
                     preparedStatement.setObject(2, grupo.getUuid_categoria());
                     preparedStatement.setObject(3, grupo.getUuid_produto());

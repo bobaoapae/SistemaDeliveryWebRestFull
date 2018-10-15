@@ -333,11 +333,7 @@ public class Pedido {
     }
 
     public List<ItemPedido> getProdutos() {
-        synchronized (produtos) {
-            produtos.removeIf(o -> ((ItemPedido) o).getProduto() == null);
-            Collections.sort(produtos);
-            return produtos;
-        }
+        return produtos;
     }
 
     public void setProdutos(List<ItemPedido> produtos) {

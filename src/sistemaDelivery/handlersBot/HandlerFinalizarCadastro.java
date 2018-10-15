@@ -23,7 +23,7 @@ public class HandlerFinalizarCadastro extends HandlerBotDelivery {
     protected boolean runFirstTime(Message m) {
         try {
             ((ChatBotDelivery) chat).getCliente().setCadastroRealizado(true);
-            ControleClientes.getInstace().salvarCliente(((ChatBotDelivery) chat).getCliente());
+            ControleClientes.getInstance().salvarCliente(((ChatBotDelivery) chat).getCliente());
         } catch (Exception ex) {
             chat.getChat().getDriver().onError(ex);
             chat.getChat().sendMessage("Falha ao salvar seu cadastro, tente novamente em alguns minutos");

@@ -16,20 +16,20 @@ import java.util.*;
 
 public class ControleRecargas {
 
-    private static ControleRecargas instace;
+    private static final Object syncronizeGetInstance = new Object();
     private Map<UUID, RecargaCliente> recargas;
-    private static final Object syncronizeGetSession = new Object();
+    private static ControleRecargas instance;
 
     private ControleRecargas() {
         this.recargas = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleRecargas getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleRecargas();
+    public static ControleRecargas getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleRecargas();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -45,10 +45,10 @@ public class ControleRecargas {
                 if (recargaCliente == null) {
                     return null;
                 }
-                recargas.put(uuid, recargaCliente);
-                recargaCliente.setCliente(ControleClientes.getInstace().getClienteByUUID(recargaCliente.getUuid_cliente()));
-                recargaCliente.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(recargaCliente.getUuid_estabelecimento()));
-                return recargaCliente;
+                recargas.putIfAbsent(uuid, recargaCliente);
+                recargaCliente.setCliente(ControleClientes.getInstance().getClienteByUUID(recargaCliente.getUuid_cliente()));
+                recargaCliente.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(recargaCliente.getUuid_estabelecimento()));
+                return recargas.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

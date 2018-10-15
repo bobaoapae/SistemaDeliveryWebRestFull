@@ -12,13 +12,14 @@ public class ControleSessions {
 
     private static ControleSessions instance;
     private Map<Estabelecimento, SistemaDelivery> sessions;
-    private static final Object syncronizeGetSession = new Object();
+    private static final Object syncroniseGetInstance = new Object();
+
     private ControleSessions() {
         this.sessions = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleSessions getInstance() {
-        synchronized (syncronizeGetSession) {
+        synchronized (syncroniseGetInstance) {
             if (instance == null) {
                 instance = new ControleSessions();
             }

@@ -17,19 +17,20 @@ import java.util.*;
 
 public class ControleAdicionais {
 
-    private static ControleAdicionais instace;
+    private static final Object syncronizeGetInstance = new Object();
     private Map<UUID, AdicionalProduto> adicionais;
-    private static final Object syncronizeGetSession = new Object();
+    private static ControleAdicionais instance;
+
     private ControleAdicionais() {
         this.adicionais = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleAdicionais getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleAdicionais();
+    public static ControleAdicionais getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleAdicionais();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -45,9 +46,9 @@ public class ControleAdicionais {
                 if (adicional == null) {
                     return null;
                 }
-                adicionais.put(uuid, adicional);
-                adicional.setGrupoAdicional(ControleGruposAdicionais.getInstace().getGrupoByUUID(adicional.getUuid_grupo_adicional()));
-                return adicional;
+                adicionais.putIfAbsent(uuid, adicional);
+                adicional.setGrupoAdicional(ControleGruposAdicionais.getInstance().getGrupoByUUID(adicional.getUuid_grupo_adicional()));
+                return adicionais.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -58,9 +59,11 @@ public class ControleAdicionais {
     public boolean salvarAdicional(AdicionalProduto adicionalProduto) {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
-            if (adicionalProduto.getUuid() == null) {
-                adicionalProduto.setUuid(UUID.randomUUID());
+            if (adicionalProduto.getUuid() == null || this.getAdicionalByUUID(adicionalProduto.getUuid()) == null) {
                 try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Adicionais\" (uuid, uuid_grupo_adicional, nome, descricao, valor) values (?,?,?,?,?)")) {
+                    if (adicionalProduto.getUuid() == null) {
+                        adicionalProduto.setUuid(UUID.randomUUID());
+                    }
                     preparedStatement.setObject(1, adicionalProduto.getUuid());
                     preparedStatement.setObject(2, adicionalProduto.getGrupoAdicional().getUuid());
                     preparedStatement.setString(3, adicionalProduto.getNome());
@@ -151,7 +154,7 @@ public class ControleAdicionais {
     public List<AdicionalProduto> getAdicionaisItemPedido(ItemPedido item) {
         List<AdicionalProduto> adicionais = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid_adicional from \"Adicionais_Items_Pedidos\" where uuid_item_pedido = ?");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid_adicional from \"Adicionais_Items_Pedidos\" as a inner join \"Adicionais\" as b on a.uuid_adicional = b.uuid inner join \"Grupos_Adicionais\" as c on b.uuid_grupo_adicional = c.uuid where uuid_item_pedido = ? order by uuid_produto asc,b.nome asc");
         ) {
             preparedStatement.setObject(1, item.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

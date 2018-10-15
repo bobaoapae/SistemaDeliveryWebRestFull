@@ -12,10 +12,10 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UseGetterAdapterSerialize implements JsonSerializer<Object> {
+public class UseGetterAdapterSerialize<K> implements JsonSerializer<K> {
     @Override
-    public JsonElement serialize(Object o, Type type, JsonSerializationContext jsonSerializationContext) {
-        Gson builder = Utilitarios.getDefaultGsonBuilder().create();
+    public JsonElement serialize(K o, Type type, JsonSerializationContext jsonSerializationContext) {
+        Gson builder = Utilitarios.getDefaultGsonBuilder(type).create();
         JsonElement element = builder.toJsonTree(o, type);
         HashMap<String, JsonElement> valoresAtualizar = new HashMap<>();
         if (o.getClass().isAnnotationPresent(ExposeGetter.class)) {

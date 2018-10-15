@@ -4,32 +4,37 @@ import DAO.Conexao;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
+import restFul.controle.ControleSessions;
+import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.modelo.*;
 import utils.PedidoHandlerRowProcessor;
 import utils.Utilitarios;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ControlePedidos {
 
-    private static ControlePedidos instace;
+    private static final Lock lockWhenLoading = new ReentrantLock();
     private Map<UUID, Pedido> pedidos;
     private static final Object syncronizeGetSession = new Object();
-
+    private static ControlePedidos instance;
     private ControlePedidos() {
         this.pedidos = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControlePedidos getInstace() {
+    public static ControlePedidos getInstance() {
         synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControlePedidos();
+            if (instance == null) {
+                instance = new ControlePedidos();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -45,11 +50,11 @@ public class ControlePedidos {
                 if (pedido == null) {
                     return null;
                 }
-                pedidos.put(uuid, pedido);
-                pedido.setCliente(ControleClientes.getInstace().getClienteByUUID(pedido.getUuid_cliente()));
-                pedido.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(pedido.getUuid_estabelecimento()));
-                pedido.setProdutos(ControleItensPedidos.getInstace().getItensPedidos(pedido));
-                return pedido;
+                pedidos.putIfAbsent(uuid, pedido);
+                pedido.setCliente(ControleClientes.getInstance().getClienteByUUID(pedido.getUuid_cliente()));
+                pedido.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(pedido.getUuid_estabelecimento()));
+                pedido.setProdutos(ControleItensPedidos.getInstance().getItensPedidos(pedido));
+                return pedidos.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -116,11 +121,19 @@ public class ControlePedidos {
                         if (itemPedido.getPedido() == null) {
                             itemPedido.setPedido(pedido);
                         }
-                        if (!ControleItensPedidos.getInstace().salvarItemPedido(connection, itemPedido)) {
+                        if (!ControleItensPedidos.getInstance().salvarItemPedido(connection, itemPedido)) {
                             throw new SQLException("Falha ao salvar item pedido");
                         }
                     }
                     connection.commit();
+                    try {
+                        SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(pedido.getEstabelecimento());
+                        if (sistemaDelivery.getBroadcaster() != null) {
+                            sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("novo-pedido", pedido.getUuid().toString()));
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     return true;
                 } catch (SQLException ex) {
                     connection.rollback();

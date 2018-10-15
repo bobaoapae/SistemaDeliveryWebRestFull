@@ -16,19 +16,19 @@ import java.util.Map;
 
 public class ControleTokens {
 
-    private static ControleTokens instace;
+    private static final Object syncronizeGetInstance = new Object();
     private Map<String, Token> tokens;
-    private static final Object syncronizeGetSession = new Object();
+    private static ControleTokens instance;
     private ControleTokens() {
         this.tokens = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleTokens getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleTokens();
+    public static ControleTokens getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleTokens();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -44,10 +44,10 @@ public class ControleTokens {
                 if (u == null) {
                     return null;
                 }
-                tokens.put(token, u);
-                u.setEstabelecimento(ControleEstabelecimentos.getInstace().getEstabelecimentoByUUID(u.getUuid_estabelecimento()));
-                u.setUsuario(ControleUsuarios.getInstace().getUsuarioByUUID(u.getUuid_usuario()));
-                return u;
+                tokens.putIfAbsent(token, u);
+                u.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(u.getUuid_estabelecimento()));
+                u.setUsuario(ControleUsuarios.getInstance().getUsuarioByUUID(u.getUuid_usuario()));
+                return tokens.get(token);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

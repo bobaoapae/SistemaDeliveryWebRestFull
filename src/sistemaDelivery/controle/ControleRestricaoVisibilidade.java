@@ -18,20 +18,20 @@ import java.util.UUID;
 
 public class ControleRestricaoVisibilidade {
 
-    private static ControleRestricaoVisibilidade instace;
+    private static final Object syncronizeGetInstance = new Object();
     private Map<UUID, RestricaoVisibilidade> restricoes;
-    private static final Object syncronizeGetSession = new Object();
+    private static ControleRestricaoVisibilidade instance;
 
     private ControleRestricaoVisibilidade() {
         this.restricoes = Collections.synchronizedMap(new HashMap<>());
     }
 
-    public static ControleRestricaoVisibilidade getInstace() {
-        synchronized (syncronizeGetSession) {
-            if (instace == null) {
-                instace = new ControleRestricaoVisibilidade();
+    public static ControleRestricaoVisibilidade getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleRestricaoVisibilidade();
             }
-            return instace;
+            return instance;
         }
     }
 
@@ -57,10 +57,10 @@ public class ControleRestricaoVisibilidade {
                 diasSemana[5] = resultSet.getBoolean("sexta");
                 diasSemana[6] = resultSet.getBoolean("sabado");
                 restricao.setDiasSemana(diasSemana);
-                restricoes.put(uuid, restricao);
-                restricao.setCategoria(ControleCategorias.getInstace().getCategoriaByUUID(restricao.getUuid_categoria()));
-                restricao.setProduto(ControleProdutos.getInstace().getProdutoByUUID(restricao.getUuid_produto()));
-                return restricao;
+                restricoes.putIfAbsent(uuid, restricao);
+                restricao.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(restricao.getUuid_categoria()));
+                restricao.setProduto(ControleProdutos.getInstance().getProdutoByUUID(restricao.getUuid_produto()));
+                return restricoes.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
             }

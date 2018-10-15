@@ -3,10 +3,7 @@ package restFul.modelo;
 
 import sistemaDelivery.modelo.Estabelecimento;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 public class Usuario {
     private UUID uuid, uuid_usuario_indicacao;
@@ -38,7 +35,7 @@ public class Usuario {
     }
 
     public void setEstabelecimentos(List<Estabelecimento> estabelecimentos) {
-        this.estabelecimentos = estabelecimentos;
+        this.estabelecimentos = Collections.synchronizedList(estabelecimentos);
     }
 
     public UUID getUuid() {
