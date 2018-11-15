@@ -3,12 +3,12 @@
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/WebWhatsNew.jar!/" />
       <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/lib/jsoup-1.11.3.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/lib/jxbrowser-6.21.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/lib/jxbrowser-linux64-6.21.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/lib/jxbrowser-mac-6.21.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/lib/jxbrowser-win32-6.21.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/lib/jxbrowser-win64-6.21.jar!/" />
       <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/lib/licenseCrack.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../jxbrowser/6.22/jxbrowser-6.22.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../jxbrowser/6.22/jxbrowser-linux64-6.22.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../jxbrowser/6.22/jxbrowser-mac-6.22.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../jxbrowser/6.22/jxbrowser-win32-6.22.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../jxbrowser/6.22/jxbrowser-win64-6.22.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

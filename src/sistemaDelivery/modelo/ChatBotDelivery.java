@@ -36,14 +36,14 @@ public class ChatBotDelivery extends ChatBot {
     public ChatBotDelivery(Chat chat, Estabelecimento estabelecimento, boolean autoPause) {
         super(chat, autoPause);
         this.estabelecimento = estabelecimento;
-        Cliente cliente = ControleClientes.getInstance().getClienteChatId(chat.getId());
+        Cliente cliente = ControleClientes.getInstance().getClienteChatId(chat.getId(), estabelecimento);
         if (cliente != null) {
             this.cliente = cliente;
             if (cliente.getTelefoneMovel().isEmpty()) {
                 this.cliente.setTelefoneMovel(((UserChat) chat).getContact().getPhoneNumber());
             }
         } else {
-            this.cliente = new Cliente(chat.getId());
+            this.cliente = new Cliente(chat.getId(), estabelecimento);
             this.cliente.setTelefoneMovel(((UserChat) chat).getContact().getPhoneNumber());
             this.cliente.setNome(chat.getContact().getSafeName());
             ControleClientes.getInstance().salvarCliente(this.cliente);
@@ -61,7 +61,7 @@ public class ChatBotDelivery extends ChatBot {
         if (System.currentTimeMillis() - this.timeCheck >= 60000 * 30) {
             this.handler = new HandlerChatExpirado(this);
         }
-        return super.getHandler(); //To change body of generated methods, choose Tools | Templates.
+        return super.getHandler();
     }
 
     public DecimalFormat getMoneyFormat() {

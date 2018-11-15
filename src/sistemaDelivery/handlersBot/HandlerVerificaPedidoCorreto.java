@@ -13,6 +13,7 @@ import sistemaDelivery.modelo.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author jvbor
@@ -35,7 +36,7 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
         for (int x = 0; x < p.getProdutos().size(); x++) {
             ItemPedido produto = p.getProdutos().get(x);
             builder.textNewLine(produto.getProduto().getNomeWithCategories() + (produto.getComentario().isEmpty() ? "" : " Obs: " + produto.getComentario()));
-            if (produto.getAdicionais().size() > 0) {
+            /*if (produto.getAdicionais().size() > 0) {
                 String adicionais = "";
                 for (int y = 0; y < produto.getAdicionais().size(); y++) {
                     AdicionalProduto adicional = produto.getAdicionais().get(y);
@@ -48,6 +49,22 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
                     adicionais = adicionais.substring(0, adicionais.lastIndexOf(","));
                 }
                 builder.textNewLine("Adicionais: " + adicionais);
+            }*/
+            Map<GrupoAdicional, List<AdicionalProduto>> hashMap = produto.getAdicionaisGroupByGrupo();
+            for (Map.Entry<GrupoAdicional, List<AdicionalProduto>> entry : hashMap.entrySet()) {
+                builder.textBold(entry.getKey().getNomeGrupo()).text(": ");
+                String adicionais = "";
+                for (int y = 0; y < entry.getValue().size(); y++) {
+                    AdicionalProduto adicional = entry.getValue().get(y);
+                    adicionais += adicional.getNome();
+                    if (y < entry.getValue().size() - 1) {
+                        adicionais += ",";
+                    }
+                }
+                if (adicionais.endsWith(",")) {
+                    adicionais = adicionais.substring(0, adicionais.lastIndexOf(","));
+                }
+                builder.textNewLine(adicionais + ".");
             }
         }
         p.calcularValor();
@@ -72,7 +89,7 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
                 if (!c.isFazEntrega() || !c.getRootCategoria().isFazEntrega()) {
                     ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
                     chat.getChat().sendMessage("O seu pedido foi marcado automaticamente como para retirada, pois algum produto que você pediu não pode ser entregue, caso queira cancelar basta enviar *CANCELAR* a qualquer momento", 2000);
-                    if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) > 0) {
+                    if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
                         chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
                     } else {
                         chat.setHandler(new HandlerDesejaAgendar(chat), true);
@@ -82,7 +99,7 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
                 if (c.getRootCategoria().getQtdMinEntrega() > ((ChatBotDelivery) chat).getPedidoAtual().getProdutos(c).size() && !c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
                     ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
                     chat.getChat().sendMessage("O seu pedido foi marcado automaticamente como para retirada, pois algum produto que você pediu não pode ser entregue, caso queira cancelar basta enviar *CANCELAR* a qualquer momento", 2000);
-                    if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) > 0) {
+                    if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
                         chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
                     } else {
                         chat.setHandler(new HandlerDesejaAgendar(chat), true);
@@ -106,7 +123,7 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
                     if (!temCategoriaPrecisa || c.getRootCategoria().getQtdMinEntrega() > ((ChatBotDelivery) chat).getPedidoAtual().getProdutos(c).size()) {
                         ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
                         chat.getChat().sendMessage("O seu pedido foi marcado automaticamente para retirada no balcão, pois algum produto que você pediu não pode ser entregue, caso queira cancelar basta enviar *CANCELAR* a qualquer momento", 2000);
-                        if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) > 0) {
+                        if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
                             chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
                         } else {
                             chat.setHandler(new HandlerDesejaAgendar(chat), true);

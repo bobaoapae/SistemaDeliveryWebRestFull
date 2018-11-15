@@ -78,4 +78,31 @@ public class ControleTokens {
         return false;
     }
 
+    public boolean removerToken(Token token) {
+        try (Connection connection = Conexao.getConnection()) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement("delete from \"Tokens\" where token = ? and uuid_estabelecimento = ? and uuid_usuario = ?")) {
+                preparedStatement.setString(1, token.getToken());
+                preparedStatement.setObject(2, token.getEstabelecimento().getUuid());
+                preparedStatement.setObject(3, token.getUsuario().getUuid());
+                preparedStatement.executeUpdate();
+                connection.commit();
+                synchronized (tokens) {
+                    if (tokens.containsKey(token.getToken())) {
+                        tokens.remove(token.getToken());
+                    }
+                }
+                return true;
+            } catch (SQLException ex) {
+                connection.rollback();
+                throw ex;
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        return false;
+    }
+
 }

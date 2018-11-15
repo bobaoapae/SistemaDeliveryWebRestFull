@@ -20,7 +20,7 @@ public class HandlerDesejaUtilizarCreditos extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Você possui R$ " + moneyFormat.format(((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento())) + " de créditos", 500);
+        chat.getChat().sendMessage("Você possui R$ " + moneyFormat.format(((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis()) + " de créditos", 500);
         chat.getChat().sendMessage("Deseja utlizar o valor como desconto?", 300);
         chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
         chat.getChat().sendMessage("1 - Sim");

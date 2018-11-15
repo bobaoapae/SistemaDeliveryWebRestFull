@@ -11,6 +11,7 @@ import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Reserva;
 import utils.DateUtils;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.Calendar;
 
@@ -40,7 +41,9 @@ public class HandlerRealizarReserva extends HandlerBotDelivery {
             data.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
             if (DateUtils.isToday(data.getTime()) || DateUtils.isAfterDay(data.getTime(), Calendar.getInstance().getTime())) {
                 Reserva r = new Reserva();
-                r.setDataReserva(data.getTime());
+                r.setCliente(((ChatBotDelivery) chat).getCliente());
+                r.setEstabelecimento(((ChatBotDelivery) chat).getEstabelecimento());
+                r.setDataReserva(new Timestamp(data.getTime().getTime()));
                 ((ChatBotDelivery) chat).setReservaAtual(r);
                 chat.setHandler(new HandlerSolicitarHorarioReserva(chat), true);
                 return true;

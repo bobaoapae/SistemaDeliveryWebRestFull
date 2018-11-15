@@ -1,22 +1,72 @@
 package sistemaDelivery.modelo;
 
-import java.util.Date;
+import jdk.nashorn.internal.ir.annotations.Ignore;
+
+import java.sql.Timestamp;
 import java.util.Objects;
 import java.util.UUID;
 
 public class Reserva {
+
+    @Ignore
     private UUID uuid, uuid_estabelecimento, uuid_cliente;
     private String telefoneContato, nomeContato, comentario;
-    private Date dataReserva;
+    private Timestamp dataReserva;
     private int qtdPessoas;
+    private long cod;
     private boolean impresso;
+    @Ignore
+    private transient Estabelecimento estabelecimento;
+    @Ignore
+    private transient Cliente cliente;
 
-    public Reserva() {
-        impresso = false;
+    public long getCod() {
+        return cod;
+    }
+
+    public void setCod(long cod) {
+        this.cod = cod;
+    }
+
+    public String getTelefoneContato() {
+        if (telefoneContato == null) {
+            return "";
+        }
+        return telefoneContato;
+    }
+
+    public String getNomeContato() {
+        if (nomeContato == null) {
+            return "";
+        }
+        return nomeContato;
     }
 
     public String getComentario() {
+        if (comentario == null) {
+            return "";
+        }
         return comentario;
+    }
+
+    public Estabelecimento getEstabelecimento() {
+        return estabelecimento;
+    }
+
+    public void setEstabelecimento(Estabelecimento estabelecimento) {
+        this.estabelecimento = estabelecimento;
+    }
+
+    public Cliente getCliente() {
+        return cliente;
+    }
+
+    public void setCliente(Cliente cliente) {
+        this.cliente = cliente;
+    }
+
+    public Reserva() {
+        impresso = false;
     }
 
     public void setComentario(String comentario) {
@@ -31,27 +81,19 @@ public class Reserva {
         this.impresso = impresso;
     }
 
-    public String getTelefoneContato() {
-        return telefoneContato;
-    }
-
     public void setTelefoneContato(String telefoneContato) {
         this.telefoneContato = telefoneContato;
-    }
-
-    public String getNomeContato() {
-        return nomeContato;
     }
 
     public void setNomeContato(String nomeContato) {
         this.nomeContato = nomeContato;
     }
 
-    public Date getDataReserva() {
+    public Timestamp getDataReserva() {
         return dataReserva;
     }
 
-    public void setDataReserva(Date dataReserva) {
+    public void setDataReserva(Timestamp dataReserva) {
         this.dataReserva = dataReserva;
     }
 

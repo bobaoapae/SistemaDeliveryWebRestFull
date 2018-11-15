@@ -5,7 +5,6 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import sistemaDelivery.modelo.Cliente;
-import sistemaDelivery.modelo.Estabelecimento;
 import sistemaDelivery.modelo.RecargaCliente;
 
 import java.sql.Connection;
@@ -81,12 +80,11 @@ public class ControleRecargas {
         return false;
     }
 
-    public List<RecargaCliente> getRecargasCliente(Cliente cliente, Estabelecimento estabelecimento) {
+    public List<RecargaCliente> getRecargasCliente(Cliente cliente) {
         List<RecargaCliente> recargaClientes = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select * from \"Recargas_Clientes\" where uuid_cliente = ? and uuid_estabelecimento = ?")) {
+             PreparedStatement preparedStatement = conn.prepareStatement("select * from \"Recargas_Clientes\" where uuid_cliente = ?")) {
             preparedStatement.setObject(1, cliente.getUuid());
-            preparedStatement.setObject(2, estabelecimento.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     recargaClientes.add(getRecargaByUUID(UUID.fromString(resultSet.getString("uuid"))));

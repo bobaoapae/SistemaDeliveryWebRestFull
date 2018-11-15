@@ -9,6 +9,7 @@ import driver.WebWhatsDriver;
 import modelo.Chat;
 import modelo.EstadoDriver;
 import restFul.controle.ControleSessions;
+import restFul.controle.ControleTokens;
 import restFul.modelo.Token;
 import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.*;
@@ -47,7 +48,7 @@ public class API {
     }
 
     @GET
-    @Path("/eventoNovoPedido")
+    @Path("/eventos")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void eventoNovoPedido(@Context SseEventSink sink, @Context Sse sse) {
         try {
@@ -737,11 +738,87 @@ public class API {
     }
 
     @GET
+    @Path("/reservaImpressa")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response reservaImpressa(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        Reserva reserva = ControleReservas.getInstance().getReservaByUUID(UUID.fromString(uuid));
+        if (reserva == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        if (!reserva.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        reserva.setImpresso(true);
+        if (ControleReservas.getInstance().salvarReserva(reserva)) {
+            return Response.status(Response.Status.CREATED).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Path("/reservasImprimir")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response reservasImprimir() {
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControleReservas.getInstance().getReservasImprimir(token.getEstabelecimento()))).build();
+    }
+
+    @GET
+    @Path("/reservas")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getReservas(@QueryParam("uuid") String uuid) {
+        if (uuid == null || uuid.isEmpty()) {
+            return Response.status(Response.Status.OK).entity(builder.toJson(ControleReservas.getInstance().getReservasEstabelecimento(token.getEstabelecimento()))).build();
+        } else {
+            Reserva reserva = ControleReservas.getInstance().getReservaByUUID(UUID.fromString(uuid));
+            if (reserva == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            } else if (reserva.getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.OK).entity(builder.toJson(reserva)).build();
+            } else {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+        }
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/salvarReserva")
+    public Response salvarReserva(@FormParam("reserva") String res) {
+        Reserva reserva = builder.fromJson(res, Reserva.class);
+        reserva.setEstabelecimento(token.getEstabelecimento());
+        reserva.setCliente(ControleClientes.getInstance().getClienteByUUID(reserva.getUuid_cliente()));
+        if (ControleReservas.getInstance().salvarReserva(reserva)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleReservas.getInstance().getReservaByUUID(reserva.getUuid()))).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/excluirReserva")
+    public Response excluirReserva(@QueryParam("uuid") String uuid) {
+        Reserva reserva = ControleReservas.getInstance().getReservaByUUID(UUID.fromString(uuid));
+        if (!reserva.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (ControleReservas.getInstance().excluirReserva(reserva)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleReservas.getInstance().getReservaByUUID(reserva.getUuid()))).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/clientes")
     public Response getClientes(@QueryParam("uuid") String uuid) {
         if (uuid == null || uuid.isEmpty()) {
-            return Response.status(Response.Status.OK).entity(builder.toJson(ControleClientes.getInstance().getClientes())).build();
+            return Response.status(Response.Status.OK).entity(builder.toJson(ControleClientes.getInstance().getClientes(token.getEstabelecimento()))).build();
         } else {
             return Response.status(Response.Status.OK).entity(builder.toJson(ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)))).build();
         }
@@ -794,10 +871,10 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/recargasCliente")
     public Response getRecargasClientes(@QueryParam("uuid") String uuid) {
-        List<RecargaCliente> recargaClientes = ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)).getRegargas(token.getEstabelecimento());
+        List<RecargaCliente> recargaClientes = ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)).getRegargas();
         JsonObject object = new JsonObject();
-        object.addProperty("saldo", ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)).getCreditosDisponiveis(token.getEstabelecimento()));
-        JsonElement element = builder.toJsonTree(ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)).getRegargas(token.getEstabelecimento()), new TypeToken<List<RecargaCliente>>() {
+        object.addProperty("saldo", ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)).getCreditosDisponiveis());
+        JsonElement element = builder.toJsonTree(ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid)).getRegargas(), new TypeToken<List<RecargaCliente>>() {
         }.getType());
         object.add("recargas", element);
         return Response.status(Response.Status.OK).entity(builder.toJson(object)).build();
@@ -808,8 +885,21 @@ public class API {
     @Path("/alterarEstadoPedidos")
     @Produces(MediaType.APPLICATION_JSON)
     public Response alterarEstadoPedidos() {
-        token.getEstabelecimento().setOpenPedidos(!token.getEstabelecimento().isOpenPedidos());
-        if (ControleEstabelecimentos.getInstance().salvarEstabelecimento(token.getEstabelecimento())) {
+        boolean flag = false;
+        if (token.getEstabelecimento().isOpenPedidos()) {
+            try {
+                flag = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).fecharPedidos();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            try {
+                flag = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).abrirPedidos();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if (flag) {
             return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento())).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -856,7 +946,7 @@ public class API {
         if (cliente == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstance().getPedidosCliente(cliente, token.getEstabelecimento()))).build();
+        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstance().getPedidosCliente(cliente))).build();
     }
 
     @GET
@@ -982,7 +1072,7 @@ public class API {
         if (!itemPedido.getPedido().getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        if (itemPedido.getPedido().getEstadoPedido() == EstadoPedido.Concluido) {
+        if (itemPedido.getPedido().getEstadoPedido() == EstadoPedido.Concluido || itemPedido.getPedido().getEstadoPedido() == EstadoPedido.Cancelado) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
         if (ControleItensPedidos.getInstance().excluirPedido(itemPedido) && ControlePedidos.getInstance().salvarPedido(itemPedido.getPedido())) {
@@ -996,7 +1086,7 @@ public class API {
     @Path("/criarPedidoTeste")
     @Produces(MediaType.APPLICATION_JSON)
     public Response pedidoTeste() {
-        Pedido p = new Pedido(ControleClientes.getInstance().getClienteChatId("554491050665@c.us"), token.getEstabelecimento());
+        Pedido p = new Pedido(ControleClientes.getInstance().getClienteChatId("554491050665@c.us", token.getEstabelecimento()), token.getEstabelecimento());
 
         List<Produto> produtosDisponiveis = ControleProdutos.getInstance().getProdutosEstabelecimento(token.getEstabelecimento());
         if (produtosDisponiveis.size() > 0) {
@@ -1103,8 +1193,22 @@ public class API {
     @GET
     @Path("/finalizar")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response logout() {
+    public Response finalizar() {
         ControleSessions.getInstance().finalizarSessionForEstabelecimento(token.getEstabelecimento());
+        ControleTokens.getInstance().removerToken(token);
+        return Response.status(Response.Status.OK).build();
+    }
+
+    @GET
+    @Path("/logout")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response logout() {
+        try {
+            ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).logout();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
         return Response.status(Response.Status.OK).build();
     }
 }

@@ -47,6 +47,7 @@ public class ControleClientes {
                     return null;
                 }
                 clientes.putIfAbsent(uuid, cliente);
+                cliente.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(cliente.getUuid_estabelecimento()));
                 return clientes.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -55,9 +56,10 @@ public class ControleClientes {
         }
     }
 
-    public Cliente getClienteChatId(String chatid) {
-        try (Connection connection = Conexao.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("select uuid from \"Clientes\" where \"chatId\" !='' and \"chatId\" = ?")) {
+    public Cliente getClienteChatId(String chatid, Estabelecimento estabelecimento) {
+        try (Connection connection = Conexao.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("select uuid from \"Clientes\" where \"chatId\" !='' and \"chatId\" = ? and uuid_estabelecimento = ?")) {
             preparedStatement.setString(1, chatid);
+            preparedStatement.setObject(2, estabelecimento.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
                     return getClienteByUUID(UUID.fromString(resultSet.getString("uuid")));
@@ -73,7 +75,7 @@ public class ControleClientes {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             if (cliente.getUuid() == null || getClienteByUUID(cliente.getUuid()) == null) {
-                try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Clientes\" (uuid,\"chatId\", nome, \"telefoneMovel\", \"telefoneFixo\", \"dataAniversario\", logradouro, bairro,referencia,numero,\"cadastroRealizado\") values(?,?,?,?,?,?,?,?,?,?,?)")) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Clientes\" (uuid,\"chatId\", nome, \"telefoneMovel\", \"telefoneFixo\", \"dataAniversario\", logradouro, bairro,referencia,numero,\"cadastroRealizado\",uuid_estabelecimento) values(?,?,?,?,?,?,?,?,?,?,?,?)")) {
                     if (cliente.getUuid() == null) {
                         cliente.setUuid(UUID.randomUUID());
                     }
@@ -99,6 +101,7 @@ public class ControleClientes {
                         preparedStatement.setString(10, "");
                     }
                     preparedStatement.setBoolean(11, cliente.isCadastroRealizado());
+                    preparedStatement.setObject(12, cliente.getEstabelecimento().getUuid());
                     preparedStatement.executeUpdate();
                     connection.commit();
                     return true;
@@ -109,7 +112,7 @@ public class ControleClientes {
                     connection.setAutoCommit(true);
                 }
             } else {
-                try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Clientes\" set \"chatId\" = ?,nome = ?,\"telefoneMovel\" = ?, \"telefoneFixo\" = ?,\"dataAniversario\" = ?, logradouro = ?, bairro = ?, referencia = ?, numero = ?, \"cadastroRealizado\" = ? where uuid = ?")) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Clientes\" set \"chatId\" = ?,nome = ?,\"telefoneMovel\" = ?, \"telefoneFixo\" = ?,\"dataAniversario\" = ?, logradouro = ?, bairro = ?, referencia = ?, numero = ?, \"cadastroRealizado\" = ? where uuid = ? and uuid_estabelecimento = ?")) {
                     preparedStatement.setString(1, cliente.getChatId());
                     preparedStatement.setString(2, cliente.getNome());
                     preparedStatement.setString(3, cliente.getTelefoneMovel());
@@ -132,6 +135,7 @@ public class ControleClientes {
                     }
                     preparedStatement.setBoolean(10, cliente.isCadastroRealizado());
                     preparedStatement.setObject(11, cliente.getUuid());
+                    preparedStatement.setObject(12, cliente.getEstabelecimento().getUuid());
                     preparedStatement.executeUpdate();
                     connection.commit();
                     if (clientes.containsKey(cliente.getUuid())) {
@@ -150,11 +154,12 @@ public class ControleClientes {
     }
 
 
-    public List<Cliente> getClientes() {
+    public List<Cliente> getClientes(Estabelecimento estabelecimento) {
         List<Cliente> clientes = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Clientes\"");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Clientes\" where uuid_estabelecimento = ?");
         ) {
+            preparedStatement.setObject(1, estabelecimento.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     clientes.add(getClienteByUUID(UUID.fromString(resultSet.getString("uuid"))));

@@ -10,6 +10,7 @@ import modelo.Message;
 import sistemaDelivery.modelo.ChatBotDelivery;
 import utils.DateUtils;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -44,7 +45,7 @@ public class HandlerSolicitarHorarioReserva extends HandlerBotDelivery {
             dataChat.set(Calendar.SECOND, 0);
             dataChat.set(Calendar.MILLISECOND, 0);
             if (((dataInformada.get(Calendar.HOUR_OF_DAY) == getChatBotDelivery().getEstabelecimento().getHoraInicioReservas().toLocalTime().getHour() && dataInformada.get(Calendar.MINUTE) >= getChatBotDelivery().getEstabelecimento().getHoraInicioReservas().toLocalTime().getMinute()) || dataInformada.get(Calendar.HOUR_OF_DAY) > getChatBotDelivery().getEstabelecimento().getHoraInicioReservas().toLocalTime().getHour()) && ((dataChat.get(Calendar.HOUR_OF_DAY) == horaAtual.get(Calendar.HOUR_OF_DAY) && dataChat.get(Calendar.MINUTE) > horaAtual.get(Calendar.MINUTE)) || dataChat.get(Calendar.HOUR_OF_DAY) > horaAtual.get(Calendar.HOUR_OF_DAY) || DateUtils.isAfterDay(((ChatBotDelivery) chat).getReservaAtual().getDataReserva(), Calendar.getInstance().getTime()))) {
-                ((ChatBotDelivery) chat).getReservaAtual().setDataReserva(dataChat.getTime());
+                ((ChatBotDelivery) chat).getReservaAtual().setDataReserva(new Timestamp(dataChat.getTime().getTime()));
                 chat.setHandler(new HandlerSolicitarQuantidadePessoasReserva(chat), true);
                 return true;
             } else {

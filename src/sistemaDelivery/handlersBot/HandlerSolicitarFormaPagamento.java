@@ -25,7 +25,7 @@ public class HandlerSolicitarFormaPagamento extends HandlerBotDelivery {
         chat.getChat().sendMessage("*1* - 💵 Dinheiro");
         chat.getChat().sendMessage("*2* - 💳 Cartão de Crédito");
         chat.getChat().sendMessage("*3* - 💳💵 Dinheiro e Cartão de Crédito");
-        if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) > 0) {
+        if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
             chat.getChat().sendMessage("*4* - Créditos de Recarga");
         }
         return true;
@@ -43,7 +43,7 @@ public class HandlerSolicitarFormaPagamento extends HandlerBotDelivery {
             ((ChatBotDelivery) chat).getPedidoAtual().setCartao(true);
             ((ChatBotDelivery) chat).getPedidoAtual().setTroco(-1);
             chat.setHandler(new HandlerSolicitarTroco(chat), true);
-        } else if (msg.getContent().trim().equals("4") && ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) > 0) {
+        } else if (msg.getContent().trim().equals("4") && ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
             chat.setHandler(new HandlerPagarComCreditos(chat), true);
         } else {
             return false;

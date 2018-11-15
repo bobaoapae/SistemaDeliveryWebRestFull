@@ -21,21 +21,40 @@ import java.util.UUID;
 public class Cliente {
 
     @Ignore
-    private UUID uuid;
+    private UUID uuid, uuid_estabelecimento;
     private String nome, chatId, telefoneMovel, telefoneFixo;
     private java.sql.Date dataAniversario;
     private java.sql.Date dataCadastro;
     private Timestamp dataUltimaCompra;
     private boolean cadastroRealizado;
     private Endereco endereco;
+    @Ignore
+    private transient Estabelecimento estabelecimento;
 
-    public Cliente(String chatId) {
+    public Cliente(String chatId, Estabelecimento estabelecimento) {
         this();
         this.chatId = chatId;
+        this.estabelecimento = estabelecimento;
     }
 
     public Cliente() {
         this.dataCadastro = new java.sql.Date(new Date().getTime());
+    }
+
+    public UUID getUuid_estabelecimento() {
+        return uuid_estabelecimento;
+    }
+
+    public void setUuid_estabelecimento(UUID uuid_estabelecimento) {
+        this.uuid_estabelecimento = uuid_estabelecimento;
+    }
+
+    public Estabelecimento getEstabelecimento() {
+        return estabelecimento;
+    }
+
+    public void setEstabelecimento(Estabelecimento estabelecimento) {
+        this.estabelecimento = estabelecimento;
     }
 
     public Endereco getEndereco() {
@@ -58,8 +77,8 @@ public class Cliente {
         ControleRecargas.getInstance().salvarRecarga(new RecargaCliente(e, this, valorRecarga, tipoRecarga));
     }
 
-    public List<RecargaCliente> getRegargas(Estabelecimento e) {
-        return ControleRecargas.getInstance().getRecargasCliente(this, e);
+    public List<RecargaCliente> getRegargas() {
+        return ControleRecargas.getInstance().getRecargasCliente(this);
     }
 
 
@@ -67,9 +86,9 @@ public class Cliente {
         return null;
     }
 
-    public double getCreditosDisponiveis(Estabelecimento e) {
+    public double getCreditosDisponiveis() {
         double valor = 0;
-        for (RecargaCliente recargaCliente : this.getRegargas(e)) {
+        for (RecargaCliente recargaCliente : this.getRegargas()) {
             if (recargaCliente.getTipoRecarga() == TipoRecarga.DEPOSITO) {
                 valor += recargaCliente.getValor();
             } else if (recargaCliente.getTipoRecarga() == TipoRecarga.SAQUE) {
@@ -157,8 +176,8 @@ public class Cliente {
         this.dataUltimaCompra = dataUltimaCompra;
     }
 
-    public List<Pedido> getPedidosCliente(Estabelecimento estabelecimento) {
-        return ControlePedidos.getInstance().getPedidosCliente(this, estabelecimento);
+    public List<Pedido> getPedidosCliente() {
+        return ControlePedidos.getInstance().getPedidosCliente(this);
     }
 
     @Override

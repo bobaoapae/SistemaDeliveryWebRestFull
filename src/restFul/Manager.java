@@ -7,6 +7,7 @@ import com.google.gson.JsonObject;
 import restFul.controle.ControleSessions;
 import restFul.controle.ControleTokens;
 import restFul.controle.ControleUsuarios;
+import restFul.modelo.TipoUsuario;
 import restFul.modelo.Token;
 import restFul.modelo.Usuario;
 import sistemaDelivery.controle.ControleEstabelecimentos;
@@ -110,16 +111,20 @@ public class Manager {
     public Response criarEstabelecimento(@QueryParam("login") String login, @QueryParam("senha") String senha, @FormParam("estabelecimento") String estabelecimento) {
         Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
         if (usuario != null) {
-            Estabelecimento estabelecimento1 = builder.fromJson(estabelecimento, Estabelecimento.class);
-            if (estabelecimento1.getUuid() != null && !usuario.getEstabelecimentos().contains(estabelecimento1)) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            }
-            if (ControleEstabelecimentos.getInstance().criarEstabelecimento(usuario, estabelecimento1)) {
-                estabelecimento1 = ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(estabelecimento1.getUuid());
-                usuario.getEstabelecimentos().add(estabelecimento1);
-                return Response.status(Response.Status.CREATED).entity(builder.toJson(estabelecimento1)).build();
+            if (usuario.getTipoUsuario() == TipoUsuario.SUPER_ADMIN || usuario.getEstabelecimentos().size() + 1 <= usuario.getMaxEstabelecimentos()) {
+                Estabelecimento estabelecimento1 = builder.fromJson(estabelecimento, Estabelecimento.class);
+                if (estabelecimento1.getUuid() != null && !usuario.getEstabelecimentos().contains(estabelecimento1)) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                if (ControleEstabelecimentos.getInstance().criarEstabelecimento(usuario, estabelecimento1)) {
+                    estabelecimento1 = ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(estabelecimento1.getUuid());
+                    usuario.getEstabelecimentos().add(estabelecimento1);
+                    return Response.status(Response.Status.CREATED).entity(builder.toJson(estabelecimento1)).build();
+                } else {
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                }
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                return Response.status(Response.Status.BAD_REQUEST).build();
             }
         } else {
             return Response.status(Response.Status.UNAUTHORIZED).build();

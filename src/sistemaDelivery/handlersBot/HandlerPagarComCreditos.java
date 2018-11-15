@@ -21,16 +21,16 @@ public class HandlerPagarComCreditos extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) >= ((ChatBotDelivery) chat).getPedidoAtual().getTotal()) {
-            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) - ((ChatBotDelivery) chat).getPedidoAtual().getTotal(), TipoRecarga.SAQUE);
+        if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() >= ((ChatBotDelivery) chat).getPedidoAtual().getTotal()) {
+            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() - ((ChatBotDelivery) chat).getPedidoAtual().getTotal(), TipoRecarga.SAQUE);
             ((ChatBotDelivery) chat).getPedidoAtual().setPgCreditos(((ChatBotDelivery) chat).getPedidoAtual().getTotal());
         } else {
-            ((ChatBotDelivery) chat).getPedidoAtual().setPgCreditos(((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()));
-            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()), TipoRecarga.SAQUE);
+            ((ChatBotDelivery) chat).getPedidoAtual().setPgCreditos(((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis());
+            ((ChatBotDelivery) chat).getCliente().realizarRecarga(getChatBotDelivery().getEstabelecimento(), ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(), TipoRecarga.SAQUE);
         }
         if (((ChatBotDelivery) chat).getPedidoAtual().getTotal() == 0) {
             chat.getChat().sendMessage("Perfeito, seu pedido foi pago por completo utilizando seus créditos", 500);
-            chat.getChat().sendMessage("Ainda lhe restaram R$" + moneyFormat.format(((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento())) + " créditos", 2000);
+            chat.getChat().sendMessage("Ainda lhe restaram R$" + moneyFormat.format(((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis()) + " créditos", 2000);
             ((ChatBotDelivery) chat).getPedidoAtual().setCartao(false);
             ((ChatBotDelivery) chat).getPedidoAtual().setTroco(0);
             chat.setHandler(new HandlerDesejaAgendar(chat), true);

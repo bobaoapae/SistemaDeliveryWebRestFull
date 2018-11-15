@@ -7,6 +7,8 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
+import sistemaDelivery.controle.ControleReservas;
+import sistemaDelivery.modelo.ChatBotDelivery;
 
 /**
  * @author jvbor
@@ -20,7 +22,7 @@ public class HandlerFinalizarReserva extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         try {
-            //ControleReservas.getInstance(Db4oGenerico.getInstance("banco")).salvar(((ChatBotDelivery) chat).getReservaAtual());
+            ControleReservas.getInstance().salvarReserva(((ChatBotDelivery) chat).getReservaAtual());
         } catch (Exception ex) {
             chat.getChat().getDriver().onError(ex);
             chat.getChat().sendMessage("Falha ao registrar o pedido de reserva, tente novamente em alguns minutos");

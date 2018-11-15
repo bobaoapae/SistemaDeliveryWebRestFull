@@ -11,10 +11,7 @@ import utils.PedidoHandlerRowProcessor;
 import utils.Utilitarios;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -25,6 +22,7 @@ public class ControlePedidos {
     private Map<UUID, Pedido> pedidos;
     private static final Object syncronizeGetSession = new Object();
     private static ControlePedidos instance;
+
     private ControlePedidos() {
         this.pedidos = Collections.synchronizedMap(new HashMap<>());
     }
@@ -198,13 +196,30 @@ public class ControlePedidos {
         return false;
     }
 
-    public List<Pedido> getPedidosCliente(Cliente cliente, Estabelecimento estabelecimento) {
+    public List<Pedido> getPedidosCliente(Cliente cliente) {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_cliente = ? and uuid_estabelecimento=? order by \"dataPedido\" asc");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_cliente = ?  order by \"dataPedido\" asc");
         ) {
             preparedStatement.setObject(1, cliente.getUuid());
-            preparedStatement.setObject(2, estabelecimento.getUuid());
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return pedidos;
+    }
+
+    public List<Pedido> getPedidosDoDia(Estabelecimento estabelecimento) {
+        List<Pedido> pedidos = new ArrayList<>();
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"dataPedido\" >= ? order by \"dataPedido\" asc");
+        ) {
+            preparedStatement.setObject(1, estabelecimento.getUuid());
+            preparedStatement.setTimestamp(2, new Timestamp(estabelecimento.getHoraAberturaPedidos().getTime()));
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
@@ -219,7 +234,7 @@ public class ControlePedidos {
     public List<Pedido> getPedidosNaoImpressos(Estabelecimento estabelecimento) {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and not impresso order by \"dataPedido\" asc");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!='Cancelado' and \"estadoPedido\"!='Concluido' and not impresso order by \"dataPedido\" asc");
         ) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

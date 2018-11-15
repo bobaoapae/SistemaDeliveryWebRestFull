@@ -56,7 +56,7 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
             }
         } else if (msg.getContent().trim().equals("2") || msg.getContent().toLowerCase().trim().contains("retira") || msg.getContent().toLowerCase().trim().contains("busca")) {
             ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
-            if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis(getChatBotDelivery().getEstabelecimento()) > 0) {
+            if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
                 chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
             } else {
                 chat.setHandler(new HandlerDesejaAgendar(chat), true);

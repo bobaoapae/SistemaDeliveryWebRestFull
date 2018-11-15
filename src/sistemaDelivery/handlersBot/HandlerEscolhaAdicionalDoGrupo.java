@@ -38,7 +38,11 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
     protected boolean runFirstTime(Message m) {
         synchronized (grupoAtual.getAdicionais()) {
             if (!grupoAtual.getAdicionais().isEmpty()) {
-                chat.getChat().sendMessage("Quais " + grupoAtual.getNomeGrupo() + " você quer?");
+                if (grupoAtual.getQtdMax() > 1) {
+                    chat.getChat().sendMessage("Quais " + grupoAtual.getNomeGrupo() + " você quer?");
+                } else {
+                    chat.getChat().sendMessage("Qual " + grupoAtual.getNomeGrupo() + " você quer?");
+                }
                 if (grupoAtual.getQtdMax() > 1) {
                     chat.getChat().sendMessage("*_Obs¹: Você pode escolher no máximo " + grupoAtual.getQtdMax() + ". Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*");
                 } else if (grupoAtual.getQtdMax() == 1) {
@@ -49,6 +53,11 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                 if (grupoAtual.getQtdMin() == 0) {
                     chat.getChat().sendMessage("*_Obs²: Caso não deseje nada, basta enviar NÃO._*");
                 }
+                try {
+                    Thread.sleep(2500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 String adicionais = "";
                 for (AdicionalProduto ad : grupoAtual.getAdicionais()) {
                     adicionaisDisponiveis.add(ad);
@@ -57,6 +66,10 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                     } else {
                         adicionais += "*" + adicionaisDisponiveis.size() + "* - " + ad.getNome() + "\n";
                     }
+                    if (!ad.getDescricao().isEmpty()) {
+                        adicionais += "_" + ad.getDescricao() + "_\n";
+                    }
+                    adicionais += "\n";
                 }
                 chat.getChat().sendMessage(adicionais);
             } else {
