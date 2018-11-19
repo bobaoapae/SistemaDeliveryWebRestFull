@@ -212,11 +212,13 @@ public class SistemaDelivery {
         if (driver.getBrowser().isDisposed()) {
             return;
         }
-        broadcaster.broadcast(sse.newEvent("logout", "ok"));
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if (broadcaster != null) {
+            broadcaster.broadcast(sse.newEvent("logout", "ok"));
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
         ControleChatsAsync.getInstance(estabelecimento).finalizar();
         driver.finalizar();

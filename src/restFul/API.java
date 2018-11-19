@@ -829,9 +829,10 @@ public class API {
     @Path("/salvarCliente")
     public Response salvarCliente(@FormParam("cliente") String cli) {
         Cliente cliente = builder.fromJson(cli, Cliente.class);
+        cliente.setEstabelecimento(token.getEstabelecimento());
         if (!cliente.getTelefoneMovel().isEmpty()) {
             try {
-                Chat chat = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatByNumber("55" + cliente.getTelefoneMovel());
+                Chat chat = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatByNumber("55" + Utilitarios.replaceAllNoDigit(cliente.getTelefoneMovel()));
                 if (chat != null) {
                     cliente.setChatId(chat.getId());
                 }
@@ -1103,28 +1104,26 @@ public class API {
                 p.setHoraAgendamento(Time.valueOf(LocalTime.now()));
             }
             p.setCartao(new Random().nextInt() % 2 == 0);
-            for (int x = 0; x < new Random().nextInt(30) + 1; x++) {
-                for (Produto produto : produtosDisponiveis) {
-                    ItemPedido itemPedido = new ItemPedido();
-                    p.getProdutos().add(itemPedido);
-                    itemPedido.setProduto(produto);
-                    List<GrupoAdicional> grupoAdicionals = produto.getAllGruposAdicionais();
-                    if (grupoAdicionals.size() > 0) {
-                        for (GrupoAdicional grupoAdicional : grupoAdicionals) {
-                            List<AdicionalProduto> adicionalProdutos = grupoAdicional.getAdicionais();
-                            if (adicionalProdutos.size() > 0) {
-                                Collections.shuffle(adicionalProdutos);
-                                for (AdicionalProduto adicionalProduto : adicionalProdutos) {
-                                    itemPedido.addAdicional(adicionalProduto);
-                                }
+            for (Produto produto : produtosDisponiveis) {
+                ItemPedido itemPedido = new ItemPedido();
+                itemPedido.setProduto(produto);
+                List<GrupoAdicional> grupoAdicionals = produto.getAllGruposAdicionais();
+                if (grupoAdicionals.size() > 0) {
+                    for (GrupoAdicional grupoAdicional : grupoAdicionals) {
+                        List<AdicionalProduto> adicionalProdutos = new ArrayList<>(grupoAdicional.getAdicionais());
+                        if (adicionalProdutos.size() > 0) {
+                            Collections.shuffle(adicionalProdutos);
+                            for (AdicionalProduto adicionalProduto : adicionalProdutos) {
+                                itemPedido.addAdicional(adicionalProduto);
                             }
                         }
                     }
-                    itemPedido.setQtd(new Random().nextInt(10) + 1);
-                    if (new Random().nextInt() % 2 == 0) {
-                        itemPedido.setComentario("Sem salada");
-                    }
                 }
+                itemPedido.setQtd(new Random().nextInt(10) + 1);
+                if (new Random().nextInt() % 2 == 0) {
+                    itemPedido.setComentario("Sem salada");
+                }
+                p.addItemPedido(itemPedido);
             }
             if (!p.isCartao()) {
                 p.calcularValor();

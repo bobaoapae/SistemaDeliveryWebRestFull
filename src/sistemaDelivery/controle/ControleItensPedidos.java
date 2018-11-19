@@ -152,7 +152,7 @@ public class ControleItensPedidos {
     public List<ItemPedido> getItensPedidos(Pedido pedido) {
         List<ItemPedido> itemPedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Items_Pedidos\" where uuid_pedido = ?");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Items_Pedidos\" where uuid_pedido = ? order by uuid_produto");
         ) {
             preparedStatement.setObject(1, pedido.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
