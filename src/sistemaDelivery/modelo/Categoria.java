@@ -14,7 +14,7 @@ public class Categoria {
     @Ignore
     private List<Categoria> categoriasFilhas;
     @Ignore
-    private List<Produto> produtos;
+    private transient List<Produto> produtos;
     @Ignore
     private transient Categoria categoriaPai;
     private RestricaoVisibilidade restricaoVisibilidade;

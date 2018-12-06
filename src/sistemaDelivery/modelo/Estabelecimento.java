@@ -19,9 +19,9 @@ public class Estabelecimento {
     private Time horaAutomaticaFecharPedidos, horaAutomaticaAbrirPedidos, horaInicioReservas;
     private double taxaEntregaFixa, taxaEntregaKm, valorSelo;
     @Ignore
-    private List<Categoria> categorias;
+    private transient List<Categoria> categorias;
     @Ignore
-    private List<Rodizio> rodizios;
+    private transient List<Rodizio> rodizios;
     private int maximoSeloPorCompra, validadeSeloFidelidade;
 
     public List<Rodizio> getRodizios() {

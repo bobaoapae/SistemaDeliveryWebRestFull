@@ -10,11 +10,15 @@ import modelo.Chat;
 import modelo.ChatBot;
 import modelo.Message;
 import modelo.UserChat;
+import restFul.controle.ControleSessions;
+import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.ControleClientes;
 import sistemaDelivery.handlersBot.HandlerBoasVindas;
 import sistemaDelivery.handlersBot.HandlerBotDelivery;
 import sistemaDelivery.handlersBot.HandlerChatExpirado;
+import utils.Utilitarios;
 
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
@@ -158,6 +162,26 @@ public class ChatBotDelivery extends ChatBot {
         getChat().sendMessage("Parece que você precisa de ajuda, vou te transferir para nosso atendente.");
         getChat().sendMessage("Caso queira voltar para o atendimento automatico envie: *INICIAR*.");
         setPaused(true);
+        try {
+            SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
+            if (sistemaDelivery != null && sistemaDelivery.getBroadcaster() != null) {
+                sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("pedido-ajuda", getCliente().getNome()));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            Chat c = chat.getDriver().getFunctions().getChatByNumber("554491050665");
+            if (c != null) {
+                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
+            }
+            c = chat.getDriver().getFunctions().getChatByNumber("55" + Utilitarios.replaceAllNoDigit(estabelecimento.getNumeroAviso()));
+            if (c != null) {
+                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
+            }
+        } catch (Exception ex) {
+
+        }
         return true;
     }
 

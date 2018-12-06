@@ -47,7 +47,7 @@ public class SistemaDelivery {
                 broadcaster.broadcast(sse.newEvent("low-battery", e + ""));
             }
         };
-        this.driver = new WebWhatsDriver(estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+        this.driver = new WebWhatsDriver("C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
         executores.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -209,9 +209,6 @@ public class SistemaDelivery {
     }
 
     public void finalizar() {
-        if (driver.getBrowser().isDisposed()) {
-            return;
-        }
         if (broadcaster != null) {
             broadcaster.broadcast(sse.newEvent("logout", "ok"));
             try {
@@ -219,10 +216,11 @@ public class SistemaDelivery {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+            broadcaster.close();
+            broadcaster = null;
         }
         ControleChatsAsync.getInstance(estabelecimento).finalizar();
         driver.finalizar();
-        driver.getBrowser().dispose();
     }
 
     public void logout() {

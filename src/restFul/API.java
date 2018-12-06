@@ -27,6 +27,7 @@ import javax.ws.rs.sse.SseEventSink;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -98,7 +99,7 @@ public class API {
     @Path("/info")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getInfo() {
-        return Response.status(Response.Status.OK).entity(builder.toJson(token)).build();
+        return Response.status(Response.Status.OK).entity(builder.toJson(token.getEstabelecimento())).build();
     }
 
 
@@ -116,6 +117,19 @@ public class API {
             return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).entity(builder.toJson(object)).build();
         } catch (IOException e) {
             e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Path("/tempoMedio")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response tempoMedio(@QueryParam("entrega") String entrega, @QueryParam("retirada") String retirada) {
+        token.getEstabelecimento().setTempoMedioEntrega(Integer.parseInt(entrega));
+        token.getEstabelecimento().setTempoMedioRetirada(Integer.parseInt(retirada));
+        if (ControleEstabelecimentos.getInstance().salvarEstabelecimento(token.getEstabelecimento())) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento())).build();
+        } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -933,7 +947,13 @@ public class API {
         if (!pedido.getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
-        return Response.status(Response.Status.OK).entity(builder.toJson(pedido)).build();
+        JsonElement element = builder.toJsonTree(pedido);
+        JsonArray arrayItensPedidos = element.getAsJsonObject().get("produtos").getAsJsonArray();
+        for (int y = 0; y < arrayItensPedidos.size(); y++) {
+            JsonObject object = arrayItensPedidos.get(y).getAsJsonObject().get("produto").getAsJsonObject();
+            object.remove("foto");
+        }
+        return Response.status(Response.Status.OK).entity(builder.toJson(element)).build();
     }
 
     @GET
@@ -947,28 +967,68 @@ public class API {
         if (cliente == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstance().getPedidosCliente(cliente))).build();
+        List<Pedido> pedidos = ControlePedidos.getInstance().getPedidosCliente(cliente);
+        JsonElement element = builder.toJsonTree(pedidos);
+        JsonArray array = element.getAsJsonArray();
+        for (int x = 0; x < array.size(); x++) {
+            JsonArray arrayItensPedidos = array.get(x).getAsJsonObject().get("produtos").getAsJsonArray();
+            for (int y = 0; y < arrayItensPedidos.size(); y++) {
+                JsonObject object = arrayItensPedidos.get(y).getAsJsonObject().get("produto").getAsJsonObject();
+                object.remove("foto");
+            }
+        }
+        return Response.status(Response.Status.OK).entity(builder.toJson(element)).build();
     }
 
     @GET
     @Path("/pedidosEstabelecimento")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPedidosEstabelecimento() {
-        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstance().getPedidos(token.getEstabelecimento()))).build();
+        List<Pedido> pedidos = ControlePedidos.getInstance().getPedidos(token.getEstabelecimento());
+        JsonElement element = builder.toJsonTree(pedidos);
+        JsonArray array = element.getAsJsonArray();
+        for (int x = 0; x < array.size(); x++) {
+            JsonArray arrayItensPedidos = array.get(x).getAsJsonObject().get("produtos").getAsJsonArray();
+            for (int y = 0; y < arrayItensPedidos.size(); y++) {
+                JsonObject object = arrayItensPedidos.get(y).getAsJsonObject().get("produto").getAsJsonObject();
+                object.remove("foto");
+            }
+        }
+        return Response.status(Response.Status.OK).entity(builder.toJson(element)).build();
     }
 
     @GET
     @Path("/pedidosAtivos")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getPedidosAtivos() {
-        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstance().getPedidosAtivos(token.getEstabelecimento()))).build();
+        List<Pedido> pedidos = ControlePedidos.getInstance().getPedidosAtivos(token.getEstabelecimento());
+        JsonElement element = builder.toJsonTree(pedidos);
+        JsonArray array = element.getAsJsonArray();
+        for (int x = 0; x < array.size(); x++) {
+            JsonArray arrayItensPedidos = array.get(x).getAsJsonObject().get("produtos").getAsJsonArray();
+            for (int y = 0; y < arrayItensPedidos.size(); y++) {
+                JsonObject object = arrayItensPedidos.get(y).getAsJsonObject().get("produto").getAsJsonObject();
+                object.remove("foto");
+            }
+        }
+        return Response.status(Response.Status.OK).entity(builder.toJson(element)).build();
     }
 
     @GET
     @Path("/pedidosImprimir")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getpedidosImprimir() {
-        return Response.status(Response.Status.OK).entity(builder.toJson(ControlePedidos.getInstance().getPedidosNaoImpressos(token.getEstabelecimento()))).build();
+    public Response getPedidosImprimir() {
+        List<Pedido> pedidos = ControlePedidos.getInstance().getPedidosNaoImpressos(token.getEstabelecimento());
+        JsonElement element = builder.toJsonTree(pedidos);
+        JsonArray array = element.getAsJsonArray();
+        for (int x = 0; x < array.size(); x++) {
+            JsonArray arrayItensPedidos = array.get(x).getAsJsonObject().get("produtos").getAsJsonArray();
+            for (int y = 0; y < arrayItensPedidos.size(); y++) {
+                JsonObject object = arrayItensPedidos.get(y).getAsJsonObject().get("produto").getAsJsonObject();
+                object.remove("foto");
+            }
+        }
+        return Response.status(Response.Status.OK).entity(builder.toJson(element)).build();
     }
 
     @GET
@@ -1137,6 +1197,153 @@ public class API {
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @GET
+    @Path("/entregasPorHorario")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response entregasPorHorario(@QueryParam("dataInicio") String data1) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date dataInicio = dateFormat.parse(data1);
+            HashMap<Integer, Integer> entregas = ControlePedidos.getInstance().getEntregasPorHorario(token.getEstabelecimento(), dataInicio);
+            JsonObject object = new JsonObject();
+            object.add("entregas", builder.toJsonTree(entregas));
+            object.addProperty("data", data1);
+            return Response.status(Response.Status.OK).entity(builder.toJson(object)).build();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @GET
+    @Path("/entregasPorDiaDaSemana")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response entregasPorDiaDaSemana(@QueryParam("dataInicio") String data1, @QueryParam("dataFim") String data2) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date dataInicio = dateFormat.parse(data1);
+            Date dataFim = dateFormat.parse(data2);
+            HashMap<String, Integer> entregas = ControlePedidos.getInstance().getEntregasPorDiaSemana(token.getEstabelecimento(), dataInicio, dataFim);
+            JsonObject object = new JsonObject();
+            object.add("entregas", builder.toJsonTree(entregas));
+            object.addProperty("datas", data1 + " - " + data2);
+            return Response.status(Response.Status.OK).entity(builder.toJson(object)).build();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @GET
+    @Path("/receitaPorPeriodo")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response receitaPorPeriodo(@QueryParam("dataInicio") String data1, @QueryParam("dataFim") String data2) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date dataInicio = dateFormat.parse(data1);
+            Date dataFim = dateFormat.parse(data2);
+            HashMap<String, HashMap<String, Double>> lista = ControlePedidos.getInstance().getReceitaPeriodo(token.getEstabelecimento(), dataInicio, dataFim);
+            JsonObject object = new JsonObject();
+            JsonArray array = new JsonArray();
+            JsonArray array2 = new JsonArray();
+            JsonArray array3 = new JsonArray();
+            JsonArray array4 = new JsonArray();
+
+            for (Map.Entry<String, Double> entry : lista.get("entrega").entrySet()) {
+                array.add(entry.getValue());
+                array4.add(entry.getKey());
+            }
+            for (Map.Entry<String, Double> entry : lista.get("retirada").entrySet()) {
+                array2.add(entry.getValue());
+            }
+            for (Map.Entry<String, Double> entry : lista.get("total").entrySet()) {
+                array3.add(entry.getValue());
+            }
+
+            JsonArray arrayData = new JsonArray();
+            JsonObject entregas = new JsonObject();
+            entregas.addProperty("name", "Entrega");
+            entregas.add("data", array);
+            
+            JsonObject retirada = new JsonObject();
+            retirada.addProperty("name", "Retirada");
+            retirada.add("data", array2);
+
+            JsonObject total = new JsonObject();
+            total.addProperty("name", "Total");
+            total.add("data", array3);
+
+            arrayData.add(entregas);
+            arrayData.add(retirada);
+            arrayData.add(total);
+
+            object.add("series", arrayData);
+            object.add("meses", array4);
+            object.addProperty("datas", data1 + " - " + data2);
+            return Response.status(Response.Status.OK).entity(builder.toJson(object)).build();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+
+    @GET
+    @Path("/vendasPorProduto")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response vendasPorProduto(@QueryParam("dataInicio") String data1, @QueryParam("dataFim") String data2) {
+        try {
+            HashMap<String, Integer> top5VendidosMes = new HashMap<>();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            Date dataInicio = dateFormat.parse(data1);
+            Date dataFim = dateFormat.parse(data2);
+            List<Pedido> pedidosMes = ControlePedidos.getInstance().getPedidosBetween(token.getEstabelecimento(), dataInicio, dataFim);
+            for (Pedido pedido : pedidosMes) {
+                synchronized (pedido.getProdutos()) {
+                    for (ItemPedido itemPedido : pedido.getProdutos()) {
+                        if (itemPedido.isRemovido()) {
+                            continue;
+                        }
+                        String stringAtual = itemPedido.getProduto().getNomeWithCategories() + "";
+                        if (!itemPedido.getAdicionais().isEmpty()) {
+                            stringAtual += " - ";
+                            for (Map.Entry<GrupoAdicional, List<AdicionalProduto>> entry : itemPedido.getAdicionaisGroupByGrupo().entrySet()) {
+                                if (entry.getValue().isEmpty()) {
+                                    continue;
+                                }
+                                stringAtual += entry.getKey().getNomeGrupo() + ": ";
+                                for (AdicionalProduto adicionalProduto : entry.getValue()) {
+                                    stringAtual += adicionalProduto.getNome() + ", ";
+                                }
+                                stringAtual = stringAtual.substring(0, stringAtual.lastIndexOf(",")).trim() + ". ";
+                            }
+                        }
+                        stringAtual = stringAtual.trim();
+                        if (top5VendidosMes.containsKey(stringAtual)) {
+                            top5VendidosMes.put(stringAtual, top5VendidosMes.get(stringAtual) + itemPedido.getQtd());
+                        } else {
+                            top5VendidosMes.put(stringAtual, itemPedido.getQtd());
+                        }
+                    }
+                }
+            }
+            LinkedHashMap<String, Integer> sortedMap = top5VendidosMes.entrySet().stream().sorted(Map.Entry.comparingByValue((t, t1) -> Integer.compare(t1, t))).limit(5).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+            JsonObject object = new JsonObject();
+            JsonArray array = new JsonArray();
+            for (Map.Entry<String, Integer> entry : sortedMap.entrySet()) {
+                JsonObject object1 = new JsonObject();
+                object1.addProperty("nome", entry.getKey());
+                object1.addProperty("qtd", entry.getValue());
+                array.add(object1);
+            }
+            object.add("top5Vendidos", builder.toJsonTree(array));
+            object.addProperty("data", data1 + " - " + data2);
+            return Response.status(Response.Status.OK).entity(builder.toJson(object)).build();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
 
     @GET

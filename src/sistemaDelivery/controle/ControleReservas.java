@@ -125,14 +125,6 @@ public class ControleReservas {
                     preparedStatement.setObject(8, reserva.getEstabelecimento().getUuid());
                     preparedStatement.executeUpdate();
                     connection.commit();
-                    try {
-                        SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(reserva.getEstabelecimento());
-                        if (sistemaDelivery.getBroadcaster() != null) {
-                            sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("nova-reserva", reserva.getUuid().toString()));
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                     if (reservas.containsKey(reserva.getUuid())) {
                         Utilitarios.atualizarObjeto(reservas.get(reserva.getUuid()), reserva);
                     }

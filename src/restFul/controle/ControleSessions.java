@@ -13,6 +13,7 @@ public class ControleSessions {
     private static ControleSessions instance;
     private Map<Estabelecimento, SistemaDelivery> sessions;
     private static final Object syncroniseGetInstance = new Object();
+    private static boolean finalizado = false;
 
     private ControleSessions() {
         this.sessions = Collections.synchronizedMap(new HashMap<>());
@@ -34,6 +35,9 @@ public class ControleSessions {
     }
 
     public SistemaDelivery getSessionForEstabelecimento(Estabelecimento estabelecimento) throws IOException {
+        if (finalizado) {
+            return null;
+        }
         synchronized (sessions) {
             if (!sessions.containsKey(estabelecimento)) {
                 sessions.put(estabelecimento, new SistemaDelivery(estabelecimento));
@@ -43,15 +47,28 @@ public class ControleSessions {
     }
 
     public void finalizar() {
+        if (finalizado) {
+            return;
+        }
+        finalizado = true;
         synchronized (sessions) {
             for (Map.Entry<Estabelecimento, SistemaDelivery> entry : sessions.entrySet()) {
                 entry.getValue().finalizar();
+                System.out.println("Finalizado para - " + entry.getKey().getNomeEstabelecimento());
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
             sessions.clear();
         }
     }
 
     public void finalizarSessionForEstabelecimento(Estabelecimento estabelecimento) {
+        if (finalizado) {
+            return;
+        }
         synchronized (sessions) {
             if (sessions.containsKey(estabelecimento)) {
                 sessions.get(estabelecimento).finalizar();

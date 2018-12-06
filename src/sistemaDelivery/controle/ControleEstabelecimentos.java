@@ -226,6 +226,22 @@ public class ControleEstabelecimentos {
         return false;
     }
 
+    public List<Estabelecimento> getEstabelecimentosChatBotAberto() {
+        List<Estabelecimento> estabelecimentos = new ArrayList<>();
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Estabelecimentos\" where \"openChatBot\" and ativo");
+        ) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    estabelecimentos.add(getEstabelecimentoByUUID(UUID.fromString(resultSet.getString("uuid"))));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return estabelecimentos;
+    }
+
     public List<Estabelecimento> getEstabelecimentosUsuario(Usuario u) {
         List<Estabelecimento> estabelecimentos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();

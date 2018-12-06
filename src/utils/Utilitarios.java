@@ -31,6 +31,9 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.*;
 
 /**
@@ -183,6 +186,14 @@ public class Utilitarios {
             }
         }
         iin.setText(s);
+    }
+
+    public static String getMonth(int mes) {
+        return Month.of(mes).getDisplayName(TextStyle.FULL, Locale.forLanguageTag("pt-BR"));
+    }
+
+    public static String getDayOfWeekName(int diaSemana) {
+        return DayOfWeek.of(diaSemana).getDisplayName(TextStyle.FULL_STANDALONE, Locale.forLanguageTag("pt-BR"));
     }
 
     public static String replaceAllNoDigit(String iin) {
