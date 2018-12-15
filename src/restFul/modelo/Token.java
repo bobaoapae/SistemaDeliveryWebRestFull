@@ -1,5 +1,6 @@
 package restFul.modelo;
 
+import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.modelo.Estabelecimento;
 
 import java.security.Principal;
@@ -14,6 +15,15 @@ public class Token implements Principal {
     private Date validade;
     private Estabelecimento estabelecimento;
     private Usuario usuario;
+    private SistemaDelivery sistemaDelivery;
+
+    public SistemaDelivery getSistemaDelivery() {
+        return sistemaDelivery;
+    }
+
+    public void setSistemaDelivery(SistemaDelivery sistemaDelivery) {
+        this.sistemaDelivery = sistemaDelivery;
+    }
 
     public Estabelecimento getEstabelecimento() {
         return estabelecimento;

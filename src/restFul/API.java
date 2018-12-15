@@ -1,13 +1,9 @@
 package restFul;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import driver.WebWhatsDriver;
-import modelo.Chat;
-import modelo.EstadoDriver;
+import modelo.*;
 import restFul.controle.ControleSessions;
 import restFul.controle.ControleTokens;
 import restFul.modelo.Token;
@@ -24,11 +20,14 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseEventSink;
-import java.io.IOException;
+import java.io.File;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -52,47 +51,30 @@ public class API {
     @Path("/eventos")
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void eventoNovoPedido(@Context SseEventSink sink, @Context Sse sse) {
-        try {
-            SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
-            if (sistemaDelivery.getBroadcaster() != null) {
-                sistemaDelivery.getBroadcaster().register(sink);
-            } else {
-                sistemaDelivery.setSse(sse);
-                sistemaDelivery.setBroadcaster(sse.newBroadcaster());
-                sistemaDelivery.getBroadcaster().register(sink);
-            }
-            sink.send(sse.newEvent("ok"));
-        } catch (IOException e) {
-            e.printStackTrace();
+        SistemaDelivery sistemaDelivery = token.getSistemaDelivery();
+        if (sistemaDelivery.getBroadcaster() != null) {
+            sistemaDelivery.getBroadcaster().register(sink);
+        } else {
+            sistemaDelivery.setSse(sse);
+            sistemaDelivery.setBroadcaster(sse.newBroadcaster());
+            sistemaDelivery.getBroadcaster().register(sink);
         }
-    }
-
-
-    @GET
-    @Path("/iniciarNovoPedido")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response iniciarNovoPedido() {
-        Pedido pedido = new Pedido();
-        pedido.setEstabelecimento(token.getEstabelecimento());
-        pedido.setUuid(UUID.randomUUID());
-        synchronized (pedidosSendoCriados) {
-            pedidosSendoCriados.add(pedido);
-        }
-        return Response.status(Response.Status.CREATED).entity(builder.toJson(pedido)).build();
+        sink.send(sse.newEvent("ok"));
     }
 
     @GET
-    @Path("/infoPedidoSendoCriado")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response infoPedidoSendoCriado(@QueryParam("uuid") String uuid) {
-        synchronized (pedidosSendoCriados) {
-            for (Pedido pedido : pedidosSendoCriados) {
-                if (pedido.getUuid().equals(UUID.fromString(uuid))) {
-                    return Response.status(Response.Status.CREATED).entity(builder.toJson(pedido)).build();
-                }
-            }
+    @Path("/eventosWpp")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
+    public void eventosWpp(@Context SseEventSink sink, @Context Sse sse) {
+        SistemaDelivery sistemaDelivery = token.getSistemaDelivery();
+        if (sistemaDelivery.getBroadcasterWhats() != null) {
+            sistemaDelivery.getBroadcasterWhats().register(sink);
+        } else {
+            sistemaDelivery.setSseWhats(sse);
+            sistemaDelivery.setBroadcasterWhats(sse.newBroadcaster());
+            sistemaDelivery.getBroadcasterWhats().register(sink);
         }
-        return Response.status(Response.Status.NOT_FOUND).build();
+        sink.send(sse.newEvent("ok"));
     }
 
     @GET
@@ -102,20 +84,19 @@ public class API {
         return Response.status(Response.Status.OK).entity(builder.toJson(token.getEstabelecimento())).build();
     }
 
-
     @GET
     @Path("/estadoWhats")
     @Produces(MediaType.APPLICATION_JSON)
     public Response estadoWhats() {
         JsonObject object = new JsonObject();
         try {
-            WebWhatsDriver driver = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver();
+            WebWhatsDriver driver = token.getSistemaDelivery().getDriver();
             object.addProperty("status", driver.getEstadoDriver().toString());
             if (driver.getEstadoDriver() == EstadoDriver.WAITING_QR_CODE_SCAN) {
                 object.addProperty("qrCode", driver.getQrCodePlain());
             }
             return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).entity(builder.toJson(object)).build();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -210,6 +191,7 @@ public class API {
         Categoria categoria = builder.fromJson(cat, Categoria.class);
         categoria.setEstabelecimento(token.getEstabelecimento());
         categoria.setCategoriaPai(ControleCategorias.getInstance().getCategoriaByUUID(categoria.getUuid_categoria_pai()));
+        categoria.setAtivo(true);
         for (UUID uuidCat : categoria.getUuidsCategoriasNecessarias()) {
             Categoria catNecessaria = ControleCategorias.getInstance().getCategoriaByUUID(uuidCat);
             if (catNecessaria == null) {
@@ -302,6 +284,7 @@ public class API {
     public Response salvarProduto(@FormParam("produto") String prod) {
         Produto produto = builder.fromJson(prod, Produto.class);
         produto.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(produto.getUuid_categoria()));
+        produto.setAtivo(true);
         if (!produto.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -844,13 +827,13 @@ public class API {
     public Response salvarCliente(@FormParam("cliente") String cli) {
         Cliente cliente = builder.fromJson(cli, Cliente.class);
         cliente.setEstabelecimento(token.getEstabelecimento());
-        if (!cliente.getTelefoneMovel().isEmpty()) {
+        if (!cliente.getTelefoneMovel().isEmpty() && token.getSistemaDelivery().getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
             try {
-                Chat chat = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatByNumber("55" + Utilitarios.replaceAllNoDigit(cliente.getTelefoneMovel()));
+                Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utilitarios.replaceAllNoDigit(cliente.getTelefoneMovel()));
                 if (chat != null) {
                     cliente.setChatId(chat.getId());
                 }
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -903,14 +886,14 @@ public class API {
         boolean flag = false;
         if (token.getEstabelecimento().isOpenPedidos()) {
             try {
-                flag = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).fecharPedidos();
-            } catch (IOException e) {
+                flag = token.getSistemaDelivery().fecharPedidos();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         } else {
             try {
-                flag = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).abrirPedidos();
-            } catch (IOException e) {
+                flag = token.getSistemaDelivery().abrirPedidos();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -1266,7 +1249,7 @@ public class API {
             JsonObject entregas = new JsonObject();
             entregas.addProperty("name", "Entrega");
             entregas.add("data", array);
-            
+
             JsonObject retirada = new JsonObject();
             retirada.addProperty("name", "Retirada");
             retirada.add("data", array2);
@@ -1396,6 +1379,205 @@ public class API {
         return Response.status(Response.Status.OK).entity(builder.toJson(object)).build();
     }
 
+    @POST
+    @Path("/formatarMsg")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response formatarMsg(@FormParam("msg") String msg, @QueryParam("uuid-cliente") String uuid) {
+        Cliente cliente = null;
+        if (uuid != null && !uuid.isEmpty()) {
+            cliente = ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid));
+        }
+        int horaAtual = LocalTime.now().getHour();
+        String saudacao = "";
+        if (horaAtual >= 2 && horaAtual < 12) {
+            saudacao = "Bom Dia";
+        } else if (horaAtual >= 12 && horaAtual < 18) {
+            saudacao = "Boa Tarde";
+        } else {
+            saudacao = "Boa Noite";
+        }
+        String hoje = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy"));
+        String amanha = LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy"));
+        msg = msg.replaceAll("\\{estabelecimento}", token.getEstabelecimento().getNomeEstabelecimento()).replaceAll("\\{saudacao}", saudacao).replaceAll("\\{hoje}", hoje).replaceAll("\\{amanha}", amanha);
+        if (cliente != null) {
+            msg = msg.replaceAll("\\{cliente}", cliente.getNome());
+        }
+        return Response.status(Response.Status.OK).entity(msg).build();
+    }
+
+    @GET
+    @Path("/listasTransmissao")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getListasTransmissao() {
+        WebWhatsDriver driver = token.getSistemaDelivery().getDriver();
+        if (driver.getEstadoDriver() != EstadoDriver.LOGGED) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        JsonArray array = new JsonArray();
+        List<BroadcastChat> listas = driver.getFunctions().getAllBroadcastChats();
+        for (BroadcastChat chat : listas) {
+            JsonObject ob = new JsonObject();
+            ob.addProperty("nome", chat.getFormattedTitle());
+            ob.addProperty("id", chat.getId());
+            array.add(ob);
+        }
+        return Response.status(Response.Status.OK).entity(builder.toJson(array)).build();
+    }
+
+    @POST
+    @Path("/enviarMsg")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response enviarMsg(@FormParam("msg") String msg, @QueryParam("uuid-cliente") String uuid, @QueryParam("chatId") String chatid) {
+        Cliente cliente = null;
+        if (uuid != null && !uuid.isEmpty()) {
+            cliente = ControleClientes.getInstance().getClienteByUUID(UUID.fromString(uuid));
+        } else if (chatid == null || chatid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (cliente == null && (chatid == null || chatid.isEmpty())) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        int horaAtual = LocalTime.now().getHour();
+        String saudacao = "";
+        if (horaAtual >= 2 && horaAtual < 12) {
+            saudacao = "Bom Dia";
+        } else if (horaAtual >= 12 && horaAtual < 18) {
+            saudacao = "Boa Tarde";
+        } else {
+            saudacao = "Boa Noite";
+        }
+        String hoje = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy"));
+        String amanha = LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy"));
+        msg = msg.replaceAll("\\{estabelecimento}", token.getEstabelecimento().getNomeEstabelecimento()).replaceAll("\\{saudacao}", saudacao).replaceAll("\\{hoje}", hoje).replaceAll("\\{amanha}", amanha);
+        if (cliente != null) {
+            msg = msg.replaceAll("\\{cliente}", cliente.getNome());
+        }
+        try {
+            WebWhatsDriver driver = token.getSistemaDelivery().getDriver();
+            if (driver.getEstadoDriver() != EstadoDriver.LOGGED) {
+                return Response.status(Response.Status.FORBIDDEN).build();
+            }
+            if (cliente != null) {
+                driver.getFunctions().getChatById(cliente.getChatId()).sendMessage(msg);
+            } else {
+                driver.getFunctions().getChatById(chatid).sendMessage(msg);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+
+        }
+        return Response.status(Response.Status.OK).build();
+    }
+
+    @GET
+    @Path("/chats")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getChats() {
+        if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        JsonArray array = new JsonArray();
+        List<Chat> chats = token.getSistemaDelivery().getDriver().getFunctions().getAllChats();
+        JsonParser parser = new JsonParser();
+        for (Chat c : chats) {
+            JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.getJsObject().toJSONString()));
+            object.add("contact", builder.toJsonTree(parser.parse(c.getContact().getJsObject().toJSONString())));
+            Cliente cliente = ControleClientes.getInstance().getClienteChatId(c.getId(), token.getEstabelecimento());
+            if (cliente != null) {
+                object.add("cliente", builder.toJsonTree(cliente));
+            }
+            array.add(object);
+        }
+        return Response.status(Response.Status.OK).entity(builder.toJson(array)).build();
+    }
+
+    @GET
+    @Path("/pictureChat")
+    @Produces("image/png")
+    public Response pictureChat(@QueryParam("chatId") String chatid) {
+        if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid);
+        if (chat != null) {
+            String img = chat.getContact().getThumb();
+            if (img.isEmpty()) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            return Response.status(Response.Status.OK).entity(Base64.getDecoder().decode(img.split(",")[1])).build();
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+    }
+
+    @GET
+    @Path("/loadEarly")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response loadEarly(@QueryParam("chatId") String chatid) {
+        if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid);
+        if (chat == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        chat.loadEarlierMsgs(false);
+        return Response.status(Response.Status.OK).build();
+    }
+
+    @GET
+    @Path("/msgsChat")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response msgsChat(@QueryParam("chatId") String chatid) {
+        if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid);
+        if (chat == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        List<Message> msgs = token.getSistemaDelivery().getDriver().getFunctions().getAllMessagesInChat(chat, true, true);
+        if (msgs.isEmpty() || msgs.size() < 10) {
+            chat.loadEarlierMsgs(false);
+        }
+        msgs = token.getSistemaDelivery().getDriver().getFunctions().getAllMessagesInChat(chat, true, true);
+        JsonArray array = new JsonArray();
+        JsonParser parser = new JsonParser();
+        for (Message msg : msgs) {
+            if (msg instanceof MediaMessage) {
+                JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(msg.getJsObject().toJSONString()));
+                MediaMessage mediaMessage = (MediaMessage) msg;
+                File file = mediaMessage.downloadMedia();
+                try {
+                    String contentType = Files.probeContentType(file.toPath());
+
+                    // read data as byte[]
+                    byte[] data = Files.readAllBytes(file.toPath());
+
+                    // convert byte[] to base64(java7)
+                    //String base64str = DatatypeConverter.printBase64Binary(data);
+                    // convert byte[] to base64(java8)
+                    String base64str = Base64.getEncoder().encodeToString(data);
+
+                    // cretate "data URI"
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("data:");
+                    sb.append(contentType);
+                    sb.append(";base64,");
+                    sb.append(base64str);
+                    object.addProperty("mediaBase64", sb.toString());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+                array.add(object);
+            } else {
+                array.add(builder.toJsonTree(parser.parse(msg.getJsObject().toJSONString())));
+            }
+        }
+        return Response.status(Response.Status.OK).entity(builder.toJson(array)).build();
+    }
+
     @GET
     @Path("/finalizar")
     @Produces(MediaType.TEXT_PLAIN)
@@ -1410,8 +1592,8 @@ public class API {
     @Produces(MediaType.TEXT_PLAIN)
     public Response logout() {
         try {
-            ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).logout();
-        } catch (IOException e) {
+            token.getSistemaDelivery().logout();
+        } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }

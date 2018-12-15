@@ -68,6 +68,9 @@ public class Utilitarios {
     }
 
     public static void atualizarObjeto(Object x, Object y) {
+        if (x == y) {
+            return;
+        }
         ArrayList<Field[]> listaFields = new ArrayList<>();
         Class cla = x.getClass();
         int nrHeranca = 0;

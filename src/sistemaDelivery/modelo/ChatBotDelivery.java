@@ -46,10 +46,14 @@ public class ChatBotDelivery extends ChatBot {
             if (cliente.getTelefoneMovel().isEmpty()) {
                 this.cliente.setTelefoneMovel(((UserChat) chat).getContact().getPhoneNumber());
             }
+            if (!cliente.isCadastroRealizado()) {
+                this.cliente.setNome(chat.getContact().getPushName());
+            }
+            ControleClientes.getInstance().salvarCliente(this.cliente);
         } else {
             this.cliente = new Cliente(chat.getId(), estabelecimento);
             this.cliente.setTelefoneMovel(((UserChat) chat).getContact().getPhoneNumber());
-            this.cliente.setNome(chat.getContact().getSafeName());
+            this.cliente.setNome(chat.getContact().getPushName());
             ControleClientes.getInstance().salvarCliente(this.cliente);
             this.cliente = ControleClientes.getInstance().getClienteByUUID(this.cliente.getUuid());
         }
@@ -128,7 +132,7 @@ public class ChatBotDelivery extends ChatBot {
         if (cliente.isCadastroRealizado()) {
             return cliente.getNome();
         } else {
-            return chat.getContact().getSafeName();
+            return chat.getContact().getPushName();
         }
     }
 
@@ -187,6 +191,9 @@ public class ChatBotDelivery extends ChatBot {
 
     @Override
     public void processNewMsg(Message m) {
+        if (!estabelecimento.isOpenChatBot()) {
+            return;
+        }
         if (m.getChat().getContact().getId().equals("554491050665@c.us")) {
             if (m.getContent().toLowerCase().equals("/encerrar")) {
 

@@ -1,16 +1,18 @@
 package sistemaDelivery;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.teamdev.jxbrowser.chromium.swing.BrowserView;
 import driver.WebWhatsDriver;
 import modelo.*;
 import sistemaDelivery.controle.ControleChatsAsync;
+import sistemaDelivery.controle.ControleClientes;
 import sistemaDelivery.controle.ControleEstabelecimentos;
 import sistemaDelivery.controle.ControlePedidos;
 import sistemaDelivery.handlersBot.HandlerBoasVindas;
 import sistemaDelivery.handlersBot.HandlerBotDelivery;
-import sistemaDelivery.modelo.ChatBotDelivery;
-import sistemaDelivery.modelo.Estabelecimento;
-import sistemaDelivery.modelo.EstadoPedido;
-import sistemaDelivery.modelo.Pedido;
+import sistemaDelivery.modelo.*;
 import utils.Utilitarios;
 
 import javax.ws.rs.sse.Sse;
@@ -26,21 +28,45 @@ import java.util.concurrent.TimeUnit;
 public class SistemaDelivery {
     private WebWhatsDriver driver;
     private ActionOnNeedQrCode onNeedQrCode;
-    private ActionOnLowBaterry onLowBaterry;
+    private ActionOnLowBattery onLowBaterry;
     private ActionOnErrorInDriver onErrorInDriver;
     private Runnable onConnect, onDisconnect;
     private Estabelecimento estabelecimento;
-    private SseBroadcaster broadcaster;
-    private Sse sse;
+    private SseBroadcaster broadcaster, broadcasterWhats;
+    private Sse sse, sseWhats;
     private ScheduledExecutorService executores = Executors.newSingleThreadScheduledExecutor();
+    private BrowserView view;
+    private JsonParser parser;
+    private Gson builder;
 
     public SistemaDelivery(Estabelecimento estabelecimento) throws IOException {
         this.estabelecimento = estabelecimento;
+        parser = new JsonParser();
+        builder = Utilitarios.getDefaultGsonBuilder(null).create();
         onConnect = () -> {
             for (Chat chat : driver.getFunctions().getAllNewChats()) {
                 ControleChatsAsync.getInstance(estabelecimento).addChat(chat);
             }
-            driver.getFunctions().setListennerToNewChat(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat));
+            driver.getFunctions().addListennerToNewChat(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat));
+            driver.getFunctions().addListennerToNewChat(c -> {
+                if (broadcasterWhats != null) {
+                    JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.getJsObject().toJSONString()));
+                    object.add("contact", builder.toJsonTree(parser.parse(c.getContact().getJsObject().toJSONString())));
+                    Cliente cliente = ControleClientes.getInstance().getClienteChatId(c.getId(), this.estabelecimento);
+                    if (cliente != null) {
+                        object.add("cliente", builder.toJsonTree(cliente));
+                    }
+                    broadcasterWhats.broadcast(sseWhats.newEvent("new-chat", builder.toJson(object)));
+                }
+            });
+            driver.getFunctions().addListennerToNewMsg(new MessageObserverIncludeMe() {
+                @Override
+                public void onNewMsg(Message msg) {
+                    if (broadcasterWhats != null) {
+                        broadcasterWhats.broadcast(sseWhats.newEvent("new-msg", builder.toJson(parser.parse(msg.getJsObject().toJSONString()))));
+                    }
+                }
+            });
         };
         onLowBaterry = (e) -> {
             if (broadcaster != null) {
@@ -48,6 +74,7 @@ public class SistemaDelivery {
             }
         };
         this.driver = new WebWhatsDriver("C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+        view = new BrowserView(driver.getBrowser());
         executores.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -93,6 +120,18 @@ public class SistemaDelivery {
                 }
             }
         }, 0, 10, TimeUnit.SECONDS);
+        executores.scheduleWithFixedDelay(() -> {
+            if (broadcasterWhats != null) {
+                broadcasterWhats.broadcast(sseWhats.newEvent("none"));
+            }
+            if (broadcaster != null) {
+                broadcaster.broadcast(sse.newEvent("none"));
+            }
+        }, 0, 5, TimeUnit.SECONDS);
+    }
+
+    public BrowserView getView() {
+        return view;
     }
 
     public boolean abrirPedidos() {
@@ -186,6 +225,22 @@ public class SistemaDelivery {
             return false;
         }
         return true;
+    }
+
+    public SseBroadcaster getBroadcasterWhats() {
+        return broadcasterWhats;
+    }
+
+    public void setBroadcasterWhats(SseBroadcaster broadcasterWhats) {
+        this.broadcasterWhats = broadcasterWhats;
+    }
+
+    public Sse getSseWhats() {
+        return sseWhats;
+    }
+
+    public void setSseWhats(Sse sseWhats) {
+        this.sseWhats = sseWhats;
     }
 
     public Sse getSse() {

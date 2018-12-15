@@ -11,6 +11,8 @@
       <root url="jar://$PROJECT_DIR$/../jxbrowser/6.22/jxbrowser-win64-6.22.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES />
+    <SOURCES>
+      <root url="file://$PROJECT_DIR$/../WebWhatsNew/src" />
+    </SOURCES>
   </library>
 </component>

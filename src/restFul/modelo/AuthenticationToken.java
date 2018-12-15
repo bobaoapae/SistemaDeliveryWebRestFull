@@ -40,7 +40,7 @@ public class AuthenticationToken implements ContainerRequestFilter {
                     if (DateUtils.isAfterDay(k.getValidade(), new Date())) {
                         TokenSecurityContext securityContext = new TokenSecurityContext(k);
                         containerRequestContext.setSecurityContext(securityContext);
-                        ControleSessions.getInstance().getSessionForEstabelecimento(k.getEstabelecimento());
+                        k.setSistemaDelivery(ControleSessions.getInstance().getSessionForEstabelecimento(k.getEstabelecimento()));
                     } else {
                         JsonObject ob = new JsonObject();
                         ob.addProperty("status", "tokenExpired");
