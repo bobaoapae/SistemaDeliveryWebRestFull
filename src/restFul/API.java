@@ -37,6 +37,8 @@ public class API {
     private Gson builder;
     private Token token;
     private List<Pedido> pedidosSendoCriados;
+    JsonParser parser;
+
 
     public API(@Context HttpServletRequest session, @Context SecurityContext securityContext) {
         this.token = (Token) securityContext.getUserPrincipal();
@@ -45,6 +47,7 @@ public class API {
             session.getSession().setAttribute("pedidosSendoCriados", Collections.synchronizedList(new ArrayList<>()));
         }
         pedidosSendoCriados = ((List<Pedido>) session.getSession().getAttribute("pedidosSendoCriados"));
+        parser = new JsonParser();
     }
 
     @GET
@@ -1478,11 +1481,11 @@ public class API {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         JsonArray array = new JsonArray();
-        List<Chat> chats = token.getSistemaDelivery().getDriver().getFunctions().getAllChats();
-        JsonParser parser = new JsonParser();
+        List<Chat> chats = token.getSistemaDelivery().getDriver().getFunctions().getAllChats(100);
         for (Chat c : chats) {
-            JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.getJsObject().toJSONString()));
-            object.add("contact", builder.toJsonTree(parser.parse(c.getContact().getJsObject().toJSONString())));
+            JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.toJson()));
+            object.addProperty("noEarlierMsgs", c.noEarlierMsgs());
+            object.add("contact", builder.toJsonTree(parser.parse(c.getContact().toJson())));
             Cliente cliente = ControleClientes.getInstance().getClienteChatId(c.getId(), token.getEstabelecimento());
             if (cliente != null) {
                 object.add("cliente", builder.toJsonTree(cliente));
@@ -1490,6 +1493,28 @@ public class API {
             array.add(object);
         }
         return Response.status(Response.Status.OK).entity(builder.toJson(array)).build();
+    }
+
+    @GET
+    @Path("/mediaMessage")
+    public Response mediaMessage(@QueryParam("msgId") String msgid) {
+        if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        Message message = token.getSistemaDelivery().getDriver().getFunctions().getMessageById(msgid);
+        if (message != null && message instanceof MediaMessage) {
+            File file = ((MediaMessage) message).downloadMedia();
+            try {
+                String contentType = Files.probeContentType(file.toPath());
+                byte[] data = Files.readAllBytes(file.toPath());
+                return Response.status(Response.Status.OK).type(contentType).entity(data).build();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
+        } else {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
     }
 
     @GET
@@ -1512,6 +1537,21 @@ public class API {
     }
 
     @GET
+    @Path("/sendSeenChat")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response sendSeenChat(@QueryParam("chatId") String chatid) {
+        if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+        Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid);
+        if (chat == null) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        chat.sendSeen(false);
+        return Response.status(Response.Status.OK).build();
+    }
+
+    @GET
     @Path("/loadEarly")
     @Produces(MediaType.APPLICATION_JSON)
     public Response loadEarly(@QueryParam("chatId") String chatid) {
@@ -1522,7 +1562,14 @@ public class API {
         if (chat == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        chat.loadEarlierMsgs(false);
+        chat.loadEarlierMsgs(() -> {
+            if (token.getSistemaDelivery().getBroadcasterWhats() != null) {
+                JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(chat.toJson()));
+                object.addProperty("noEarlierMsgs", chat.noEarlierMsgs());
+                object.add("contact", builder.toJsonTree(parser.parse(chat.getContact().toJson())));
+                token.getSistemaDelivery().getBroadcasterWhats().broadcast(token.getSistemaDelivery().getSseWhats().newEvent("chat-update", builder.toJson(object)));
+            }
+        });
         return Response.status(Response.Status.OK).build();
     }
 
@@ -1538,15 +1585,11 @@ public class API {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         List<Message> msgs = token.getSistemaDelivery().getDriver().getFunctions().getAllMessagesInChat(chat, true, true);
-        if (msgs.isEmpty() || msgs.size() < 10) {
-            chat.loadEarlierMsgs(false);
-        }
         msgs = token.getSistemaDelivery().getDriver().getFunctions().getAllMessagesInChat(chat, true, true);
         JsonArray array = new JsonArray();
-        JsonParser parser = new JsonParser();
         for (Message msg : msgs) {
             if (msg instanceof MediaMessage) {
-                JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(msg.getJsObject().toJSONString()));
+                JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(msg.toJson()));
                 MediaMessage mediaMessage = (MediaMessage) msg;
                 File file = mediaMessage.downloadMedia();
                 try {

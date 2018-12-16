@@ -3,7 +3,6 @@ package sistemaDelivery;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.teamdev.jxbrowser.chromium.swing.BrowserView;
 import driver.WebWhatsDriver;
 import modelo.*;
 import sistemaDelivery.controle.ControleChatsAsync;
@@ -34,8 +33,7 @@ public class SistemaDelivery {
     private Estabelecimento estabelecimento;
     private SseBroadcaster broadcaster, broadcasterWhats;
     private Sse sse, sseWhats;
-    private ScheduledExecutorService executores = Executors.newSingleThreadScheduledExecutor();
-    private BrowserView view;
+    private ScheduledExecutorService executores = Executors.newScheduledThreadPool(5);
     private JsonParser parser;
     private Gson builder;
 
@@ -50,8 +48,8 @@ public class SistemaDelivery {
             driver.getFunctions().addListennerToNewChat(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat));
             driver.getFunctions().addListennerToNewChat(c -> {
                 if (broadcasterWhats != null) {
-                    JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.getJsObject().toJSONString()));
-                    object.add("contact", builder.toJsonTree(parser.parse(c.getContact().getJsObject().toJSONString())));
+                    JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.toJson()));
+                    object.add("contact", builder.toJsonTree(parser.parse(c.getContact().toJson())));
                     Cliente cliente = ControleClientes.getInstance().getClienteChatId(c.getId(), this.estabelecimento);
                     if (cliente != null) {
                         object.add("cliente", builder.toJsonTree(cliente));
@@ -74,7 +72,6 @@ public class SistemaDelivery {
             }
         };
         this.driver = new WebWhatsDriver("C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
-        view = new BrowserView(driver.getBrowser());
         executores.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -83,37 +80,21 @@ public class SistemaDelivery {
                     if (!estabelecimento.isOpenPedidos()) {
                         if (estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime().isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime())) {
                             if (!(horaAtual.isBefore(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime()) && horaAtual.isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime()))) {
-                                new Thread() {
-                                    public void run() {
-                                        abrirPedidos();
-                                    }
-                                }.start();
+                                abrirPedidos();
                             }
                         } else {
                             if (horaAtual.isAfter(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime()) && horaAtual.isBefore(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime())) {
-                                new Thread() {
-                                    public void run() {
-                                        abrirPedidos();
-                                    }
-                                }.start();
+                                abrirPedidos();
                             }
                         }
                     } else {
                         if (estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime().isBefore(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime())) {
                             if ((horaAtual.isBefore(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime()) && horaAtual.isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime()))) {
-                                new Thread() {
-                                    public void run() {
-                                        fecharPedidos();
-                                    }
-                                }.start();
+                                fecharPedidos();
                             }
                         } else {
                             if (horaAtual.isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime()) || horaAtual.isBefore(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime())) {
-                                new Thread() {
-                                    public void run() {
-                                        fecharPedidos();
-                                    }
-                                }.start();
+                                fecharPedidos();
                             }
                         }
                     }
@@ -127,11 +108,7 @@ public class SistemaDelivery {
             if (broadcaster != null) {
                 broadcaster.broadcast(sse.newEvent("none"));
             }
-        }, 0, 5, TimeUnit.SECONDS);
-    }
-
-    public BrowserView getView() {
-        return view;
+        }, 0, 20, TimeUnit.SECONDS);
     }
 
     public boolean abrirPedidos() {

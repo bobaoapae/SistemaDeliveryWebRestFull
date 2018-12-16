@@ -36,6 +36,8 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
+        adicionaisDisponiveis.clear();
+        adicionaisEscolhidos.clear();
         synchronized (grupoAtual.getAdicionais()) {
             if (!grupoAtual.getAdicionais().isEmpty()) {
                 if (grupoAtual.getQtdMax() > 1) {
