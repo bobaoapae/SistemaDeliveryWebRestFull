@@ -4,8 +4,6 @@ import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import driver.WebWhatsDriver;
 import modelo.*;
-import restFul.controle.ControleSessions;
-import restFul.controle.ControleTokens;
 import restFul.modelo.Token;
 import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.*;
@@ -123,7 +121,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response alterarEstabelecimento(@FormParam("estabelecimento") String estabelecimento) {
         Estabelecimento novosValoresEstabelecimento = builder.fromJson(estabelecimento, Estabelecimento.class);
-        token.getEstabelecimento().setAbrirFecharPedidosAutomaticamente(novosValoresEstabelecimento.isAbrirFecharPedidosAutomaticamente());
+        token.getEstabelecimento().setAbrirFecharPedidosAutomatico(novosValoresEstabelecimento.isAbrirFecharPedidosAutomatico());
         token.getEstabelecimento().setAgendamentoDePedidos(novosValoresEstabelecimento.isAgendamentoDePedidos());
         token.getEstabelecimento().setHoraAutomaticaAbrirPedidos(novosValoresEstabelecimento.getHoraAutomaticaAbrirPedidos());
         token.getEstabelecimento().setHoraAutomaticaFecharPedidos(novosValoresEstabelecimento.getHoraAutomaticaFecharPedidos());
@@ -1625,9 +1623,12 @@ public class API {
     @Path("/finalizar")
     @Produces(MediaType.TEXT_PLAIN)
     public Response finalizar() {
-        ControleSessions.getInstance().finalizarSessionForEstabelecimento(token.getEstabelecimento());
-        ControleTokens.getInstance().removerToken(token);
-        return Response.status(Response.Status.OK).build();
+        token.getEstabelecimento().setOpenChatBot(false);
+        if (ControleEstabelecimentos.getInstance().salvarEstabelecimento(token.getEstabelecimento())) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento())).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GET

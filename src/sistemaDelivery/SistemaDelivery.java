@@ -75,7 +75,7 @@ public class SistemaDelivery {
         executores.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-                if (estabelecimento.isAbrirFecharPedidosAutomaticamente()) {
+                if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
                     LocalTime horaAtual = LocalTime.now();
                     if (!estabelecimento.isOpenPedidos()) {
                         if (estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime().isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime())) {

@@ -44,7 +44,7 @@ public class HandlerComecarNovoPedido extends HandlerBotDelivery {
             ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(((ChatBotDelivery) chat).getCliente(), getChatBotDelivery().getEstabelecimento()));
             if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
                 if (!getChatBotDelivery().getEstabelecimento().isAgendamentoDePedidos()) {
-                    if (!getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomaticamente()) {
+                    if (!getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomatico()) {
                         if (!getChatBotDelivery().getEstabelecimento().isReservasComPedidosFechados()) {
                             chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, por favor retorne mais tarde._", 2000);
                             chat.setHandler(new HandlerAdeus(chat), true);

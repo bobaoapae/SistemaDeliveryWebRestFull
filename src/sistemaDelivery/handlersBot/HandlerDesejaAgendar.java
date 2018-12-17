@@ -27,7 +27,7 @@ public class HandlerDesejaAgendar extends HandlerBotDelivery {
             return true;
         }
         if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
-            if (getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomaticamente()) {
+            if (getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomatico()) {
                 chat.getChat().sendMessage("Não iniciamos o atendimento ainda, nosso horário de atentimento é das " + getChatBotDelivery().getEstabelecimento().getHoraAutomaticaAbrirPedidos().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " às " + getChatBotDelivery().getEstabelecimento().getHoraAutomaticaFecharPedidos().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você pode agendar o horario do seu pedido.", 1000);
             } else {
                 chat.getChat().sendMessage("Não iniciamos o atendimento ainda, porém você pode agendar o horario do seu pedido.", 1000);

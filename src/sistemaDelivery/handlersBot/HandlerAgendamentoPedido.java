@@ -39,7 +39,7 @@ public class HandlerAgendamentoPedido extends HandlerBotDelivery {
         try {
             LocalTime horaAtual = LocalTime.now();
             LocalTime horaInformada = LocalTime.parse(dataS, DateTimeFormatter.ofPattern("HH:mm"));
-            if ((horaInformada.isAfter(horaAtual) || horaInformada.equals(horaAtual)) && (!getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomaticamente() || (getChatBotDelivery().getEstabelecimento().isTimeBeetwenHorarioFuncionamento(horaInformada) || horaInformada.equals(getChatBotDelivery().getEstabelecimento().getHoraAutomaticaAbrirPedidos())))) {
+            if ((horaInformada.isAfter(horaAtual) || horaInformada.equals(horaAtual)) && (!getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomatico() || (getChatBotDelivery().getEstabelecimento().isTimeBeetwenHorarioFuncionamento(horaInformada) || horaInformada.equals(getChatBotDelivery().getEstabelecimento().getHoraAutomaticaAbrirPedidos())))) {
                 ((ChatBotDelivery) chat).getPedidoAtual().setHoraAgendamento(java.sql.Time.valueOf(horaInformada));
                 chat.setHandler(new HandlerConcluirPedido(chat), true);
                 return true;
@@ -56,7 +56,7 @@ public class HandlerAgendamentoPedido extends HandlerBotDelivery {
     protected void onError(Message m) {
         chat.getChat().sendMessage("A hora informada é invalida, tente novamente");
         chat.getChat().sendMessage("*Obs¹*: Envie a hora no seguinte formato *hh:mm*. Ex: *18:50*");
-        if (getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomaticamente()) {
+        if (getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomatico()) {
             chat.getChat().sendMessage("*Obs²*: Os horarios de agendamento disponíveis são apenas para após às *" + getChatBotDelivery().getEstabelecimento().getHoraAutomaticaAbrirPedidos().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "*");
         }
         chat.getChat().sendMessage("*Obs³*: Você não pode informar um horario anterior à hora atual: *" + ((ChatBotDelivery) chat).getTimeFormat().format(Calendar.getInstance().getTime()) + "*");

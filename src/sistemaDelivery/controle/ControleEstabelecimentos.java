@@ -86,9 +86,9 @@ public class ControleEstabelecimentos {
                 preparedStatement.setInt(6, estabelecimento.getTempoMedioEntrega());
                 preparedStatement.setBoolean(7, estabelecimento.isReservas());
                 preparedStatement.setBoolean(8, estabelecimento.isReservasComPedidosFechados());
-                preparedStatement.setBoolean(9, estabelecimento.isAbrirFecharPedidosAutomaticamente());
+                preparedStatement.setBoolean(9, estabelecimento.isAbrirFecharPedidosAutomatico());
                 preparedStatement.setBoolean(10, estabelecimento.isAgendamentoDePedidos());
-                if (estabelecimento.isAbrirFecharPedidosAutomaticamente()) {
+                if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
                     preparedStatement.setTime(11, estabelecimento.getHoraAutomaticaAbrirPedidos());
                     preparedStatement.setTime(12, estabelecimento.getHoraAutomaticaFecharPedidos());
                 } else {
@@ -153,10 +153,10 @@ public class ControleEstabelecimentos {
                     preparedStatement.setBoolean(7, estabelecimento.isOpenChatBot());
                     preparedStatement.setBoolean(8, estabelecimento.isReservas());
                     preparedStatement.setBoolean(9, estabelecimento.isReservasComPedidosFechados());
-                    preparedStatement.setBoolean(10, estabelecimento.isAbrirFecharPedidosAutomaticamente());
+                    preparedStatement.setBoolean(10, estabelecimento.isAbrirFecharPedidosAutomatico());
                     preparedStatement.setBoolean(11, estabelecimento.isAgendamentoDePedidos());
                     preparedStatement.setTimestamp(12, new java.sql.Timestamp(estabelecimento.getHoraAberturaPedidos() == null ? new Date().getTime() : estabelecimento.getHoraAberturaPedidos().getTime()));
-                    if (estabelecimento.isAbrirFecharPedidosAutomaticamente()) {
+                    if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
                         preparedStatement.setTime(13, estabelecimento.getHoraAutomaticaAbrirPedidos());
                         preparedStatement.setTime(14, estabelecimento.getHoraAutomaticaFecharPedidos());
                     } else {

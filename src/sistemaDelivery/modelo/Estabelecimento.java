@@ -12,7 +12,7 @@ public class Estabelecimento {
     private UUID uuid;
     private String nomeEstabelecimento, nomeBot, numeroAviso, webHookNovoPedido, webHookNovaReserva, logo;
     private int tempoMedioRetirada, tempoMedioEntrega;
-    private boolean openPedidos, openChatBot, reservas, reservasComPedidosFechados, abrirFecharPedidosAutomaticamente;
+    private boolean openPedidos, openChatBot, reservas, reservasComPedidosFechados, abrirFecharPedidosAutomatico;
     private boolean agendamentoDePedidos, ativo;
     @Ignore
     private Date horaAberturaPedidos;
@@ -173,12 +173,12 @@ public class Estabelecimento {
         this.reservasComPedidosFechados = reservasComPedidosFechados;
     }
 
-    public boolean isAbrirFecharPedidosAutomaticamente() {
-        return abrirFecharPedidosAutomaticamente;
+    public boolean isAbrirFecharPedidosAutomatico() {
+        return abrirFecharPedidosAutomatico;
     }
 
-    public void setAbrirFecharPedidosAutomaticamente(boolean abrirFecharPedidosAutomaticamente) {
-        this.abrirFecharPedidosAutomaticamente = abrirFecharPedidosAutomaticamente;
+    public void setAbrirFecharPedidosAutomatico(boolean abrirFecharPedidosAutomatico) {
+        this.abrirFecharPedidosAutomatico = abrirFecharPedidosAutomatico;
     }
 
     public boolean isAgendamentoDePedidos() {

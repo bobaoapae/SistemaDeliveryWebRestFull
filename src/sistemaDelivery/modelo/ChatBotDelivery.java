@@ -47,7 +47,7 @@ public class ChatBotDelivery extends ChatBot {
                 this.cliente.setTelefoneMovel(((UserChat) chat).getContact().getPhoneNumber());
             }
             if (!cliente.isCadastroRealizado()) {
-                this.cliente.setNome(chat.getContact().getPushName());
+                this.cliente.setNome(chat.getContact().getSafeName());
             }
             ControleClientes.getInstance().salvarCliente(this.cliente);
         } else {
