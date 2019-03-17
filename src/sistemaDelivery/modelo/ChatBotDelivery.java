@@ -53,7 +53,7 @@ public class ChatBotDelivery extends ChatBot {
         } else {
             this.cliente = new Cliente(chat.getId(), estabelecimento);
             this.cliente.setTelefoneMovel(((UserChat) chat).getContact().getPhoneNumber());
-            this.cliente.setNome(chat.getContact().getPushName());
+            this.cliente.setNome(chat.getContact().getSafeName());
             ControleClientes.getInstance().salvarCliente(this.cliente);
             this.cliente = ControleClientes.getInstance().getClienteByUUID(this.cliente.getUuid());
         }
@@ -132,7 +132,7 @@ public class ChatBotDelivery extends ChatBot {
         if (cliente.isCadastroRealizado()) {
             return cliente.getNome();
         } else {
-            return chat.getContact().getPushName();
+            return chat.getContact().getSafeName();
         }
     }
 

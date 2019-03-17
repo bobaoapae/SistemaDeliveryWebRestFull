@@ -8,10 +8,7 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import modelo.MessageBuilder;
-import sistemaDelivery.modelo.Categoria;
-import sistemaDelivery.modelo.ChatBotDelivery;
-import sistemaDelivery.modelo.ItemPedido;
-import sistemaDelivery.modelo.Produto;
+import sistemaDelivery.modelo.*;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -138,9 +135,28 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
             }
             codigosMenu.add(new HandlerVerificaEscolhaCorreta(l, chat, this, new HandlerAdicionaisProduto(l, chat)));
             if (l.getValor() > 0) {
-                builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + " - R$" + moneyFormat.format(l.getValor()) + "*");
-            } else {
                 builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + "*");
+            } else {
+                double valorMinimo = 0;
+                for (GrupoAdicional grupoAdicional : l.getAllGruposAdicionais()) {
+                    if (grupoAdicional.getAdicionais().size() == 0) {
+                        continue;
+                    }
+                    if (grupoAdicional.getQtdMin() > 0) {
+                        double menorValor = grupoAdicional.getAdicionais().get(0).getValor();
+                        for (AdicionalProduto ad : grupoAdicional.getAdicionais()) {
+                            if (ad.getValor() < menorValor) {
+                                menorValor = ad.getValor();
+                            }
+                        }
+                        valorMinimo += menorValor;
+                    }
+                }
+                if (valorMinimo > 0) {
+                    builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + "*\n    *Apartir de R$" + moneyFormat.format(valorMinimo) + "*");
+                } else {
+                    builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + "*");
+                }
             }
             if (!l.getDescricao().trim().isEmpty()) {
                 builder.textNewLine("       _" + l.getDescricao() + "_");

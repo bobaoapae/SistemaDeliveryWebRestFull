@@ -1503,9 +1503,12 @@ public class API {
         if (message != null && message instanceof MediaMessage) {
             File file = ((MediaMessage) message).downloadMedia();
             try {
-                String contentType = Files.probeContentType(file.toPath());
                 byte[] data = Files.readAllBytes(file.toPath());
-                return Response.status(Response.Status.OK).type(contentType).entity(data).build();
+                String fileName = ((MediaMessage) message).getFileName();
+                if (fileName.isEmpty()) {
+                    fileName = file.getName();
+                }
+                return Response.status(Response.Status.OK).header("Content-disposition", "attachment;filename=\"" + fileName + "\"").type(((MediaMessage) message).getMime()).entity(data).build();
             } catch (Exception ex) {
                 ex.printStackTrace();
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

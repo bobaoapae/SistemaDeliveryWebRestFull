@@ -30,5 +30,6 @@
     <orderEntry type="library" name="commons-dbutils:commons-dbutils:1.7" level="project" />
     <orderEntry type="library" name="javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" name="org.apache.poi:poi-ooxml:4.0.0" level="project" />
+    <orderEntry type="library" name="Java EE 6-Java EE 6" level="project" />
   </component>
 </module>
