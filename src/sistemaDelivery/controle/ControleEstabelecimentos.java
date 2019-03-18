@@ -9,6 +9,7 @@ import restFul.modelo.Usuario;
 import sistemaDelivery.modelo.Estabelecimento;
 import utils.Utilitarios;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -208,6 +209,11 @@ public class ControleEstabelecimentos {
                 preparedStatement.executeUpdate();
                 connection.commit();
                 if (ControleSessions.getInstance().checkSessionAtiva(estabelecimento)) {
+                    try {
+                        ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento).logout();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     ControleSessions.getInstance().finalizarSessionForEstabelecimento(estabelecimento);
                 }
                 synchronized (estabelecimentos) {
