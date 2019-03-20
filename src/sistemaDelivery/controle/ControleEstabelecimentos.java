@@ -7,6 +7,7 @@ import org.apache.commons.dbutils.handlers.BeanHandler;
 import restFul.controle.ControleSessions;
 import restFul.modelo.Usuario;
 import sistemaDelivery.modelo.Estabelecimento;
+import sistemaDelivery.modelo.TipoEntrega;
 import utils.Utilitarios;
 
 import java.io.IOException;
@@ -50,6 +51,7 @@ public class ControleEstabelecimentos {
                 estabelecimentos.putIfAbsent(uuid, estabelecimento);
                 estabelecimento.setCategorias(ControleCategorias.getInstance().getCategoriasEstabelecimento(estabelecimento));
                 estabelecimento.setRodizios(ControleRodizios.getInstace().getRodiziosEstabelecimento(estabelecimento));
+                estabelecimento.setTiposEntregas(ControleTiposEntrega.getInstance().getTiposEntregasEstabelecimento(estabelecimento));
                 return estabelecimentos.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -69,13 +71,13 @@ public class ControleEstabelecimentos {
                     "            \"tempoMedioEntrega\", reservas, \n" +
                     "            \"reservasComPedidosFechados\", \"abrirFecharPedidosAutomatico\", \n" +
                     "            \"agendamentoDePedidos\", \"horaAutomaticaAbrirPedidos\", \n" +
-                    "            \"horaAutomaticaFecharPedidos\", \"horaInicioReservas\", \"taxaEntregaFixa\", \n" +
-                    "            \"taxaEntregaKm\",\"webHookNovaReserva\",\"webHookNovoPedido\", \"logo\",\"valorSelo\",\"maximoSeloPorCompra\",\"validadeSeloFidelidade\")\n" +
+                    "            \"horaAutomaticaFecharPedidos\", \"horaInicioReservas\", \n" +
+                    "            \"webHookNovaReserva\",\"webHookNovoPedido\", \"logo\",\"valorSelo\",\"maximoSeloPorCompra\",\"validadeSeloFidelidade\")\n" +
                     "    VALUES (?, ?, ?, ?, ?, \n" +
                     "            ?, ?, ?, ?, \n" +
                     "            ?, ?, \n" +
                     "            ?, ?, ?, \n" +
-                    "            ?,?,?,?,?,?,?);")) {
+                    "            ?,?,?,?,?);")) {
                 if (estabelecimento.getUuid() == null) {
                     estabelecimento.setUuid(UUID.randomUUID());
                 }
@@ -101,14 +103,12 @@ public class ControleEstabelecimentos {
                 } else {
                     preparedStatement.setTime(13, null);
                 }
-                preparedStatement.setDouble(14, estabelecimento.getTaxaEntregaFixa());
-                preparedStatement.setDouble(15, estabelecimento.getTaxaEntregaKm());
-                preparedStatement.setString(16, estabelecimento.getWebHookNovaReserva());
-                preparedStatement.setString(17, estabelecimento.getWebHookNovoPedido());
-                preparedStatement.setString(18, estabelecimento.getLogo());
-                preparedStatement.setDouble(19, estabelecimento.getValorSelo());
-                preparedStatement.setInt(20, estabelecimento.getMaximoSeloPorCompra());
-                preparedStatement.setInt(21, estabelecimento.getValidadeSeloFidelidade());
+                preparedStatement.setString(14, estabelecimento.getWebHookNovaReserva());
+                preparedStatement.setString(15, estabelecimento.getWebHookNovoPedido());
+                preparedStatement.setString(16, estabelecimento.getLogo());
+                preparedStatement.setDouble(17, estabelecimento.getValorSelo());
+                preparedStatement.setInt(18, estabelecimento.getMaximoSeloPorCompra());
+                preparedStatement.setInt(19, estabelecimento.getValidadeSeloFidelidade());
                 preparedStatement.executeUpdate();
 
                 try (PreparedStatement preparedStatement2 = connection.prepareStatement("insert into \"Estabelecimentos_Usuario\" (uuid_usuario, uuid_estabelecimento) values (?,?)");) {
@@ -117,6 +117,10 @@ public class ControleEstabelecimentos {
                     preparedStatement2.executeUpdate();
                 } catch (SQLException ex) {
                     throw ex;
+                }
+                for (TipoEntrega tipoEntrega : estabelecimento.getTiposEntregas()) {
+                    tipoEntrega.setEstabelecimento(estabelecimento);
+                    ControleTiposEntrega.getInstance().salvarTipoEntrega(tipoEntrega, connection);
                 }
                 connection.commit();
                 return true;
@@ -142,7 +146,7 @@ public class ControleEstabelecimentos {
                         "       \"openChatBot\"=?, reservas=?, \"reservasComPedidosFechados\"=?, \n" +
                         "       \"abrirFecharPedidosAutomatico\"=?, \"agendamentoDePedidos\"=?, \"horaAberturaPedidos\"=?, \n" +
                         "       \"horaAutomaticaAbrirPedidos\"=?, \"horaAutomaticaFecharPedidos\"=?, \n" +
-                        "       \"horaInicioReservas\"=?, \"taxaEntregaFixa\"=?, \"taxaEntregaKm\"=?, \n" +
+                        "       \"horaInicioReservas\"=?, \n" +
                         "       \"webHookNovaReserva\"=? , \"webHookNovoPedido\"=?, logo=?,  \"valorSelo\"=?, \"maximoSeloPorCompra\"=?, \"validadeSeloFidelidade\"=?\n" +
                         " WHERE uuid=?;")) {
                     preparedStatement.setString(1, estabelecimento.getNomeEstabelecimento());
@@ -169,15 +173,13 @@ public class ControleEstabelecimentos {
                     } else {
                         preparedStatement.setTime(15, null);
                     }
-                    preparedStatement.setDouble(16, estabelecimento.getTaxaEntregaFixa());
-                    preparedStatement.setDouble(17, estabelecimento.getTaxaEntregaKm());
-                    preparedStatement.setString(18, estabelecimento.getWebHookNovaReserva());
-                    preparedStatement.setString(19, estabelecimento.getWebHookNovoPedido());
-                    preparedStatement.setString(20, estabelecimento.getLogo());
-                    preparedStatement.setDouble(21, estabelecimento.getValorSelo());
-                    preparedStatement.setInt(22, estabelecimento.getMaximoSeloPorCompra());
-                    preparedStatement.setInt(23, estabelecimento.getValidadeSeloFidelidade());
-                    preparedStatement.setObject(24, estabelecimento.getUuid());
+                    preparedStatement.setString(16, estabelecimento.getWebHookNovaReserva());
+                    preparedStatement.setString(17, estabelecimento.getWebHookNovoPedido());
+                    preparedStatement.setString(18, estabelecimento.getLogo());
+                    preparedStatement.setDouble(19, estabelecimento.getValorSelo());
+                    preparedStatement.setInt(20, estabelecimento.getMaximoSeloPorCompra());
+                    preparedStatement.setInt(21, estabelecimento.getValidadeSeloFidelidade());
+                    preparedStatement.setObject(22, estabelecimento.getUuid());
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
                     connection.commit();

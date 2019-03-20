@@ -11,7 +11,6 @@ import modelo.MessageBuilder;
 import sistemaDelivery.modelo.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -82,28 +81,24 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message msg) {
         if (msg.getContent().trim().equals("1") || msg.getContent().toLowerCase().trim().equals("sim") || msg.getContent().toLowerCase().trim().equals("s")) {
-            List<ItemPedido> pedidos = new ArrayList<>();
-            Collections.copy(((ChatBotDelivery) chat).getPedidoAtual().getProdutos(), pedidos);
+            List<ItemPedido> pedidos = new ArrayList<>(((ChatBotDelivery) chat).getPedidoAtual().getProdutos());
             for (ItemPedido item : pedidos) {
                 Categoria c = item.getProduto().getCategoria();
                 if (!c.isFazEntrega() || !c.getRootCategoria().isFazEntrega()) {
                     ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
-                    chat.getChat().sendMessage("O seu pedido foi marcado automaticamente como para retirada, pois algum produto que você pediu não pode ser entregue, caso queira cancelar basta enviar *CANCELAR* a qualquer momento", 2000);
-                    if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
-                        chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
-                    } else {
-                        chat.setHandler(new HandlerDesejaAgendar(chat), true);
+                    synchronized (getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
+                        for (TipoEntrega tipoEntrega : getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
+                            if (tipoEntrega.getValor() == 0 && !tipoEntrega.isSolicitarEndereco()) {
+                                ((ChatBotDelivery) chat).getPedidoAtual().setTipoEntrega(tipoEntrega);
+                                break;
+                            }
+                        }
                     }
+                    chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
                     return true;
                 }
                 if (c.getRootCategoria().getQtdMinEntrega() > ((ChatBotDelivery) chat).getPedidoAtual().getProdutos(c).size() && !c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
-                    chat.getChat().sendMessage("O seu pedido foi marcado automaticamente como para retirada, pois algum produto que você pediu não pode ser entregue, caso queira cancelar basta enviar *CANCELAR* a qualquer momento", 2000);
-                    if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
-                        chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
-                    } else {
-                        chat.setHandler(new HandlerDesejaAgendar(chat), true);
-                    }
+                    chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
                     return true;
                 } else {
                     List<Categoria> categoriasCompradas = new ArrayList<>();
@@ -121,13 +116,7 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
                         }
                     }
                     if (!temCategoriaPrecisa || c.getRootCategoria().getQtdMinEntrega() > ((ChatBotDelivery) chat).getPedidoAtual().getProdutos(c).size()) {
-                        ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
-                        chat.getChat().sendMessage("O seu pedido foi marcado automaticamente para retirada no balcão, pois algum produto que você pediu não pode ser entregue, caso queira cancelar basta enviar *CANCELAR* a qualquer momento", 2000);
-                        if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
-                            chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
-                        } else {
-                            chat.setHandler(new HandlerDesejaAgendar(chat), true);
-                        }
+                        chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
                         return true;
                     }
                 }

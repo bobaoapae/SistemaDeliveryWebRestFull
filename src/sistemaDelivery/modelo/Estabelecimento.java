@@ -17,12 +17,22 @@ public class Estabelecimento {
     @Ignore
     private Date horaAberturaPedidos;
     private Time horaAutomaticaFecharPedidos, horaAutomaticaAbrirPedidos, horaInicioReservas;
-    private double taxaEntregaFixa, taxaEntregaKm, valorSelo;
+    private double valorSelo;
     @Ignore
     private transient List<Categoria> categorias;
     @Ignore
     private transient List<Rodizio> rodizios;
+    @Ignore
+    private List<TipoEntrega> tiposEntregas;
     private int maximoSeloPorCompra, validadeSeloFidelidade;
+
+    public List<TipoEntrega> getTiposEntregas() {
+        return tiposEntregas;
+    }
+
+    public void setTiposEntregas(List<TipoEntrega> tiposEntregas) {
+        this.tiposEntregas = Collections.synchronizedList(tiposEntregas);
+    }
 
     public List<Rodizio> getRodizios() {
         return rodizios;
@@ -243,22 +253,6 @@ public class Estabelecimento {
 
     public void setHoraAberturaPedidos(Date horaAberturaPedidos) {
         this.horaAberturaPedidos = horaAberturaPedidos;
-    }
-
-    public double getTaxaEntregaFixa() {
-        return taxaEntregaFixa;
-    }
-
-    public void setTaxaEntregaFixa(double taxaEntregaFixa) {
-        this.taxaEntregaFixa = taxaEntregaFixa;
-    }
-
-    public double getTaxaEntregaKm() {
-        return taxaEntregaKm;
-    }
-
-    public void setTaxaEntregaKm(double taxaEntregaKm) {
-        this.taxaEntregaKm = taxaEntregaKm;
     }
 
     public boolean isTimeBeetwenHorarioFuncionamento(LocalTime horaInformada) {

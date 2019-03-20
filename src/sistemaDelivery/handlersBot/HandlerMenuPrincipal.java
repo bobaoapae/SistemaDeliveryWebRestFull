@@ -29,6 +29,7 @@ public class HandlerMenuPrincipal extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
+        codigosMenu.clear();
         MessageBuilder builder = new MessageBuilder();
         chat.getChat().sendMessage("Qual cardapio você gostaria de olhar?", 2000);
         builder.textNewLine("*_Obs: Envie somente o número da sua escolha_*");

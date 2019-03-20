@@ -12,6 +12,7 @@ import restFul.modelo.Token;
 import restFul.modelo.Usuario;
 import sistemaDelivery.controle.ControleEstabelecimentos;
 import sistemaDelivery.modelo.Estabelecimento;
+import sistemaDelivery.modelo.TipoEntrega;
 import utils.Utilitarios;
 
 import javax.ws.rs.*;
@@ -23,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 
@@ -115,6 +117,16 @@ public class Manager {
                 Estabelecimento estabelecimento1 = builder.fromJson(estabelecimento, Estabelecimento.class);
                 if (estabelecimento1.getUuid() != null && !usuario.getEstabelecimentos().contains(estabelecimento1)) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                if (estabelecimento1.getTiposEntregas() == null || estabelecimento1.getTiposEntregas().isEmpty()) {
+                    estabelecimento1.setTiposEntregas(new ArrayList<>());
+                    TipoEntrega tipoEntrega = new TipoEntrega();
+                    tipoEntrega.setNome("Retirada");
+                    estabelecimento1.getTiposEntregas().add(tipoEntrega);
+                    new TipoEntrega();
+                    tipoEntrega.setNome("Entrega");
+                    tipoEntrega.setSolicitarEndereco(true);
+                    estabelecimento1.getTiposEntregas().add(tipoEntrega);
                 }
                 if (ControleEstabelecimentos.getInstance().criarEstabelecimento(usuario, estabelecimento1)) {
                     estabelecimento1 = ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(estabelecimento1.getUuid());

@@ -9,11 +9,16 @@ import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.ItemPedido;
+import sistemaDelivery.modelo.TipoEntrega;
+
+import java.util.ArrayList;
 
 /**
  * @author jvbor
  */
 public class HandlerFormaRetirada extends HandlerBotDelivery {
+
+    private ArrayList<TipoEntrega> codigosMenu = new ArrayList<>();
 
     public HandlerFormaRetirada(ChatBot chat) {
         super(chat);
@@ -21,55 +26,91 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
+        codigosMenu.clear();
         chat.getChat().sendMessage("Informo que nosso prazo médio para entrega é de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
         chat.getChat().sendMessage("Você quer que seu pedido seja para entrega ou retirada no balcão?");
         chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-        if (((ChatBotDelivery) chat).getEstabelecimento().getTaxaEntregaFixa() != 0 || ((ChatBotDelivery) chat).getEstabelecimento().getTaxaEntregaKm() != 0) {
-            boolean cobrarTaxa = true;
-            for (ItemPedido itemPedido : ((ChatBotDelivery) chat).getPedidoAtual().getProdutos()) {
-                if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
-                    cobrarTaxa = false;
-                    break;
+        synchronized (getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
+            for (TipoEntrega tipoEntrega : getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
+                boolean cobrarTaxa = tipoEntrega.getValor() > 0;
+                if (tipoEntrega.getValor() > 0) {
+                    for (ItemPedido itemPedido : ((ChatBotDelivery) chat).getPedidoAtual().getProdutos()) {
+                        if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
+                            cobrarTaxa = false;
+                            break;
+                        }
+                    }
+                }
+                codigosMenu.add(tipoEntrega);
+                if (cobrarTaxa) {
+                    chat.getChat().sendMessage("*" + codigosMenu.size() + "* - " + tipoEntrega.getNome() + " R$ " + ((ChatBotDelivery) chat).getMoneyFormat().format(tipoEntrega.getValor()));
+                } else {
+                    chat.getChat().sendMessage("*" + codigosMenu.size() + "* - " + tipoEntrega.getNome());
                 }
             }
-            if (cobrarTaxa) {
-                chat.getChat().sendMessage("*1* - 🛵 Entrega R$ " + ((ChatBotDelivery) chat).getMoneyFormat().format(((ChatBotDelivery) chat).getEstabelecimento().getTaxaEntregaFixa()));
-            } else {
-                chat.getChat().sendMessage("*1* - 🛵 Entrega");
-            }
-        } else {
-            chat.getChat().sendMessage("*1* - 🛵 Entrega");
         }
-        chat.getChat().sendMessage("*2* - 🛎️ Retirada no balcão");
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message msg) {
-        if (msg.getContent().trim().equals("1") || msg.getContent().toLowerCase().trim().contains("entrega")) {
-            ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(true);
-            chat.getChat().sendMessage("Blz");
-            if (((ChatBotDelivery) chat).getCliente().getEndereco() == null || ((ChatBotDelivery) chat).getCliente().getEndereco().getLogradouro().isEmpty()) {
-                chat.setHandler(new HandlerSolicitarEndereco(chat), true);
+        try {
+            int escolha = Integer.parseInt(msg.getContent().trim()) - 1;
+            if (escolha >= 0 && codigosMenu.size() > escolha) {
+                TipoEntrega tipoEntrega = codigosMenu.get(escolha);
+                ((ChatBotDelivery) chat).getPedidoAtual().setTipoEntrega(tipoEntrega);
+                if (tipoEntrega.isSolicitarEndereco()) {
+                    ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(true);
+                    chat.getChat().sendMessage("Blz");
+                    if (((ChatBotDelivery) chat).getCliente().getEndereco() == null || ((ChatBotDelivery) chat).getCliente().getEndereco().getLogradouro().isEmpty()) {
+                        chat.setHandler(new HandlerSolicitarEndereco(chat), true);
+                    } else {
+                        chat.setHandler(new HandlerUsarUltimoEndereco(chat), true);
+                    }
+                } else {
+                    ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
+                    if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
+                        chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
+                    } else {
+                        chat.setHandler(new HandlerDesejaAgendar(chat), true);
+                    }
+                }
+                return true;
             } else {
-                chat.setHandler(new HandlerUsarUltimoEndereco(chat), true);
+                return false;
             }
-        } else if (msg.getContent().trim().equals("2") || msg.getContent().toLowerCase().trim().contains("retira") || msg.getContent().toLowerCase().trim().contains("busca")) {
-            ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
-            if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
-                chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
-            } else {
-                chat.setHandler(new HandlerDesejaAgendar(chat), true);
-            }
-        } else {
+        } catch (Exception ex) {
             return false;
         }
-        return true;
     }
 
     @Override
     public boolean notificaPedidosFechados() {
         return true;
+    }
+
+    private class HandlerFormaRetiradaSelecionado extends HandlerBotDelivery {
+
+        private TipoEntrega tipoEntrega;
+
+        public HandlerFormaRetiradaSelecionado(ChatBot chat, TipoEntrega tipoEntrega) {
+            super(chat);
+        }
+
+        @Override
+        public boolean notificaPedidosFechados() {
+            return true;
+        }
+
+        @Override
+        protected boolean runFirstTime(Message message) {
+            return false;
+        }
+
+        @Override
+        protected boolean runSecondTime(Message message) {
+            return false;
+        }
     }
 
 }

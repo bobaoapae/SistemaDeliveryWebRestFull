@@ -16,8 +16,8 @@ import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 import java.util.Date;
+import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -57,6 +57,7 @@ public class ControlePedidos {
                 pedido.setCliente(ControleClientes.getInstance().getClienteByUUID(pedido.getUuid_cliente()));
                 pedido.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(pedido.getUuid_estabelecimento()));
                 pedido.setProdutos(ControleItensPedidos.getInstance().getItensPedidos(pedido));
+                pedido.setTipoEntrega(ControleTiposEntrega.getInstance().getTipoEntregaByUUID(pedido.getUuid_tipoEntrega()));
                 return pedidos.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -82,11 +83,11 @@ public class ControlePedidos {
                         "            uuid, uuid_cliente, uuid_estabelecimento, \"comentarioPedido\", \n" +
                         "            entrega, cartao, impresso, \"valorPago\", desconto, \"pgCreditos\", \n" +
                         "            \"subTotal\", total, \"horaAgendamento\", \"estadoPedido\", \n" +
-                        "            troco, \"totalRemovido\", logradouro, bairro, referencia, numero,cod,\"taxaEntrega\")\n" +
+                        "            troco, \"totalRemovido\", logradouro, bairro, referencia, numero,cod,\"taxaEntrega\",\"uuid_tipoEntrega\")\n" +
                         "    VALUES (?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, ?, ?,?);\n")) {
+                        "            ?, ?, ?, ?, ?, ?,?,?);\n")) {
                     pedido.setUuid(UUID.randomUUID());
                     pedido.calcularValor();
                     preparedStatement.setObject(1, pedido.getUuid());
@@ -118,6 +119,7 @@ public class ControlePedidos {
                     }
                     preparedStatement.setLong(21, pedido.getCod());
                     preparedStatement.setDouble(22, pedido.getTaxaEntrega());
+                    preparedStatement.setObject(23, pedido.getTipoEntrega().getUuid());
                     preparedStatement.executeUpdate();
                     for (ItemPedido itemPedido : pedido.getProdutos()) {
                         itemPedido.calcularValor();

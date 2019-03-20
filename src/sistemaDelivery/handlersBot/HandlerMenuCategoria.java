@@ -13,7 +13,6 @@ import sistemaDelivery.modelo.*;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,8 +37,6 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
         if (!c.isFazEntrega()) {
             chat.getChat().sendMessage("*_Obs³: Não é feita a entrega dos produtos à baixo_*", 3000);
         } else {
-            List<ItemPedido> pedidos = new ArrayList<>();
-            Collections.copy(((ChatBotDelivery) chat).getPedidoAtual().getProdutos(), pedidos);
             boolean temCategoriaPrecisa = false;
             boolean msg = false;
             List<Categoria> categoriasCompradas = new ArrayList<>();
@@ -79,8 +76,7 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
     }
 
     @Override
-    protected boolean runSecondTime(Message m
-    ) {
+    protected boolean runSecondTime(Message m) {
         try {
             int escolha = Integer.parseInt(m.getContent().trim()) - 1;
             if (escolha >= 0 && codigosMenu.size() > escolha) {
@@ -135,7 +131,8 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
             }
             codigosMenu.add(new HandlerVerificaEscolhaCorreta(l, chat, this, new HandlerAdicionaisProduto(l, chat)));
             if (l.getValor() > 0) {
-                builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + "*");
+                builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + " R$" + moneyFormat.format(l.getValor()) + "*");
+
             } else {
                 double valorMinimo = 0;
                 for (GrupoAdicional grupoAdicional : l.getAllGruposAdicionais()) {

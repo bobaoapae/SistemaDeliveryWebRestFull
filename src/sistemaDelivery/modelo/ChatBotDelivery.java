@@ -13,6 +13,7 @@ import modelo.UserChat;
 import restFul.controle.ControleSessions;
 import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.ControleClientes;
+import sistemaDelivery.handlersBot.HandlerAdeus;
 import sistemaDelivery.handlersBot.HandlerBoasVindas;
 import sistemaDelivery.handlersBot.HandlerBotDelivery;
 import sistemaDelivery.handlersBot.HandlerChatExpirado;
@@ -198,6 +199,10 @@ public class ChatBotDelivery extends ChatBot {
             if (m.getContent().toLowerCase().equals("/encerrar")) {
 
             }
+        }
+        if (m.getContent().trim().toLowerCase().equals("cancelar")) {
+            setHandler(new HandlerAdeus(this), true);
+            return;
         }
         getHandler().handle(m);
     }

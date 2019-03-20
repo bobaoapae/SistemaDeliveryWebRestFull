@@ -14,12 +14,17 @@ public class ListennerServer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         for (Estabelecimento estabelecimento : ControleEstabelecimentos.getInstance().getEstabelecimentosChatBotAberto()) {
-            try {
-                ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
-                System.out.println("Iniciado para - " + estabelecimento.getNomeEstabelecimento());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            new Thread() {
+                public void run() {
+                    try {
+                        System.out.println("Iniciando para - " + estabelecimento.getNomeEstabelecimento());
+                        ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
+                        System.out.println("Iniciado para - " + estabelecimento.getNomeEstabelecimento());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.start();
         }
         System.out.println("Sistema Delivery WhatsApp Web Iniciado");
     }

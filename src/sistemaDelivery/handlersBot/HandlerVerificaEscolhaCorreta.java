@@ -14,7 +14,6 @@ import sistemaDelivery.modelo.ItemPedido;
 import sistemaDelivery.modelo.Produto;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,8 +40,7 @@ public class HandlerVerificaEscolhaCorreta extends HandlerBotDelivery {
         if (!this.produtoEscolhido.getCategoria().isFazEntrega() || !this.produtoEscolhido.getCategoria().getRootCategoria().isFazEntrega()) {
             chat.getChat().sendMessage("*_Obs²: Não é feita a entrega dos produtos à baixo_*", 3000);
         } else {
-            List<ItemPedido> pedidos = new ArrayList<>();
-            Collections.copy(((ChatBotDelivery) chat).getPedidoAtual().getProdutos(), pedidos);
+            List<ItemPedido> pedidos = new ArrayList<>(((ChatBotDelivery) chat).getPedidoAtual().getProdutos());
             for (ItemPedido item : pedidos) {
                 Categoria c = item.getProduto().getCategoria();
                 if (!c.isFazEntrega() || !c.getRootCategoria().isFazEntrega()) {

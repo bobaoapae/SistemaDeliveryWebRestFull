@@ -19,7 +19,7 @@ import java.util.*;
 public class Pedido {
 
     @Ignore
-    private UUID uuid, uuid_estabelecimento, uuid_cliente;
+    private UUID uuid, uuid_estabelecimento, uuid_cliente, uuid_tipoEntrega;
     private String nomeCliente;
     private boolean entrega, cartao, impresso;
     private double troco, desconto, pgCreditos, subTotal, taxaEntrega, total, valorPago, totalRemovido;
@@ -37,6 +37,8 @@ public class Pedido {
     @Ignore
     private transient Estabelecimento estabelecimento;
     private Endereco endereco;
+    @Ignore
+    private TipoEntrega tipoEntrega;
 
     public Pedido(Cliente cliente, Estabelecimento estabelecimento) {
         produtos = Collections.synchronizedList(new ArrayList<>());
@@ -50,6 +52,22 @@ public class Pedido {
     }
 
     public Pedido() {
+    }
+
+    public UUID getUuid_tipoEntrega() {
+        return uuid_tipoEntrega;
+    }
+
+    public void setUuid_tipoEntrega(UUID uuid_tipoEntrega) {
+        this.uuid_tipoEntrega = uuid_tipoEntrega;
+    }
+
+    public TipoEntrega getTipoEntrega() {
+        return tipoEntrega;
+    }
+
+    public void setTipoEntrega(TipoEntrega tipoEntrega) {
+        this.tipoEntrega = tipoEntrega;
     }
 
     public long getCod() {
@@ -263,21 +281,17 @@ public class Pedido {
                 subTotal += p.getSubTotal();
             }
         }
-        if (this.entrega) {
-            if (this.getEstabelecimento().getTaxaEntregaFixa() != 0 || this.getEstabelecimento().getTaxaEntregaKm() != 0) {
-                boolean cobrarTaxa = true;
-                for (ItemPedido itemPedido : this.getProdutos()) {
-                    if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
-                        cobrarTaxa = false;
-                        break;
-                    }
-                }
-                if (cobrarTaxa) {
-                    this.taxaEntrega = this.getEstabelecimento().getTaxaEntregaFixa();
+        if (this.tipoEntrega != null && this.tipoEntrega.getValor() > 0) {
+            boolean cobrarTaxa = true;
+            for (ItemPedido itemPedido : this.getProdutos()) {
+                if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
+                    cobrarTaxa = false;
+                    break;
                 }
             }
-        } else {
-            this.taxaEntrega = 0;
+            if (cobrarTaxa) {
+                this.taxaEntrega = this.tipoEntrega.getValor();
+            }
         }
         this.totalRemovido = totalRemovido;
         this.subTotal = subTotal;

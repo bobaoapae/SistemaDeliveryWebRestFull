@@ -131,8 +131,6 @@ public class API {
         token.getEstabelecimento().setNumeroAviso(novosValoresEstabelecimento.getNumeroAviso());
         token.getEstabelecimento().setReservas(novosValoresEstabelecimento.isReservas());
         token.getEstabelecimento().setReservasComPedidosFechados(novosValoresEstabelecimento.isReservasComPedidosFechados());
-        token.getEstabelecimento().setTaxaEntregaFixa(novosValoresEstabelecimento.getTaxaEntregaFixa());
-        token.getEstabelecimento().setTaxaEntregaKm(novosValoresEstabelecimento.getTaxaEntregaKm());
         token.getEstabelecimento().setWebHookNovoPedido(novosValoresEstabelecimento.getWebHookNovoPedido());
         token.getEstabelecimento().setWebHookNovaReserva(novosValoresEstabelecimento.getWebHookNovaReserva());
         token.getEstabelecimento().setLogo(novosValoresEstabelecimento.getLogo());
@@ -811,6 +809,34 @@ public class API {
         }
     }
 
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/salvarTipoEntrega")
+    public Response salvarTipoEntrega(@FormParam("tipoEntrega") String tipo) {
+        TipoEntrega tipoEntrega = builder.fromJson(tipo, TipoEntrega.class);
+        tipoEntrega.setEstabelecimento(token.getEstabelecimento());
+        if (ControleTiposEntrega.getInstance().salvarTipoEntrega(tipoEntrega)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleTiposEntrega.getInstance().getTipoEntregaByUUID(tipoEntrega.getUuid()))).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/excluirTipoEntrega")
+    public Response excluirTipoEntrega(@QueryParam("uuid") String uuid) {
+        TipoEntrega tipoEntrega = ControleTiposEntrega.getInstance().getTipoEntregaByUUID(UUID.fromString(uuid));
+        if (!tipoEntrega.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (ControleTiposEntrega.getInstance().excluirTipoEntrega(tipoEntrega)) {
+            return Response.status(Response.Status.CREATED).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/clientes")
@@ -1136,13 +1162,19 @@ public class API {
         List<Produto> produtosDisponiveis = ControleProdutos.getInstance().getProdutosEstabelecimento(token.getEstabelecimento());
         if (produtosDisponiveis.size() > 0) {
             Collections.shuffle(produtosDisponiveis);
-            p.setEntrega(new Random().nextInt() % 2 == 0);
-            if (p.isEntrega()) {
+            List<TipoEntrega> tipoEntregas = new ArrayList<>(token.getEstabelecimento().getTiposEntregas());
+            Collections.shuffle(tipoEntregas);
+            TipoEntrega tipoEntrega = tipoEntregas.get(0);
+            p.setTipoEntrega(tipoEntrega);
+            if (tipoEntrega.isSolicitarEndereco()) {
+                p.setEntrega(true);
                 Endereco endereco = new Endereco();
                 endereco.setLogradouro("Rua dos Alfineiros");
                 endereco.setNumero("4");
                 endereco.setBairro("Quarto embaixo da escada");
                 p.setEndereco(endereco);
+            } else {
+                p.setEntrega(false);
             }
             if (new Random().nextInt() % 2 == 0) {
                 p.setHoraAgendamento(Time.valueOf(LocalTime.now()));
