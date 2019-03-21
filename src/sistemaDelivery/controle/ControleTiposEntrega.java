@@ -69,10 +69,6 @@ public class ControleTiposEntrega {
                 preparedStatement.setDouble(4, tipoEntrega.getValor());
                 preparedStatement.setBoolean(5, tipoEntrega.isSolicitarEndereco());
                 preparedStatement.executeUpdate();
-                connection.commit();
-                synchronized (tipoEntrega.getEstabelecimento().getTiposEntregas()) {
-                    tipoEntrega.getEstabelecimento().getTiposEntregas().add(tipoEntrega);
-                }
                 return true;
             } catch (SQLException ex) {
                 throw ex;
@@ -88,7 +84,6 @@ public class ControleTiposEntrega {
                 if (preparedStatement.executeUpdate() != 1) {
                     throw new SQLException("Falha ao atualizar");
                 }
-                connection.commit();
                 if (tiposEntrega.containsKey(tipoEntrega.getUuid())) {
                     Utilitarios.atualizarObjeto(tiposEntrega.get(tipoEntrega.getUuid()), tipoEntrega);
                 }

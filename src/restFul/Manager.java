@@ -123,7 +123,7 @@ public class Manager {
                     TipoEntrega tipoEntrega = new TipoEntrega();
                     tipoEntrega.setNome("Retirada");
                     estabelecimento1.getTiposEntregas().add(tipoEntrega);
-                    new TipoEntrega();
+                    tipoEntrega = new TipoEntrega();
                     tipoEntrega.setNome("Entrega");
                     tipoEntrega.setSolicitarEndereco(true);
                     estabelecimento1.getTiposEntregas().add(tipoEntrega);
