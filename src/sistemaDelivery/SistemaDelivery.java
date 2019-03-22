@@ -14,8 +14,10 @@ import sistemaDelivery.handlersBot.HandlerBotDelivery;
 import sistemaDelivery.modelo.*;
 import utils.Utilitarios;
 
+import javax.swing.*;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
+import java.awt.*;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.LocalTime;
@@ -36,6 +38,7 @@ public class SistemaDelivery {
     private ScheduledExecutorService executores = Executors.newScheduledThreadPool(5);
     private JsonParser parser;
     private Gson builder;
+    private TelaWhatsApp telaWhatsApp;
 
     public SistemaDelivery(Estabelecimento estabelecimento) throws IOException {
         this.estabelecimento = estabelecimento;
@@ -71,7 +74,9 @@ public class SistemaDelivery {
                 broadcaster.broadcast(sse.newEvent("low-battery", e + ""));
             }
         };
-        this.driver = new WebWhatsDriver("C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+        telaWhatsApp = new TelaWhatsApp(estabelecimento.getNomeEstabelecimento());
+        telaWhatsApp.setVisible(true);
+        this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), "C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
         executores.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -257,5 +262,29 @@ public class SistemaDelivery {
 
     public void logout() {
         driver.getFunctions().logout();
+    }
+
+    private class TelaWhatsApp extends JFrame {
+
+        private JPanel panel;
+
+        public TelaWhatsApp(String estabelecimento) {
+            this.setTitle(estabelecimento);
+            this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+            this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            this.getContentPane().setLayout(new BorderLayout());
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            this.setMinimumSize(new Dimension(((int) (screenSize.getWidth() * 0.3)), ((int) (screenSize.getHeight() * 0.3))));
+            this.setPreferredSize(new Dimension(((int) (screenSize.getWidth() * 0.3)), ((int) (screenSize.getHeight() * 0.3))));
+            panel = new JPanel(new BorderLayout());
+            this.add(panel);
+            pack();
+            this.setExtendedState(JFrame.ICONIFIED);
+            this.setLocationRelativeTo(null);
+        }
+
+        public JPanel getPanel() {
+            return panel;
+        }
     }
 }
