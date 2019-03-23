@@ -85,22 +85,13 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
             for (ItemPedido item : pedidos) {
                 Categoria c = item.getProduto().getCategoria();
                 if (!c.isFazEntrega() || !c.getRootCategoria().isFazEntrega()) {
-                    ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
-                    synchronized (getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
-                        for (TipoEntrega tipoEntrega : getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
-                            if (tipoEntrega.getValor() == 0 && !tipoEntrega.isSolicitarEndereco()) {
-                                ((ChatBotDelivery) chat).getPedidoAtual().setTipoEntrega(tipoEntrega);
-                                break;
-                            }
-                        }
-                    }
                     chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
                     return true;
                 }
                 if (c.getRootCategoria().getQtdMinEntrega() > ((ChatBotDelivery) chat).getPedidoAtual().getProdutos(c).size() && !c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
                     chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
                     return true;
-                } else {
+                } else if (c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
                     List<Categoria> categoriasCompradas = new ArrayList<>();
                     for (ItemPedido item2 : ((ChatBotDelivery) chat).getPedidoAtual().getProdutos()) {
                         if (!categoriasCompradas.contains(item2.getProduto().getCategoria().getRootCategoria())) {
