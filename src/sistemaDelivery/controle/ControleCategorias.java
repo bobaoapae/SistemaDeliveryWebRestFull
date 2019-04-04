@@ -267,7 +267,7 @@ public class ControleCategorias {
     public List<Categoria> getCategoriasNecessariasEntrega(Categoria cat) {
         List<Categoria> categorias = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid_categoria_necessaria from \"Categorias_Necessrias_Entrega\" where uuid_categoria = ?");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid_categoria_necessaria from \"Categorias_Necessarias_Entrega\" where uuid_categoria = ?");
         ) {
             preparedStatement.setObject(1, cat.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

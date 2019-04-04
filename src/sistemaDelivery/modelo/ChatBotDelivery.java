@@ -163,6 +163,9 @@ public class ChatBotDelivery extends ChatBot {
 
     @Override
     public boolean sendRequestAjuda() {
+        if (getChat().getDriver().getFunctions().isBusiness()) {
+            getChat().addLabel("Precisa de Ajuda", true);
+        }
         setQtdErroResposta(0);
         getChat().sendMessage("Parece que você precisa de ajuda, vou te transferir para nosso atendente.");
         getChat().sendMessage("Caso queira voltar para o atendimento automatico envie: *INICIAR*.");
@@ -191,14 +194,21 @@ public class ChatBotDelivery extends ChatBot {
     }
 
     @Override
-    public void processNewMsg(Message m) {
-        if (!estabelecimento.isOpenChatBot()) {
-            return;
+    public void onResume() {
+        if (getChat().getDriver().getFunctions().isBusiness()) {
+            getChat().removeLabel("Precisa de Ajuda");
         }
+    }
+
+    @Override
+    public void processNewMsg(Message m) {
         if (m.getChat().getContact().getId().equals("554491050665@c.us")) {
             if (m.getContent().toLowerCase().equals("/encerrar")) {
 
             }
+        }
+        if (!estabelecimento.isOpenChatBot()) {
+            return;
         }
         if (m.getContent().trim().toLowerCase().equals("cancelar")) {
             setHandler(new HandlerAdeus(this), true);

@@ -1618,7 +1618,6 @@ public class API {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
         List<Message> msgs = token.getSistemaDelivery().getDriver().getFunctions().getAllMessagesInChat(chat, true, true);
-        msgs = token.getSistemaDelivery().getDriver().getFunctions().getAllMessagesInChat(chat, true, true);
         JsonArray array = new JsonArray();
         for (Message msg : msgs) {
             if (msg instanceof MediaMessage) {

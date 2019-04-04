@@ -74,7 +74,7 @@ public class SistemaDelivery {
                 broadcaster.broadcast(sse.newEvent("low-battery", e + ""));
             }
         };
-        telaWhatsApp = new TelaWhatsApp(estabelecimento.getNomeEstabelecimento());
+        telaWhatsApp = new TelaWhatsApp(estabelecimento);
         telaWhatsApp.setVisible(true);
         this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), "C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
         executores.scheduleWithFixedDelay(new Runnable() {
@@ -256,6 +256,9 @@ public class SistemaDelivery {
             broadcaster.close();
             broadcaster = null;
         }
+        if (telaWhatsApp != null) {
+            telaWhatsApp.dispose();
+        }
         ControleChatsAsync.getInstance(estabelecimento).finalizar();
         driver.finalizar();
     }
@@ -268,14 +271,14 @@ public class SistemaDelivery {
 
         private JPanel panel;
 
-        public TelaWhatsApp(String estabelecimento) {
-            this.setTitle(estabelecimento);
+        public TelaWhatsApp(Estabelecimento estabelecimento) {
+            this.setTitle(estabelecimento.getNomeEstabelecimento() + " - " + estabelecimento.getUuid().toString().replaceAll("-", ""));
             this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
             this.getContentPane().setLayout(new BorderLayout());
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            this.setMinimumSize(new Dimension(((int) (screenSize.getWidth() * 0.3)), ((int) (screenSize.getHeight() * 0.3))));
-            this.setPreferredSize(new Dimension(((int) (screenSize.getWidth() * 0.3)), ((int) (screenSize.getHeight() * 0.3))));
+            this.setMinimumSize(new Dimension(1024, 768));
+            this.setPreferredSize(new Dimension(1024, 768));
             panel = new JPanel(new BorderLayout());
             this.add(panel);
             pack();

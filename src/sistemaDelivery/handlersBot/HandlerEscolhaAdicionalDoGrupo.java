@@ -45,21 +45,6 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                 } else {
                     chat.getChat().sendMessage("Qual " + grupoAtual.getNomeGrupo() + " você quer?");
                 }
-                if (grupoAtual.getQtdMax() > 1) {
-                    chat.getChat().sendMessage("*_Obs¹: Você pode escolher no máximo " + grupoAtual.getQtdMax() + ". Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*");
-                } else if (grupoAtual.getQtdMax() == 1) {
-                    chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha._*");
-                } else {
-                    chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*");
-                }
-                if (grupoAtual.getQtdMin() == 0) {
-                    chat.getChat().sendMessage("*_Obs²: Caso não deseje nada, basta enviar NÃO._*");
-                }
-                try {
-                    Thread.sleep(2500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
                 String adicionais = "";
                 for (AdicionalProduto ad : grupoAtual.getAdicionais()) {
                     adicionaisDisponiveis.add(ad);
@@ -74,6 +59,16 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                     adicionais += "\n";
                 }
                 chat.getChat().sendMessage(adicionais);
+                if (grupoAtual.getQtdMax() > 1) {
+                    chat.getChat().sendMessage("*_Obs¹: Você pode escolher no máximo " + grupoAtual.getQtdMax() + ". Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*", 2000);
+                } else if (grupoAtual.getQtdMax() == 1) {
+                    chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha._*", 2000);
+                } else {
+                    chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*", 2000);
+                }
+                if (grupoAtual.getQtdMin() == 0) {
+                    chat.getChat().sendMessage("*_Obs²: Caso não deseje nada, basta enviar NÃO._*", 2000);
+                }
             } else {
                 chat.setHandler(nextHandler, true);
             }

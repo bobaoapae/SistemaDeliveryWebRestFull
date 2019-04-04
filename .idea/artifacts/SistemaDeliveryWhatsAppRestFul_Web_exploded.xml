@@ -17,6 +17,7 @@
           <element id="library" level="project" name="commons-dbutils:commons-dbutils:1.7" />
           <element id="library" level="project" name="javax.inject:javax.inject:1" />
           <element id="library" level="project" name="org.apache.poi:poi-ooxml:4.0.0" />
+          <element id="library" level="project" name="tika-app-1.19.1" />
         </element>
       </element>
     </root>
