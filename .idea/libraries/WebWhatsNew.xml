@@ -1,14 +1,14 @@
 <component name="libraryTable">
   <library name="WebWhatsNew">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/lib/jsoup-1.11.3.jar!/" />
       <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/lib/licenseCrack.jar!/" />
       <root url="jar://$PROJECT_DIR$/../jxbrowser/6.23/jxbrowser-6.23.jar!/" />
       <root url="jar://$PROJECT_DIR$/../jxbrowser/6.23/jxbrowser-linux64-6.23.jar!/" />
       <root url="jar://$PROJECT_DIR$/../jxbrowser/6.23/jxbrowser-mac-6.23.jar!/" />
       <root url="jar://$PROJECT_DIR$/../jxbrowser/6.23/jxbrowser-win32-6.23.jar!/" />
       <root url="jar://$PROJECT_DIR$/../jxbrowser/6.23/jxbrowser-win64-6.23.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../WebWhatsNew/dist/WebWhatsNew.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../WebWhatsNew/out/artifacts/WebWhatsNew_jar/WebWhatsNew.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../tika-app-1.19.1.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

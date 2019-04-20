@@ -14,9 +14,11 @@ public class ControleSessions {
     private Map<Estabelecimento, SistemaDelivery> sessions;
     private static final Object syncroniseGetInstance = new Object();
     private static boolean finalizado = false;
+    private Map<Estabelecimento, Integer> esperasGetEstabelecimento;
 
     private ControleSessions() {
         this.sessions = Collections.synchronizedMap(new HashMap<>());
+        this.esperasGetEstabelecimento = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleSessions getInstance() {
@@ -28,15 +30,35 @@ public class ControleSessions {
         }
     }
 
-    public boolean checkSessionAtiva(Estabelecimento e) {
+    public boolean checkSessionAtiva(Estabelecimento estabelecimento) {
+        synchronized (esperasGetEstabelecimento) {
+            if (esperasGetEstabelecimento.containsKey(estabelecimento)) {
+                try {
+                    Thread.sleep(esperasGetEstabelecimento.get(estabelecimento));
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+                esperasGetEstabelecimento.remove(estabelecimento);
+            }
+        }
         synchronized (sessions) {
-            return sessions.containsKey(e);
+            return sessions.containsKey(estabelecimento);
         }
     }
 
     public SistemaDelivery getSessionForEstabelecimento(Estabelecimento estabelecimento) throws IOException {
         if (finalizado) {
             return null;
+        }
+        synchronized (esperasGetEstabelecimento) {
+            if (esperasGetEstabelecimento.containsKey(estabelecimento)) {
+                try {
+                    Thread.sleep(esperasGetEstabelecimento.get(estabelecimento));
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+                esperasGetEstabelecimento.remove(estabelecimento);
+            }
         }
         synchronized (sessions) {
             if (!sessions.containsKey(estabelecimento)) {
@@ -68,6 +90,9 @@ public class ControleSessions {
     public void finalizarSessionForEstabelecimento(Estabelecimento estabelecimento) {
         if (finalizado) {
             return;
+        }
+        synchronized (esperasGetEstabelecimento) {
+            esperasGetEstabelecimento.put(estabelecimento, 15000);
         }
         synchronized (sessions) {
             if (sessions.containsKey(estabelecimento)) {
