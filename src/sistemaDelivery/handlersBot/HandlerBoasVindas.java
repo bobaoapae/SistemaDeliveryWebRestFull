@@ -11,7 +11,6 @@ import modelo.MessageBuilder;
 import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
 
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +26,7 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        int horaAtual = LocalTime.now().getHour();
+        int horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual().getHour();
         String msg = "";
         if (horaAtual >= 2 && horaAtual < 12) {
             msg = "Bom Dia";

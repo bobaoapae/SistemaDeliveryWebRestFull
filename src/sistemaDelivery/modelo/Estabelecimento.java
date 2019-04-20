@@ -3,7 +3,9 @@ package sistemaDelivery.modelo;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import java.sql.Time;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.TextStyle;
 import java.util.*;
 
 public class Estabelecimento {
@@ -25,6 +27,30 @@ public class Estabelecimento {
     @Ignore
     private List<TipoEntrega> tiposEntregas;
     private int maximoSeloPorCompra, validadeSeloFidelidade;
+    private String timeZone;
+
+    public LocalTime getHoraAtual() {
+        return LocalTime.now(getTimeZoneObject().toZoneId());
+    }
+
+    public LocalDateTime getDataComHoraAtual() {
+        return LocalDateTime.now(getTimeZoneObject().toZoneId());
+    }
+
+    public String getTimeZone() {
+        return timeZone;
+    }
+
+    public void setTimeZone(String timeZone) {
+        this.timeZone = timeZone;
+    }
+
+    public TimeZone getTimeZoneObject() {
+        if (timeZone == null) {
+            timeZone = TimeZone.getDefault().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR"));
+        }
+        return TimeZone.getTimeZone(timeZone);
+    }
 
     public List<TipoEntrega> getTiposEntregas() {
         return tiposEntregas;

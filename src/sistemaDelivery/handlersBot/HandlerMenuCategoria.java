@@ -91,9 +91,9 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
     }
 
     private void gerarMenu(Categoria c, MessageBuilder builder) {
-        Calendar dataAtual = Calendar.getInstance();
+        Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
-        LocalTime horaAtual = LocalTime.now();
+        LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
         if (!c.equals(this.c)) {
             builder.text(".          *-" + c.getNomeCategoria() + "-*");
             builder.newLine();

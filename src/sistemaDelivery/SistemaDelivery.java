@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import driver.WebWhatsDriver;
 import modelo.*;
+import restFul.controle.ControleSessions;
 import sistemaDelivery.controle.ControleChatsAsync;
 import sistemaDelivery.controle.ControleClientes;
 import sistemaDelivery.controle.ControleEstabelecimentos;
@@ -20,6 +21,7 @@ import javax.ws.rs.sse.SseBroadcaster;
 import java.awt.*;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -39,8 +41,10 @@ public class SistemaDelivery {
     private JsonParser parser;
     private Gson builder;
     private TelaWhatsApp telaWhatsApp;
+    private LocalDateTime timeStart;
 
     public SistemaDelivery(Estabelecimento estabelecimento) throws IOException {
+        timeStart = estabelecimento.getDataComHoraAtual();
         this.estabelecimento = estabelecimento;
         parser = new JsonParser();
         builder = Utilitarios.getDefaultGsonBuilder(null).create();
@@ -80,8 +84,19 @@ public class SistemaDelivery {
         executores.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
+                if ((!estabelecimento.isOpenChatBot() || driver.getEstadoDriver() != EstadoDriver.LOGGED) && timeStart.plusMinutes(5).isBefore(estabelecimento.getDataComHoraAtual())) {
+                    if (estabelecimento.isOpenChatBot()) {
+                        estabelecimento.setOpenChatBot(false);
+                        ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento);
+                    }
+                    new Thread() {
+                        public void run() {
+                            ControleSessions.getInstance().finalizarSessionForEstabelecimento(estabelecimento);
+                        }
+                    }.start();
+                }
                 if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
-                    LocalTime horaAtual = LocalTime.now();
+                    LocalTime horaAtual = estabelecimento.getHoraAtual();
                     if (!estabelecimento.isOpenPedidos()) {
                         if (estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime().isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime())) {
                             if (!(horaAtual.isBefore(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime()) && horaAtual.isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime()))) {
@@ -259,6 +274,9 @@ public class SistemaDelivery {
         if (telaWhatsApp != null) {
             telaWhatsApp.dispose();
         }
+        if (executores != null && !executores.isShutdown()) {
+            executores.shutdown();
+        }
         ControleChatsAsync.getInstance(estabelecimento).finalizar();
         driver.finalizar();
     }
@@ -277,8 +295,8 @@ public class SistemaDelivery {
             this.setExtendedState(JFrame.MAXIMIZED_BOTH);
             this.getContentPane().setLayout(new BorderLayout());
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            this.setMinimumSize(new Dimension(1024, 768));
-            this.setPreferredSize(new Dimension(1024, 768));
+            this.setMinimumSize(new Dimension(800, 600));
+            this.setPreferredSize(new Dimension(800, 600));
             panel = new JPanel(new BorderLayout());
             this.add(panel);
             pack();

@@ -10,7 +10,6 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -42,7 +41,7 @@ public class Pedido {
 
     public Pedido(Cliente cliente, Estabelecimento estabelecimento) {
         produtos = Collections.synchronizedList(new ArrayList<>());
-        dataPedido = Timestamp.valueOf(LocalDateTime.now());
+        dataPedido = Timestamp.valueOf(estabelecimento.getDataComHoraAtual());
         estadoPedido = EstadoPedido.Novo;
         celular = "";
         fixo = "";

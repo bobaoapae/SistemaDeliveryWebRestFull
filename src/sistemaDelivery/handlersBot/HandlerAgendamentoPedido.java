@@ -37,7 +37,7 @@ public class HandlerAgendamentoPedido extends HandlerBotDelivery {
     protected boolean runSecondTime(Message m) {
         String dataS = m.getContent().trim().replaceAll(" ", "");
         try {
-            LocalTime horaAtual = LocalTime.now();
+            LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
             LocalTime horaInformada = LocalTime.parse(dataS, DateTimeFormatter.ofPattern("HH:mm"));
             if ((horaInformada.isAfter(horaAtual) || horaInformada.equals(horaAtual)) && (!getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomatico() || (getChatBotDelivery().getEstabelecimento().isTimeBeetwenHorarioFuncionamento(horaInformada) || horaInformada.equals(getChatBotDelivery().getEstabelecimento().getHoraAutomaticaAbrirPedidos())))) {
                 ((ChatBotDelivery) chat).getPedidoAtual().setHoraAgendamento(java.sql.Time.valueOf(horaInformada));
@@ -59,7 +59,7 @@ public class HandlerAgendamentoPedido extends HandlerBotDelivery {
         if (getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomatico()) {
             chat.getChat().sendMessage("*Obs²*: Os horarios de agendamento disponíveis são apenas para após às *" + getChatBotDelivery().getEstabelecimento().getHoraAutomaticaAbrirPedidos().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "*");
         }
-        chat.getChat().sendMessage("*Obs³*: Você não pode informar um horario anterior à hora atual: *" + ((ChatBotDelivery) chat).getTimeFormat().format(Calendar.getInstance().getTime()) + "*");
+        chat.getChat().sendMessage("*Obs³*: Você não pode informar um horario anterior à hora atual: *" + ((ChatBotDelivery) chat).getTimeFormat().format(Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject()).getTime()) + "*");
     }
 
     @Override

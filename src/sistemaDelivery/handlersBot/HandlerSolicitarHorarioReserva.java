@@ -35,7 +35,7 @@ public class HandlerSolicitarHorarioReserva extends HandlerBotDelivery {
     protected boolean runSecondTime(Message m) {
         String dataS = m.getContent().trim().replaceAll(" ", "");
         try {
-            Calendar horaAtual = Calendar.getInstance();
+            Calendar horaAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
             Calendar dataInformada = Calendar.getInstance();
             Calendar dataChat = Calendar.getInstance();
             dataChat.setTimeInMillis(((ChatBotDelivery) chat).getReservaAtual().getDataReserva().getTime());

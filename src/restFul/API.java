@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -137,6 +138,7 @@ public class API {
         token.getEstabelecimento().setValidadeSeloFidelidade(novosValoresEstabelecimento.getValidadeSeloFidelidade());
         token.getEstabelecimento().setValorSelo(novosValoresEstabelecimento.getValorSelo());
         token.getEstabelecimento().setMaximoSeloPorCompra(novosValoresEstabelecimento.getMaximoSeloPorCompra());
+        token.getEstabelecimento().setTimeZone(novosValoresEstabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
         if (ControleEstabelecimentos.getInstance().salvarEstabelecimento(token.getEstabelecimento())) {
             return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento())).build();
         } else {

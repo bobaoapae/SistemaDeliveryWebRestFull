@@ -28,7 +28,7 @@ public class HandlerRealizarReserva extends HandlerBotDelivery {
     protected boolean runFirstTime(Message m) {
         chat.getChat().sendMessage("Certo, para poder realizar a sua reserva preciso anotar alguns dados");
         chat.getChat().sendMessage("A primeira informação que preciso é a data da reserva.");
-        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm*. Ex: *" + ((ChatBotDelivery) chat).getDateFormat().format(Calendar.getInstance().getTime()) + "*");
+        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm*. Ex: *" + ((ChatBotDelivery) chat).getDateFormat().format(getChatBotDelivery().getEstabelecimento().getDataComHoraAtual()) + "*");
         return true;
     }
 
@@ -39,7 +39,7 @@ public class HandlerRealizarReserva extends HandlerBotDelivery {
             Calendar data = Calendar.getInstance();
             data.setTime(((ChatBotDelivery) chat).getDateFormat().parse(dataS));
             data.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-            if (DateUtils.isToday(data.getTime()) || DateUtils.isAfterDay(data.getTime(), Calendar.getInstance().getTime())) {
+            if (DateUtils.isToday(data.getTime()) || DateUtils.isAfterDay(data.getTime(), Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject()).getTime())) {
                 Reserva r = new Reserva();
                 r.setCliente(((ChatBotDelivery) chat).getCliente());
                 r.setEstabelecimento(((ChatBotDelivery) chat).getEstabelecimento());

@@ -33,9 +33,9 @@ public class HandlerMenuPrincipal extends HandlerBotDelivery {
         MessageBuilder builder = new MessageBuilder();
         chat.getChat().sendMessage("Qual cardapio você gostaria de olhar?", 2000);
         builder.textNewLine("*_Obs: Envie somente o número da sua escolha_*");
-        Calendar dataAtual = Calendar.getInstance();
+        Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
-        LocalTime horaAtual = LocalTime.now();
+        LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
         for (Categoria c : ControleCategorias.getInstance().getCategoriasEstabelecimento(getChatBotDelivery().getEstabelecimento())) {
             if (c.getProdutos().isEmpty() && c.getCategoriasFilhas().isEmpty()) {
                 continue;

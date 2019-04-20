@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.format.TextStyle;
 import java.util.*;
 
 public class ControleEstabelecimentos {
@@ -72,12 +73,12 @@ public class ControleEstabelecimentos {
                     "            \"reservasComPedidosFechados\", \"abrirFecharPedidosAutomatico\", \n" +
                     "            \"agendamentoDePedidos\", \"horaAutomaticaAbrirPedidos\", \n" +
                     "            \"horaAutomaticaFecharPedidos\", \"horaInicioReservas\", \n" +
-                    "            \"webHookNovaReserva\",\"webHookNovoPedido\", \"logo\",\"valorSelo\",\"maximoSeloPorCompra\",\"validadeSeloFidelidade\")\n" +
+                    "            \"webHookNovaReserva\",\"webHookNovoPedido\", \"logo\",\"valorSelo\",\"maximoSeloPorCompra\",\"validadeSeloFidelidade\",\"timeZone\")\n" +
                     "    VALUES (?, ?, ?, ?, ?, \n" +
                     "            ?, ?, ?, ?, \n" +
                     "            ?, ?, \n" +
                     "            ?, ?, ?, \n" +
-                    "            ?,?,?,?,?);")) {
+                    "            ?,?,?,?,?,?);")) {
                 if (estabelecimento.getUuid() == null) {
                     estabelecimento.setUuid(UUID.randomUUID());
                 }
@@ -109,6 +110,7 @@ public class ControleEstabelecimentos {
                 preparedStatement.setDouble(17, estabelecimento.getValorSelo());
                 preparedStatement.setInt(18, estabelecimento.getMaximoSeloPorCompra());
                 preparedStatement.setInt(19, estabelecimento.getValidadeSeloFidelidade());
+                preparedStatement.setString(20, estabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
                 preparedStatement.executeUpdate();
 
                 try (PreparedStatement preparedStatement2 = connection.prepareStatement("insert into \"Estabelecimentos_Usuario\" (uuid_usuario, uuid_estabelecimento) values (?,?)");) {
@@ -147,7 +149,7 @@ public class ControleEstabelecimentos {
                         "       \"abrirFecharPedidosAutomatico\"=?, \"agendamentoDePedidos\"=?, \"horaAberturaPedidos\"=?, \n" +
                         "       \"horaAutomaticaAbrirPedidos\"=?, \"horaAutomaticaFecharPedidos\"=?, \n" +
                         "       \"horaInicioReservas\"=?, \n" +
-                        "       \"webHookNovaReserva\"=? , \"webHookNovoPedido\"=?, logo=?,  \"valorSelo\"=?, \"maximoSeloPorCompra\"=?, \"validadeSeloFidelidade\"=?\n" +
+                        "       \"webHookNovaReserva\"=? , \"webHookNovoPedido\"=?, logo=?,  \"valorSelo\"=?, \"maximoSeloPorCompra\"=?, \"validadeSeloFidelidade\"=?, \"timeZone\" = ?\n" +
                         " WHERE uuid=?;")) {
                     preparedStatement.setString(1, estabelecimento.getNomeEstabelecimento());
                     preparedStatement.setString(2, estabelecimento.getNomeBot());
@@ -179,7 +181,8 @@ public class ControleEstabelecimentos {
                     preparedStatement.setDouble(19, estabelecimento.getValorSelo());
                     preparedStatement.setInt(20, estabelecimento.getMaximoSeloPorCompra());
                     preparedStatement.setInt(21, estabelecimento.getValidadeSeloFidelidade());
-                    preparedStatement.setObject(22, estabelecimento.getUuid());
+                    preparedStatement.setString(22, estabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
+                    preparedStatement.setObject(23, estabelecimento.getUuid());
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
                     connection.commit();

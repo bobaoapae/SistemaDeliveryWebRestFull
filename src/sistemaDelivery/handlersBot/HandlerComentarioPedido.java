@@ -46,9 +46,9 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
         }
-        Calendar dataAtual = Calendar.getInstance();
+        Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
-        LocalTime horaAtual = LocalTime.now();
+        LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
         String categoriasDisponiveis = "";
         for (Categoria c : ControleCategorias.getInstance().getCategoriasEstabelecimento(getChatBotDelivery().getEstabelecimento())) {
             if (c.getProdutos().isEmpty() && c.getCategoriasFilhas().isEmpty()) {

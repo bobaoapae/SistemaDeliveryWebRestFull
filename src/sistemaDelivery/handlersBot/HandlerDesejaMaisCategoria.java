@@ -36,9 +36,9 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
         builder.textNewLine("Blz, o que você quer fazer agora?");
         codigosMenu.add(new HandlerMenuCategoria(c, chat));
         builder.textNewLine("*" + (codigosMenu.size()) + "* - Pedir mais " + c.getNomeCategoria());
-        Calendar dataAtual = Calendar.getInstance();
+        Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
-        LocalTime horaAtual = LocalTime.now();
+        LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
         for (Categoria c : ControleCategorias.getInstance().getCategoriasEstabelecimento(getChatBotDelivery().getEstabelecimento())) {
             if (c.equals(this.c) || !c.isVisivel() || (c.getProdutos().isEmpty() && c.getCategoriasFilhas().isEmpty())) {
                 continue;
