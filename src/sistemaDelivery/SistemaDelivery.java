@@ -49,6 +49,10 @@ public class SistemaDelivery {
         parser = new JsonParser();
         builder = Utilitarios.getDefaultGsonBuilder(null).create();
         onConnect = () -> {
+            if (!estabelecimento.isOpenChatBot()) {
+                estabelecimento.setOpenChatBot(true);
+                ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento);
+            }
             for (Chat chat : driver.getFunctions().getAllNewChats()) {
                 ControleChatsAsync.getInstance(estabelecimento).addChat(chat);
             }
