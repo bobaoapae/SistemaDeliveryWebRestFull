@@ -48,7 +48,7 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
         }
         if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
             if (!getChatBotDelivery().getEstabelecimento().isAgendamentoDePedidos()) {
-                if (!getChatBotDelivery().getEstabelecimento().isAbrirFecharPedidosAutomatico()) {
+                if (getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() == null) {
                     if (!getChatBotDelivery().getEstabelecimento().isReservasComPedidosFechados()) {
                         chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, por favor retorne mais tarde._", 2000);
                         chat.setHandler(new HandlerAdeus(chat), true);
@@ -58,10 +58,10 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
                     }
                 } else {
                     if (!getChatBotDelivery().getEstabelecimento().isReservasComPedidosFechados()) {
-                        chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + getChatBotDelivery().getEstabelecimento().getHoraAutomaticaAbrirPedidos().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._", 3500);
+                        chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._", 3500);
                         chat.setHandler(new HandlerAdeus(chat), true);
                     } else {
-                        chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + getChatBotDelivery().getEstabelecimento().getHoraAutomaticaAbrirPedidos().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_", 3500);
+                        chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_", 3500);
                         chat.setHandler(new HandlerDesejaFazerUmaReserva(chat), true);
                     }
                 }

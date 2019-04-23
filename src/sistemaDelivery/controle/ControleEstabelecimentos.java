@@ -53,6 +53,7 @@ public class ControleEstabelecimentos {
                 estabelecimento.setCategorias(ControleCategorias.getInstance().getCategoriasEstabelecimento(estabelecimento));
                 estabelecimento.setRodizios(ControleRodizios.getInstace().getRodiziosEstabelecimento(estabelecimento));
                 estabelecimento.setTiposEntregas(ControleTiposEntrega.getInstance().getTiposEntregasEstabelecimento(estabelecimento));
+                estabelecimento.setHorariosFuncionamento(ControleHorariosFuncionamento.getInstance().getHorariosFuncionamento(estabelecimento));
                 return estabelecimentos.get(uuid);
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -71,14 +72,14 @@ public class ControleEstabelecimentos {
                     "            uuid, \"nomeEstabelecimento\", \"nomeBot\", \"numeroAviso\", \"tempoMedioRetirada\", \n" +
                     "            \"tempoMedioEntrega\", reservas, \n" +
                     "            \"reservasComPedidosFechados\", \"abrirFecharPedidosAutomatico\", \n" +
-                    "            \"agendamentoDePedidos\", \"horaAutomaticaAbrirPedidos\", \n" +
-                    "            \"horaAutomaticaFecharPedidos\", \"horaInicioReservas\", \n" +
+                    "            \"agendamentoDePedidos\", \n" +
+                    "            \"horaInicioReservas\", \n" +
                     "            \"webHookNovaReserva\",\"webHookNovoPedido\", \"logo\",\"valorSelo\",\"maximoSeloPorCompra\",\"validadeSeloFidelidade\",\"timeZone\")\n" +
                     "    VALUES (?, ?, ?, ?, ?, \n" +
                     "            ?, ?, ?, ?, \n" +
                     "            ?, ?, \n" +
                     "            ?, ?, ?, \n" +
-                    "            ?,?,?,?,?,?);")) {
+                    "            ?,?,?,?);")) {
                 if (estabelecimento.getUuid() == null) {
                     estabelecimento.setUuid(UUID.randomUUID());
                 }
@@ -92,25 +93,18 @@ public class ControleEstabelecimentos {
                 preparedStatement.setBoolean(8, estabelecimento.isReservasComPedidosFechados());
                 preparedStatement.setBoolean(9, estabelecimento.isAbrirFecharPedidosAutomatico());
                 preparedStatement.setBoolean(10, estabelecimento.isAgendamentoDePedidos());
-                if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
-                    preparedStatement.setTime(11, estabelecimento.getHoraAutomaticaAbrirPedidos());
-                    preparedStatement.setTime(12, estabelecimento.getHoraAutomaticaFecharPedidos());
+                if (estabelecimento.isReservas()) {
+                    preparedStatement.setTime(11, estabelecimento.getHoraInicioReservas());
                 } else {
                     preparedStatement.setTime(11, null);
-                    preparedStatement.setTime(12, null);
                 }
-                if (estabelecimento.isReservas()) {
-                    preparedStatement.setTime(13, estabelecimento.getHoraInicioReservas());
-                } else {
-                    preparedStatement.setTime(13, null);
-                }
-                preparedStatement.setString(14, estabelecimento.getWebHookNovaReserva());
-                preparedStatement.setString(15, estabelecimento.getWebHookNovoPedido());
-                preparedStatement.setString(16, estabelecimento.getLogo());
-                preparedStatement.setDouble(17, estabelecimento.getValorSelo());
-                preparedStatement.setInt(18, estabelecimento.getMaximoSeloPorCompra());
-                preparedStatement.setInt(19, estabelecimento.getValidadeSeloFidelidade());
-                preparedStatement.setString(20, estabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
+                preparedStatement.setString(12, estabelecimento.getWebHookNovaReserva());
+                preparedStatement.setString(13, estabelecimento.getWebHookNovoPedido());
+                preparedStatement.setString(14, estabelecimento.getLogo());
+                preparedStatement.setDouble(15, estabelecimento.getValorSelo());
+                preparedStatement.setInt(16, estabelecimento.getMaximoSeloPorCompra());
+                preparedStatement.setInt(17, estabelecimento.getValidadeSeloFidelidade());
+                preparedStatement.setString(18, estabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
                 preparedStatement.executeUpdate();
 
                 try (PreparedStatement preparedStatement2 = connection.prepareStatement("insert into \"Estabelecimentos_Usuario\" (uuid_usuario, uuid_estabelecimento) values (?,?)");) {
@@ -147,7 +141,6 @@ public class ControleEstabelecimentos {
                         "       \"tempoMedioRetirada\"=?, \"tempoMedioEntrega\"=?, \"openPedidos\"=?, \n" +
                         "       \"openChatBot\"=?, reservas=?, \"reservasComPedidosFechados\"=?, \n" +
                         "       \"abrirFecharPedidosAutomatico\"=?, \"agendamentoDePedidos\"=?, \"horaAberturaPedidos\"=?, \n" +
-                        "       \"horaAutomaticaAbrirPedidos\"=?, \"horaAutomaticaFecharPedidos\"=?, \n" +
                         "       \"horaInicioReservas\"=?, \n" +
                         "       \"webHookNovaReserva\"=? , \"webHookNovoPedido\"=?, logo=?,  \"valorSelo\"=?, \"maximoSeloPorCompra\"=?, \"validadeSeloFidelidade\"=?, \"timeZone\" = ?\n" +
                         " WHERE uuid=?;")) {
@@ -163,26 +156,19 @@ public class ControleEstabelecimentos {
                     preparedStatement.setBoolean(10, estabelecimento.isAbrirFecharPedidosAutomatico());
                     preparedStatement.setBoolean(11, estabelecimento.isAgendamentoDePedidos());
                     preparedStatement.setTimestamp(12, new java.sql.Timestamp(estabelecimento.getHoraAberturaPedidos() == null ? new Date().getTime() : estabelecimento.getHoraAberturaPedidos().getTime()));
-                    if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
-                        preparedStatement.setTime(13, estabelecimento.getHoraAutomaticaAbrirPedidos());
-                        preparedStatement.setTime(14, estabelecimento.getHoraAutomaticaFecharPedidos());
+                    if (estabelecimento.isReservas()) {
+                        preparedStatement.setTime(13, estabelecimento.getHoraInicioReservas());
                     } else {
                         preparedStatement.setTime(13, null);
-                        preparedStatement.setTime(14, null);
                     }
-                    if (estabelecimento.isReservas()) {
-                        preparedStatement.setTime(15, estabelecimento.getHoraInicioReservas());
-                    } else {
-                        preparedStatement.setTime(15, null);
-                    }
-                    preparedStatement.setString(16, estabelecimento.getWebHookNovaReserva());
-                    preparedStatement.setString(17, estabelecimento.getWebHookNovoPedido());
-                    preparedStatement.setString(18, estabelecimento.getLogo());
-                    preparedStatement.setDouble(19, estabelecimento.getValorSelo());
-                    preparedStatement.setInt(20, estabelecimento.getMaximoSeloPorCompra());
-                    preparedStatement.setInt(21, estabelecimento.getValidadeSeloFidelidade());
-                    preparedStatement.setString(22, estabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
-                    preparedStatement.setObject(23, estabelecimento.getUuid());
+                    preparedStatement.setString(14, estabelecimento.getWebHookNovaReserva());
+                    preparedStatement.setString(15, estabelecimento.getWebHookNovoPedido());
+                    preparedStatement.setString(16, estabelecimento.getLogo());
+                    preparedStatement.setDouble(17, estabelecimento.getValorSelo());
+                    preparedStatement.setInt(18, estabelecimento.getMaximoSeloPorCompra());
+                    preparedStatement.setInt(19, estabelecimento.getValidadeSeloFidelidade());
+                    preparedStatement.setString(20, estabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
+                    preparedStatement.setObject(21, estabelecimento.getUuid());
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
                     connection.commit();

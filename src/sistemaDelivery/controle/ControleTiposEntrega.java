@@ -112,7 +112,7 @@ public class ControleTiposEntrega {
                     preparedStatement.executeUpdate();
                     connection.commit();
                     synchronized (tipoEntrega.getEstabelecimento().getTiposEntregas()) {
-                        tipoEntrega.getEstabelecimento().getTiposEntregas().add(tipoEntrega);
+                        tipoEntrega.getEstabelecimento().getTiposEntregas().add(getTipoEntregaByUUID(tipoEntrega.getUuid()));
                     }
                     return true;
                 } catch (SQLException ex) {

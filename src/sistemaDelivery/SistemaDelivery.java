@@ -22,7 +22,6 @@ import java.awt.*;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -82,6 +81,11 @@ public class SistemaDelivery {
                 broadcaster.broadcast(sse.newEvent("low-battery", e + ""));
             }
         };
+        onNeedQrCode = (e) -> {
+            if (broadcaster != null) {
+                broadcaster.broadcast(sse.newEvent("need-qrCode", e));
+            }
+        };
         telaWhatsApp = new TelaWhatsApp(estabelecimento);
         telaWhatsApp.setVisible(true);
         this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), "C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
@@ -100,31 +104,15 @@ public class SistemaDelivery {
                     }.start();
                 }
                 if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
-                    LocalTime horaAtual = estabelecimento.getHoraAtual();
-                    if (!estabelecimento.isOpenPedidos()) {
-                        if (estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime().isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime())) {
-                            if (!(horaAtual.isBefore(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime()) && horaAtual.isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime()))) {
-                                abrirPedidos();
-                            }
-                        } else {
-                            if (horaAtual.isAfter(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime()) && horaAtual.isBefore(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime())) {
-                                abrirPedidos();
-                            }
-                        }
+                    LocalDateTime localDateTime = estabelecimento.getDataComHoraAtual();
+                    if (estabelecimento.isTimeBeetwenHorarioFuncionamento(localDateTime.toLocalTime(), localDateTime.getDayOfWeek())) {
+                        abrirPedidos();
                     } else {
-                        if (estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime().isBefore(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime())) {
-                            if ((horaAtual.isBefore(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime()) && horaAtual.isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime()))) {
-                                fecharPedidos();
-                            }
-                        } else {
-                            if (horaAtual.isAfter(estabelecimento.getHoraAutomaticaFecharPedidos().toLocalTime()) || horaAtual.isBefore(estabelecimento.getHoraAutomaticaAbrirPedidos().toLocalTime())) {
-                                fecharPedidos();
-                            }
-                        }
+                        fecharPedidos();
                     }
                 }
             }
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.MINUTES);
         executores.scheduleWithFixedDelay(() -> {
             if (broadcasterWhats != null) {
                 broadcasterWhats.broadcast(sseWhats.newEvent("none"));
@@ -136,6 +124,9 @@ public class SistemaDelivery {
     }
 
     public boolean abrirPedidos() {
+        if (estabelecimento.isOpenPedidos()) {
+            return true;
+        }
         try {
             estabelecimento.setOpenPedidos(true);
             if (!ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento)) {
@@ -157,6 +148,9 @@ public class SistemaDelivery {
     }
 
     public boolean fecharPedidos() {
+        if (!estabelecimento.isOpenPedidos()) {
+            return true;
+        }
         try {
             estabelecimento.setOpenPedidos(false);
             if (!ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento)) {

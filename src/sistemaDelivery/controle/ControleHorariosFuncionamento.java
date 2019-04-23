@@ -1,0 +1,168 @@
+package sistemaDelivery.controle;
+
+import DAO.Conexao;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
+import org.apache.commons.dbutils.handlers.BeanHandler;
+import sistemaDelivery.modelo.Estabelecimento;
+import sistemaDelivery.modelo.HorarioFuncionamento;
+import utils.Utilitarios;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.time.DayOfWeek;
+import java.util.*;
+
+public class ControleHorariosFuncionamento {
+
+    private static final Object syncronizeGetInstance = new Object();
+    private static ControleHorariosFuncionamento instance;
+    private Map<UUID, HorarioFuncionamento> horariosFuncionamento;
+
+    private ControleHorariosFuncionamento() {
+        this.horariosFuncionamento = Collections.synchronizedMap(new HashMap<>());
+    }
+
+    public static ControleHorariosFuncionamento getInstance() {
+        synchronized (syncronizeGetInstance) {
+            if (instance == null) {
+                instance = new ControleHorariosFuncionamento();
+            }
+            return instance;
+        }
+    }
+
+    public HorarioFuncionamento getHorarioFuncionamentoByUUID(UUID uuid) {
+        if (horariosFuncionamento.containsKey(uuid)) {
+            return horariosFuncionamento.get(uuid);
+        }
+        synchronized (horariosFuncionamento) {
+            try {
+                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+                ResultSetHandler<HorarioFuncionamento> h = new BeanHandler<HorarioFuncionamento>(HorarioFuncionamento.class);
+                HorarioFuncionamento horarioFuncionamento = queryRunner.query("select * from \"Horarios_Funcionamento\" where uuid = ?", h, uuid);
+                if (horarioFuncionamento == null) {
+                    return null;
+                }
+                horariosFuncionamento.putIfAbsent(uuid, horarioFuncionamento);
+                horarioFuncionamento.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(horarioFuncionamento.getUuid_estabelecimento()));
+                return horariosFuncionamento.get(uuid);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+    }
+
+
+    public boolean salvarHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) {
+        if (horarioFuncionamento.getHoraAbrir().after(horarioFuncionamento.getHoraFechar())) {
+            return false;
+        }
+        try (Connection connection = Conexao.getConnection();) {
+            connection.setAutoCommit(false);
+            if (horarioFuncionamento.getUuid() == null || this.getHorarioFuncionamentoByUUID(horarioFuncionamento.getUuid()) == null) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Horarios_Funcionamento\" (uuid, uuid_estabelecimento, \"diaDaSemana\", \"horaAbrir\", \"horaFechar\")" +
+                        "values (?,?,?,?,?)")) {
+                    if (horarioFuncionamento.getUuid() == null) {
+                        horarioFuncionamento.setUuid(UUID.randomUUID());
+                    }
+                    preparedStatement.setObject(1, horarioFuncionamento.getUuid());
+                    preparedStatement.setObject(2, horarioFuncionamento.getEstabelecimento().getUuid());
+                    preparedStatement.setString(3, horarioFuncionamento.getDiaDaSemana().toString());
+                    preparedStatement.setTime(4, horarioFuncionamento.getHoraAbrir());
+                    preparedStatement.setTime(5, horarioFuncionamento.getHoraFechar());
+                    preparedStatement.executeUpdate();
+                    connection.commit();
+                    horarioFuncionamento.getEstabelecimento().addHorarioFuncionamento(getHorarioFuncionamentoByUUID(horarioFuncionamento.getUuid()));
+                    return true;
+                } catch (SQLException ex) {
+                    connection.rollback();
+                    throw ex;
+                } finally {
+                    connection.setAutoCommit(true);
+                }
+            } else {
+                try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Horarios_Funcionamento\" set \"diaDaSemana\" = ?,\"horaAbrir\" = ?,\"horaFechar\" = ?,ativo = ? where uuid = ? and uuid_estabelecimento = ?")) {
+                    preparedStatement.setString(1, horarioFuncionamento.getDiaDaSemana().toString());
+                    preparedStatement.setTime(2, horarioFuncionamento.getHoraAbrir());
+                    preparedStatement.setTime(3, horarioFuncionamento.getHoraFechar());
+                    preparedStatement.setBoolean(4, horarioFuncionamento.isAtivo());
+                    preparedStatement.setObject(5, horarioFuncionamento.getUuid());
+                    preparedStatement.setObject(6, horarioFuncionamento.getEstabelecimento().getUuid());
+                    if (preparedStatement.executeUpdate() != 1) {
+                        throw new SQLException("Falha ao atualizar");
+                    }
+                    connection.commit();
+                    if (horariosFuncionamento.containsKey(horarioFuncionamento.getUuid())) {
+                        Utilitarios.atualizarObjeto(horariosFuncionamento.get(horarioFuncionamento.getUuid()), horarioFuncionamento);
+                    }
+                    return true;
+                } catch (SQLException ex) {
+                    connection.rollback();
+                    throw ex;
+                } finally {
+                    connection.setAutoCommit(true);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public Map<DayOfWeek, List<HorarioFuncionamento>> getHorariosFuncionamento(Estabelecimento es) {
+        Map<DayOfWeek, List<HorarioFuncionamento>> horarios = new HashMap<>();
+        try (Connection conn = Conexao.getConnection();
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Horarios_Funcionamento\" where uuid_estabelecimento = ? order by \"diaDaSemana\" asc ,\"horaAbrir\" asc");
+        ) {
+            preparedStatement.setObject(1, es.getUuid());
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    HorarioFuncionamento horarioFuncionamento = getHorarioFuncionamentoByUUID(UUID.fromString(resultSet.getString("uuid")));
+                    if (!horarios.containsKey(horarioFuncionamento.getDiaDaSemana())) {
+                        horarios.put(horarioFuncionamento.getDiaDaSemana(), Collections.synchronizedList(new ArrayList<>()));
+                    }
+                    horarios.get(horarioFuncionamento.getDiaDaSemana()).add(horarioFuncionamento);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return horarios;
+    }
+
+    public boolean excluirHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) {
+        try (Connection connection = Conexao.getConnection()) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement preparedStatement = connection.prepareStatement("delete from \"Horarios_Funcionamento\" where uuid = ? and uuid_estabelecimento = ?")) {
+                preparedStatement.setObject(1, horarioFuncionamento.getUuid());
+                preparedStatement.setObject(2, horarioFuncionamento.getEstabelecimento().getUuid());
+                if (preparedStatement.executeUpdate() != 1) {
+                    throw new SQLException("Falha ao atualizar");
+                }
+                connection.commit();
+                synchronized (horarioFuncionamento.getEstabelecimento().getHorariosFuncionamento(horarioFuncionamento.getDiaDaSemana())) {
+                    horarioFuncionamento.getEstabelecimento().getHorariosFuncionamento(horarioFuncionamento.getDiaDaSemana()).remove(horarioFuncionamento);
+                }
+                synchronized (horariosFuncionamento) {
+                    if (horariosFuncionamento.containsKey(horarioFuncionamento.getUuid())) {
+                        horariosFuncionamento.remove(horarioFuncionamento.getUuid());
+                    }
+                }
+                return true;
+            } catch (SQLException ex) {
+                connection.rollback();
+                throw ex;
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+}

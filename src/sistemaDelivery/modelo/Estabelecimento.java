@@ -3,6 +3,7 @@ package sistemaDelivery.modelo;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 
 import java.sql.Time;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
@@ -18,7 +19,7 @@ public class Estabelecimento {
     private boolean agendamentoDePedidos, ativo;
     @Ignore
     private Date horaAberturaPedidos;
-    private Time horaAutomaticaFecharPedidos, horaAutomaticaAbrirPedidos, horaInicioReservas;
+    private Time horaInicioReservas;
     private double valorSelo;
     @Ignore
     private transient List<Categoria> categorias;
@@ -28,6 +29,33 @@ public class Estabelecimento {
     private List<TipoEntrega> tiposEntregas;
     private int maximoSeloPorCompra, validadeSeloFidelidade;
     private String timeZone;
+    @Ignore
+    private Map<DayOfWeek, List<HorarioFuncionamento>> horariosFuncionamento;
+
+
+    public void addHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) {
+        List<HorarioFuncionamento> horarios = getHorariosFuncionamento(horarioFuncionamento.getDiaDaSemana());
+        synchronized (horarios) {
+            horarios.add(horarioFuncionamento);
+        }
+    }
+
+    public List<HorarioFuncionamento> getHorariosFuncionamento(DayOfWeek dayOfWeek) {
+        synchronized (horariosFuncionamento) {
+            if (!horariosFuncionamento.containsKey(dayOfWeek)) {
+                horariosFuncionamento.put(dayOfWeek, Collections.synchronizedList(new ArrayList<>()));
+            }
+            return horariosFuncionamento.get(dayOfWeek);
+        }
+    }
+
+    public Map<DayOfWeek, List<HorarioFuncionamento>> getHorariosFuncionamento() {
+        return horariosFuncionamento;
+    }
+
+    public void setHorariosFuncionamento(Map<DayOfWeek, List<HorarioFuncionamento>> horariosFuncionamento) {
+        this.horariosFuncionamento = Collections.synchronizedMap(horariosFuncionamento);
+    }
 
     public LocalTime getHoraAtual() {
         return LocalTime.now(getTimeZoneObject().toZoneId());
@@ -180,7 +208,7 @@ public class Estabelecimento {
 
     public void setOpenPedidos(boolean openPedidos) {
         if (openPedidos && !this.openPedidos) {
-            this.horaAberturaPedidos = new Date();
+            this.horaAberturaPedidos = Calendar.getInstance(getTimeZoneObject()).getTime();
         }
         this.openPedidos = openPedidos;
     }
@@ -225,22 +253,6 @@ public class Estabelecimento {
         this.agendamentoDePedidos = agendamentoDePedidos;
     }
 
-    public Time getHoraAutomaticaFecharPedidos() {
-        return horaAutomaticaFecharPedidos;
-    }
-
-    public void setHoraAutomaticaFecharPedidos(Time horaAutomaticaFecharPedidos) {
-        this.horaAutomaticaFecharPedidos = horaAutomaticaFecharPedidos;
-    }
-
-    public Time getHoraAutomaticaAbrirPedidos() {
-        return horaAutomaticaAbrirPedidos;
-    }
-
-    public void setHoraAutomaticaAbrirPedidos(Time horaAutomaticaAbrirPedidos) {
-        this.horaAutomaticaAbrirPedidos = horaAutomaticaAbrirPedidos;
-    }
-
     public Time getHoraInicioReservas() {
         return horaInicioReservas;
     }
@@ -281,17 +293,44 @@ public class Estabelecimento {
         this.horaAberturaPedidos = horaAberturaPedidos;
     }
 
-    public boolean isTimeBeetwenHorarioFuncionamento(LocalTime horaInformada) {
-        if (this.getHoraAutomaticaAbrirPedidos().toLocalTime().isAfter(this.getHoraAutomaticaFecharPedidos().toLocalTime())) {
-            if (!(horaInformada.isBefore(this.getHoraAutomaticaAbrirPedidos().toLocalTime()) && horaInformada.isAfter(this.getHoraAutomaticaFecharPedidos().toLocalTime()))) {
-                return true;
-            }
-        } else {
-            if (horaInformada.isAfter(this.getHoraAutomaticaAbrirPedidos().toLocalTime()) && horaInformada.isBefore(this.getHoraAutomaticaFecharPedidos().toLocalTime())) {
-                return true;
+    public boolean isTimeBeetwenHorarioFuncionamento(LocalTime horaInformada, DayOfWeek dayOfWeek) {
+        List<HorarioFuncionamento> horarioFuncionamentos = getHorariosFuncionamento(dayOfWeek);
+        synchronized (horarioFuncionamentos) {
+            if (horarioFuncionamentos.isEmpty()) {
+                return false;
+            } else {
+                for (HorarioFuncionamento horarioFuncionamento : horarioFuncionamentos) {
+                    if (!horarioFuncionamento.isAtivo()) {
+                        continue;
+                    }
+                    if (horaInformada.isAfter(horarioFuncionamento.getHoraAbrir().toLocalTime()) && horaInformada.isBefore(horarioFuncionamento.getHoraFechar().toLocalTime())) {
+                        return true;
+                    }
+                }
             }
         }
         return false;
+    }
+
+    public HorarioFuncionamento nextOrCurrentHorarioAbertoOfDay() {
+        List<HorarioFuncionamento> horarioFuncionamentos = getHorariosFuncionamento(getDataComHoraAtual().getDayOfWeek());
+        synchronized (horarioFuncionamentos) {
+            if (horarioFuncionamentos.isEmpty()) {
+                return null;
+            } else {
+                for (HorarioFuncionamento horarioFuncionamento : horarioFuncionamentos) {
+                    if (!horarioFuncionamento.isAtivo()) {
+                        continue;
+                    }
+                    if ((getDataComHoraAtual().toLocalTime().isAfter(horarioFuncionamento.getHoraAbrir().toLocalTime()) || getDataComHoraAtual().toLocalTime().withSecond(0).withNano(0).equals(horarioFuncionamento.getHoraAbrir().toLocalTime())) && (getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraFechar().toLocalTime()) || getDataComHoraAtual().toLocalTime().withSecond(0).withNano(0).equals(horarioFuncionamento.getHoraFechar().toLocalTime()))) {
+                        return horarioFuncionamento;
+                    } else if (getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraAbrir().toLocalTime())) {
+                        return horarioFuncionamento;
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     @Override

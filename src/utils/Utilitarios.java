@@ -8,6 +8,7 @@ package utils;
 import adapters.*;
 import com.google.gson.GsonBuilder;
 import jdk.nashorn.internal.ir.annotations.Ignore;
+import sistemaDelivery.modelo.HorarioFuncionamento;
 import sistemaDelivery.modelo.ItemPedido;
 import sistemaDelivery.modelo.Produto;
 
@@ -58,6 +59,7 @@ public class Utilitarios {
         HashMap<Type, Object> adapters = new HashMap<>();
         adapters.put(ItemPedido.class, new UseGetterAdapterSerialize<>());
         adapters.put(Produto.class, new UseGetterAdapterSerialize<>());
+        adapters.put(HorarioFuncionamento.class, new UseGetterAdapterSerialize<>());
         for (Map.Entry<Type, Object> entry : adapters.entrySet()) {
             if (entry.getKey().equals(type)) {
                 continue;

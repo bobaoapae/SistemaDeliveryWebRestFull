@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -124,8 +125,6 @@ public class API {
         Estabelecimento novosValoresEstabelecimento = builder.fromJson(estabelecimento, Estabelecimento.class);
         token.getEstabelecimento().setAbrirFecharPedidosAutomatico(novosValoresEstabelecimento.isAbrirFecharPedidosAutomatico());
         token.getEstabelecimento().setAgendamentoDePedidos(novosValoresEstabelecimento.isAgendamentoDePedidos());
-        token.getEstabelecimento().setHoraAutomaticaAbrirPedidos(novosValoresEstabelecimento.getHoraAutomaticaAbrirPedidos());
-        token.getEstabelecimento().setHoraAutomaticaFecharPedidos(novosValoresEstabelecimento.getHoraAutomaticaFecharPedidos());
         token.getEstabelecimento().setHoraInicioReservas(novosValoresEstabelecimento.getHoraInicioReservas());
         token.getEstabelecimento().setNomeBot(novosValoresEstabelecimento.getNomeBot());
         token.getEstabelecimento().setNomeEstabelecimento(novosValoresEstabelecimento.getNomeEstabelecimento());
@@ -811,6 +810,13 @@ public class API {
         }
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/tiposEntregas")
+    public Response tiposEntregas() {
+        return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento().getTiposEntregas())).build();
+    }
+
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/salvarTipoEntrega")
@@ -834,6 +840,63 @@ public class API {
         }
         if (ControleTiposEntrega.getInstance().excluirTipoEntrega(tipoEntrega)) {
             return Response.status(Response.Status.CREATED).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/horariosFuncionamento")
+    public Response horariosFuncionamento() {
+        List<HorarioFuncionamento> horarios = new ArrayList<>();
+        for (Map.Entry<DayOfWeek, List<HorarioFuncionamento>> entry : token.getEstabelecimento().getHorariosFuncionamento().entrySet()) {
+            for (HorarioFuncionamento horarioFuncionamento : entry.getValue()) {
+                horarios.add(horarioFuncionamento);
+            }
+        }
+        return Response.status(Response.Status.CREATED).entity(builder.toJson(horarios)).build();
+    }
+
+    @POST
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/salvarHorarioFuncionamento")
+    public Response salvarHorarioFuncionamento(@FormParam("horarioFuncionamento") String horario) {
+        HorarioFuncionamento horarioFuncionamento = builder.fromJson(horario, HorarioFuncionamento.class);
+        horarioFuncionamento.setEstabelecimento(token.getEstabelecimento());
+        if (ControleHorariosFuncionamento.getInstance().salvarHorarioFuncionamento(horarioFuncionamento)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleHorariosFuncionamento.getInstance().getHorarioFuncionamentoByUUID(horarioFuncionamento.getUuid()))).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/excluirHorarioFuncionamento")
+    public Response excluirHorarioFuncionamento(@QueryParam("uuid") String uuid) {
+        HorarioFuncionamento horarioFuncionamento = ControleHorariosFuncionamento.getInstance().getHorarioFuncionamentoByUUID(UUID.fromString(uuid));
+        if (!horarioFuncionamento.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        if (ControleHorariosFuncionamento.getInstance().excluirHorarioFuncionamento(horarioFuncionamento)) {
+            return Response.status(Response.Status.CREATED).build();
+        } else {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/alterarEstadoHorarioFuncionamento")
+    public Response alterarEstadoHorarioFuncionamento(@QueryParam("uuid") String uuid) {
+        HorarioFuncionamento horarioFuncionamento = ControleHorariosFuncionamento.getInstance().getHorarioFuncionamentoByUUID(UUID.fromString(uuid));
+        if (!horarioFuncionamento.getEstabelecimento().equals(token.getEstabelecimento())) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+        horarioFuncionamento.setAtivo(!horarioFuncionamento.isAtivo());
+        if (ControleHorariosFuncionamento.getInstance().salvarHorarioFuncionamento(horarioFuncionamento)) {
+            return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleHorariosFuncionamento.getInstance().getHorarioFuncionamentoByUUID(horarioFuncionamento.getUuid()))).build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
