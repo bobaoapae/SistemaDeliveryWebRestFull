@@ -20,6 +20,7 @@ import sistemaDelivery.handlersBot.HandlerChatExpirado;
 import utils.Utilitarios;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Objects;
@@ -38,7 +39,7 @@ public class ChatBotDelivery extends ChatBot {
     private Reserva reservaAtual;
     private Estabelecimento estabelecimento;
 
-    public ChatBotDelivery(Chat chat, Estabelecimento estabelecimento, boolean autoPause) {
+    public ChatBotDelivery(Chat chat, Estabelecimento estabelecimento, boolean autoPause) throws SQLException {
         super(chat, autoPause);
         this.estabelecimento = estabelecimento;
         Cliente cliente = ControleClientes.getInstance().getClienteChatId(chat.getId(), estabelecimento);

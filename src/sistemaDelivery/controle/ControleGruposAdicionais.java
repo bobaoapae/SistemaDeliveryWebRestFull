@@ -34,7 +34,7 @@ public class ControleGruposAdicionais {
         }
     }
 
-    public GrupoAdicional getGrupoByUUID(UUID uuid) {
+    public GrupoAdicional getGrupoByUUID(UUID uuid) throws SQLException {
         if (grupos.containsKey(uuid)) {
             return grupos.get(uuid);
         }
@@ -52,13 +52,12 @@ public class ControleGruposAdicionais {
                 grupo.setProduto(ControleProdutos.getInstance().getProdutoByUUID(grupo.getUuid_produto()));
                 return grupos.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean salvarGrupoAdicional(GrupoAdicional grupo) {
+    public boolean salvarGrupoAdicional(GrupoAdicional grupo) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             if (grupo.getUuid() == null || this.getGrupoByUUID(grupo.getUuid()) == null) {
@@ -114,12 +113,11 @@ public class ControleGruposAdicionais {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
-    public boolean excluirGrupo(GrupoAdicional grupoAdicional) {
+    public boolean excluirGrupo(GrupoAdicional grupoAdicional) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Grupos_Adicionais\" set ativo = ? where uuid = ?")) {
@@ -147,12 +145,11 @@ public class ControleGruposAdicionais {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
-    public List<GrupoAdicional> getGruposCategoria(Categoria cat) {
+    public List<GrupoAdicional> getGruposCategoria(Categoria cat) throws SQLException {
         List<GrupoAdicional> grupos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Grupos_Adicionais\" where uuid_categoria = ? and ativo order by \"dataCriacao\" ");
@@ -164,12 +161,12 @@ public class ControleGruposAdicionais {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return grupos;
     }
 
-    public List<GrupoAdicional> getGruposProduto(Produto produto) {
+    public List<GrupoAdicional> getGruposProduto(Produto produto) throws SQLException {
         List<GrupoAdicional> grupos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Grupos_Adicionais\" where uuid_produto = ? and ativo order by \"dataCriacao\" ");
@@ -181,7 +178,7 @@ public class ControleGruposAdicionais {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return grupos;
     }

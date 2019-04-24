@@ -7,24 +7,42 @@ import sistemaDelivery.modelo.Estabelecimento;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
+import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @WebListener
 public class ListennerServer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        for (Estabelecimento estabelecimento : ControleEstabelecimentos.getInstance().getEstabelecimentosChatBotAberto()) {
-            new Thread() {
-                public void run() {
-                    try {
-                        System.out.println("Iniciando para - " + estabelecimento.getNomeEstabelecimento());
-                        ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
-                        System.out.println("Iniciado para - " + estabelecimento.getNomeEstabelecimento());
-                    } catch (IOException e) {
-                        e.printStackTrace();
+        try {
+            File file = new File("C:\\logs-web-whats\\");
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            Logger logger = Logger.getLogger("LogGeral");
+            FileHandler fh = new FileHandler("C:\\logs-web-whats\\LogGeral.txt", true);
+            logger.addHandler(fh);
+            for (Estabelecimento estabelecimento : ControleEstabelecimentos.getInstance().getEstabelecimentosChatBotAberto()) {
+                new Thread() {
+                    public void run() {
+                        try {
+                            System.out.println("Iniciando para - " + estabelecimento.getNomeEstabelecimento());
+                            ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
+                            System.out.println("Iniciado para - " + estabelecimento.getNomeEstabelecimento());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
-                }
-            }.start();
+                }.start();
+            }
+        } catch (SQLException e) {
+            Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         System.out.println("Sistema Delivery WhatsApp Web Iniciado");
     }

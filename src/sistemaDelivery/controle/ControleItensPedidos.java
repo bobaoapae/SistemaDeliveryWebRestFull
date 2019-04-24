@@ -34,7 +34,7 @@ public class ControleItensPedidos {
         }
     }
 
-    public ItemPedido getItemByUUID(UUID uuid) {
+    public ItemPedido getItemByUUID(UUID uuid) throws SQLException {
         if (itensPedidos.containsKey(uuid)) {
             return itensPedidos.get(uuid);
         }
@@ -52,9 +52,8 @@ public class ControleItensPedidos {
                 item.setPedido(ControlePedidos.getInstance().getPedidoByUUID(item.getUuid_pedido()));
                 return itensPedidos.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
@@ -92,7 +91,7 @@ public class ControleItensPedidos {
         return false;
     }
 
-    public boolean salvarItemPedido(ItemPedido itemPedido) {
+    public boolean salvarItemPedido(ItemPedido itemPedido) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             if (itemPedido.getUuid() == null) {
@@ -119,12 +118,11 @@ public class ControleItensPedidos {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
-    public boolean excluirPedido(ItemPedido itemPedido) {
+    public boolean excluirPedido(ItemPedido itemPedido) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Items_Pedidos\" set removido = ? where uuid = ?")) {
@@ -144,12 +142,11 @@ public class ControleItensPedidos {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
-    public List<ItemPedido> getItensPedidos(Pedido pedido) {
+    public List<ItemPedido> getItensPedidos(Pedido pedido) throws SQLException {
         List<ItemPedido> itemPedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select a.*,b.nome,c.\"nomeCategoria\" from \"Items_Pedidos\" as a inner join \"Produtos\" as b on a.uuid_produto =b.uuid inner join \"Categorias\" as c on b.uuid_categoria=c.uuid where uuid_pedido=? order by c.\"ordemExibicao\",b.\"dataCriacao\"");
@@ -161,7 +158,7 @@ public class ControleItensPedidos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return itemPedidos;
     }

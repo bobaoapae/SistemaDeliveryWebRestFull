@@ -24,6 +24,7 @@ public class HandlerFinalizarReserva extends HandlerBotDelivery {
         try {
             ControleReservas.getInstance().salvarReserva(((ChatBotDelivery) chat).getReservaAtual());
         } catch (Exception ex) {
+            this.reset();
             chat.getChat().getDriver().onError(ex);
             chat.getChat().sendMessage("Falha ao registrar o pedido de reserva, tente novamente em alguns minutos");
             return true;

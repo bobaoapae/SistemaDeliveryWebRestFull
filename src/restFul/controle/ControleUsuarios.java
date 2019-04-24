@@ -36,7 +36,7 @@ public class ControleUsuarios {
         }
     }
 
-    public Usuario getUsuarioByUUID(UUID uuid) {
+    public Usuario getUsuarioByUUID(UUID uuid) throws SQLException {
         if (usuarios.containsKey(uuid)) {
             return usuarios.get(uuid);
         }
@@ -52,13 +52,12 @@ public class ControleUsuarios {
                 u.setEstabelecimentos(ControleEstabelecimentos.getInstance().getEstabelecimentosUsuario(u));
                 return usuarios.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public Usuario getUsuario(String login) {
+    public Usuario getUsuario(String login) throws SQLException {
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Usuarios\" where usuario = ?");
         ) {
@@ -70,12 +69,12 @@ public class ControleUsuarios {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return null;
     }
 
-    public Usuario getUsuario(String login, String senha) {
+    public Usuario getUsuario(String login, String senha) throws SQLException {
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Usuarios\" where usuario = ? and senha = md5(?) ");
         ) {
@@ -88,12 +87,12 @@ public class ControleUsuarios {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return null;
     }
 
-    public boolean salvarUsuario(Usuario usuario) throws LoginInUse {
+    public boolean salvarUsuario(Usuario usuario) throws LoginInUse, SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             if (usuario.getUuid() == null) {
@@ -135,7 +134,7 @@ public class ControleUsuarios {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
         return false;
     }

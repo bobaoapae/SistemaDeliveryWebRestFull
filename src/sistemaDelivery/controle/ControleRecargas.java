@@ -32,7 +32,7 @@ public class ControleRecargas {
         }
     }
 
-    public RecargaCliente getRecargaByUUID(UUID uuid) {
+    public RecargaCliente getRecargaByUUID(UUID uuid) throws SQLException {
         if (recargas.containsKey(uuid)) {
             return recargas.get(uuid);
         }
@@ -49,13 +49,12 @@ public class ControleRecargas {
                 recargaCliente.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(recargaCliente.getUuid_estabelecimento()));
                 return recargas.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean salvarRecarga(RecargaCliente recargaCliente) {
+    public boolean salvarRecarga(RecargaCliente recargaCliente) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Recargas_Clientes\" (uuid, uuid_cliente, uuid_estabelecimento, valor, \"tipoRecarga\") values (?,?,?,?,?)")) {
@@ -75,12 +74,11 @@ public class ControleRecargas {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
-    public List<RecargaCliente> getRecargasCliente(Cliente cliente) {
+    public List<RecargaCliente> getRecargasCliente(Cliente cliente) throws SQLException {
         List<RecargaCliente> recargaClientes = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select * from \"Recargas_Clientes\" where uuid_cliente = ?")) {
@@ -91,7 +89,7 @@ public class ControleRecargas {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return recargaClientes;
     }

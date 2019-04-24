@@ -32,7 +32,7 @@ public class ControleTokens {
         }
     }
 
-    public Token getToken(String token) {
+    public Token getToken(String token) throws SQLException {
         if (tokens.containsKey(token)) {
             return tokens.get(token);
         }
@@ -49,13 +49,12 @@ public class ControleTokens {
                 u.setUsuario(ControleUsuarios.getInstance().getUsuarioByUUID(u.getUuid_usuario()));
                 return tokens.get(token);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean saveToken(Token token) {
+    public boolean saveToken(Token token) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Tokens\" (token, uuid_estabelecimento, uuid_usuario, validade) values (?,?,?,?)")) {
@@ -73,12 +72,11 @@ public class ControleTokens {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
-    public boolean removerToken(Token token) {
+    public boolean removerToken(Token token) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("delete from \"Tokens\" where token = ? and uuid_estabelecimento = ? and uuid_usuario = ?")) {
@@ -100,9 +98,8 @@ public class ControleTokens {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
 }

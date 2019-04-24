@@ -34,7 +34,7 @@ public class ControleHorariosFuncionamento {
         }
     }
 
-    public HorarioFuncionamento getHorarioFuncionamentoByUUID(UUID uuid) {
+    public HorarioFuncionamento getHorarioFuncionamentoByUUID(UUID uuid) throws SQLException {
         if (horariosFuncionamento.containsKey(uuid)) {
             return horariosFuncionamento.get(uuid);
         }
@@ -50,14 +50,13 @@ public class ControleHorariosFuncionamento {
                 horarioFuncionamento.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(horarioFuncionamento.getUuid_estabelecimento()));
                 return horariosFuncionamento.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
 
-    public boolean salvarHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) {
+    public boolean salvarHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) throws SQLException {
         if (horarioFuncionamento.getHoraAbrir().after(horarioFuncionamento.getHoraFechar())) {
             return false;
         }
@@ -108,12 +107,11 @@ public class ControleHorariosFuncionamento {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public Map<DayOfWeek, List<HorarioFuncionamento>> getHorariosFuncionamento(Estabelecimento es) {
+    public Map<DayOfWeek, List<HorarioFuncionamento>> getHorariosFuncionamento(Estabelecimento es) throws SQLException {
         Map<DayOfWeek, List<HorarioFuncionamento>> horarios = new HashMap<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Horarios_Funcionamento\" where uuid_estabelecimento = ? order by \"diaDaSemana\" asc ,\"horaAbrir\" asc");
@@ -129,12 +127,12 @@ public class ControleHorariosFuncionamento {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return horarios;
     }
 
-    public boolean excluirHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) {
+    public boolean excluirHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("delete from \"Horarios_Funcionamento\" where uuid = ? and uuid_estabelecimento = ?")) {
@@ -160,9 +158,8 @@ public class ControleHorariosFuncionamento {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
 }

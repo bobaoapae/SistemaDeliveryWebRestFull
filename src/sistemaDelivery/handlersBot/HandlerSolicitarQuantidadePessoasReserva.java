@@ -39,7 +39,11 @@ public class HandlerSolicitarQuantidadePessoasReserva extends HandlerBotDelivery
             }
             ((ChatBotDelivery) chat).getReservaAtual().setQtdPessoas(qtdPessoas);
             chat.setHandler(new HandlerVerificaNomeContatoReserva(chat), true);
+        } catch (NumberFormatException e) {
+            getChatBotDelivery().getChat().getDriver().onError(e);
+            return false;
         } catch (Exception ex) {
+            getChatBotDelivery().getChat().getDriver().onError(ex);
             return false;
         }
         return true;

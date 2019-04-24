@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import driver.WebWhatsDriver;
 import modelo.*;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import restFul.controle.ControleSessions;
 import sistemaDelivery.controle.ControleChatsAsync;
 import sistemaDelivery.controle.ControleClientes;
@@ -20,12 +21,14 @@ import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
 import java.awt.*;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.*;
 
 public class SistemaDelivery {
     private WebWhatsDriver driver;
@@ -41,8 +44,46 @@ public class SistemaDelivery {
     private Gson builder;
     private TelaWhatsApp telaWhatsApp;
     private LocalDateTime timeStart;
+    private Logger logger;
 
     public SistemaDelivery(Estabelecimento estabelecimento) throws IOException {
+        logger = Logger.getLogger(estabelecimento.getUuid().toString());
+        try {
+            FileHandler fh = new FileHandler("C:\\logs-web-whats\\" + estabelecimento.getNomeEstabelecimento() + " - " + estabelecimento.getUuid().toString().replaceAll("-", "") + ".txt", true);
+            logger.addHandler(fh);
+            logger.addHandler(new Handler() {
+                @Override
+                public void publish(LogRecord lr) {
+                    try {
+                        if (driver != null && driver.getEstadoDriver() != null && driver.getEstadoDriver() == EstadoDriver.LOGGED) {
+                            Chat c = driver.getFunctions().getChatByNumber("554491050665");
+                            if (c != null) {
+                                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Erro-> " + ExceptionUtils.getStackTrace(lr.getThrown()));
+                            }
+                        }
+                    } catch (Exception ex) {
+
+                    }
+                }
+
+                @Override
+                public void flush() {
+                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+
+                @Override
+                public void close() throws SecurityException {
+                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+            });
+            logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
+            SimpleFormatter formatter = new SimpleFormatter();
+            fh.setFormatter(formatter);
+        } catch (SecurityException e) {
+            throw e;
+        } catch (IOException e) {
+            throw e;
+        }
         timeStart = estabelecimento.getDataComHoraAtual();
         this.estabelecimento = estabelecimento;
         parser = new JsonParser();
@@ -50,7 +91,11 @@ public class SistemaDelivery {
         onConnect = () -> {
             if (!estabelecimento.isOpenChatBot()) {
                 estabelecimento.setOpenChatBot(true);
-                ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento);
+                try {
+                    ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento);
+                } catch (SQLException e) {
+                    Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+                }
             }
             for (Chat chat : driver.getFunctions().getAllNewChats()) {
                 ControleChatsAsync.getInstance(estabelecimento).addChat(chat);
@@ -60,7 +105,12 @@ public class SistemaDelivery {
                 if (broadcasterWhats != null) {
                     JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.toJson()));
                     object.add("contact", builder.toJsonTree(parser.parse(c.getContact().toJson())));
-                    Cliente cliente = ControleClientes.getInstance().getClienteChatId(c.getId(), this.estabelecimento);
+                    Cliente cliente = null;
+                    try {
+                        cliente = ControleClientes.getInstance().getClienteChatId(c.getId(), this.estabelecimento);
+                    } catch (SQLException e) {
+                        Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+                    }
                     if (cliente != null) {
                         object.add("cliente", builder.toJsonTree(cliente));
                     }
@@ -86,6 +136,9 @@ public class SistemaDelivery {
                 broadcaster.broadcast(sse.newEvent("need-qrCode", e));
             }
         };
+        onErrorInDriver = (e) -> {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        };
         telaWhatsApp = new TelaWhatsApp(estabelecimento);
         telaWhatsApp.setVisible(true);
         this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), "C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
@@ -95,7 +148,11 @@ public class SistemaDelivery {
                 if ((!estabelecimento.isOpenChatBot() || driver.getEstadoDriver() != EstadoDriver.LOGGED) && timeStart.plusMinutes(5).isBefore(estabelecimento.getDataComHoraAtual())) {
                     if (estabelecimento.isOpenChatBot()) {
                         estabelecimento.setOpenChatBot(false);
-                        ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento);
+                        try {
+                            ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento);
+                        } catch (SQLException e) {
+                            Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+                        }
                     }
                     new Thread() {
                         public void run() {
@@ -106,9 +163,17 @@ public class SistemaDelivery {
                 if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
                     LocalDateTime localDateTime = estabelecimento.getDataComHoraAtual();
                     if (estabelecimento.isTimeBeetwenHorarioFuncionamento(localDateTime.toLocalTime(), localDateTime.getDayOfWeek())) {
-                        abrirPedidos();
+                        try {
+                            abrirPedidos();
+                        } catch (SQLException e) {
+                            Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+                        }
                     } else {
-                        fecharPedidos();
+                        try {
+                            fecharPedidos();
+                        } catch (SQLException e) {
+                            Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+                        }
                     }
                 }
             }
@@ -123,7 +188,7 @@ public class SistemaDelivery {
         }, 0, 20, TimeUnit.SECONDS);
     }
 
-    public boolean abrirPedidos() {
+    public boolean abrirPedidos() throws SQLException {
         if (estabelecimento.isOpenPedidos()) {
             return true;
         }
@@ -142,12 +207,11 @@ public class SistemaDelivery {
             }
             return true;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
-    public boolean fecharPedidos() {
+    public boolean fecharPedidos() throws SQLException {
         if (!estabelecimento.isOpenPedidos()) {
             return true;
         }
@@ -157,8 +221,7 @@ public class SistemaDelivery {
                 return false;
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
+            throw ex;
         }
         new Thread() {
             public void run() {

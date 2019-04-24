@@ -9,6 +9,7 @@ import jdk.nashorn.internal.ir.annotations.Ignore;
 import sistemaDelivery.controle.ControlePedidos;
 import sistemaDelivery.controle.ControleRecargas;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
@@ -73,11 +74,11 @@ public class Cliente {
         this.uuid = uuid;
     }
 
-    public void realizarRecarga(Estabelecimento e, double valorRecarga, TipoRecarga tipoRecarga) {
+    public void realizarRecarga(Estabelecimento e, double valorRecarga, TipoRecarga tipoRecarga) throws SQLException {
         ControleRecargas.getInstance().salvarRecarga(new RecargaCliente(e, this, valorRecarga, tipoRecarga));
     }
 
-    public List<RecargaCliente> getRegargas() {
+    public List<RecargaCliente> getRegargas() throws SQLException {
         return ControleRecargas.getInstance().getRecargasCliente(this);
     }
 
@@ -86,7 +87,7 @@ public class Cliente {
         return null;
     }
 
-    public double getCreditosDisponiveis() {
+    public double getCreditosDisponiveis() throws SQLException {
         double valor = 0;
         for (RecargaCliente recargaCliente : this.getRegargas()) {
             if (recargaCliente.getTipoRecarga() == TipoRecarga.DEPOSITO) {
@@ -176,7 +177,7 @@ public class Cliente {
         this.dataUltimaCompra = dataUltimaCompra;
     }
 
-    public List<Pedido> getPedidosCliente() {
+    public List<Pedido> getPedidosCliente() throws SQLException {
         return ControlePedidos.getInstance().getPedidosCliente(this);
     }
 

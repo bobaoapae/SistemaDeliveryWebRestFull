@@ -102,7 +102,11 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
             } else {
                 return false;
             }
+        } catch (NumberFormatException e) {
+            getChatBotDelivery().getChat().getDriver().onError(e);
+            return false;
         } catch (Exception ex) {
+            getChatBotDelivery().getChat().getDriver().onError(ex);
             return false;
         }
     }

@@ -9,6 +9,8 @@ import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.modelo.ChatBotDelivery;
 
+import java.sql.SQLException;
+
 /**
  * @author jvbor
  */
@@ -25,8 +27,12 @@ public class HandlerSolicitarFormaPagamento extends HandlerBotDelivery {
         chat.getChat().sendMessage("*1* - 💵 Dinheiro");
         chat.getChat().sendMessage("*2* - 💳 Cartão de Crédito");
         chat.getChat().sendMessage("*3* - 💳💵 Dinheiro e Cartão de Crédito");
-        if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
-            chat.getChat().sendMessage("*4* - Créditos de Recarga");
+        try {
+            if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
+                chat.getChat().sendMessage("*4* - Créditos de Recarga");
+            }
+        } catch (SQLException e) {
+            getChatBotDelivery().getChat().getDriver().onError(e);
         }
         return true;
     }
@@ -43,10 +49,17 @@ public class HandlerSolicitarFormaPagamento extends HandlerBotDelivery {
             ((ChatBotDelivery) chat).getPedidoAtual().setCartao(true);
             ((ChatBotDelivery) chat).getPedidoAtual().setTroco(-1);
             chat.setHandler(new HandlerSolicitarTroco(chat), true);
-        } else if (msg.getContent().trim().equals("4") && ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
-            chat.setHandler(new HandlerPagarComCreditos(chat), true);
         } else {
-            return false;
+            try {
+                if (msg.getContent().trim().equals("4") && ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
+                    chat.setHandler(new HandlerPagarComCreditos(chat), true);
+                } else {
+                    return false;
+                }
+            } catch (SQLException e) {
+                getChatBotDelivery().getChat().getDriver().onError(e);
+                return false;
+            }
         }
         return true;
     }

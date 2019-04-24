@@ -13,6 +13,7 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 
 /**
@@ -41,8 +42,10 @@ public class HandlerSolicitarDataNascimento extends HandlerBotDelivery {
             ((ChatBotDelivery) chat).getCliente().setDataAniversario(Date.valueOf(LocalDate.parse(dataS, DateTimeFormatter.ofPattern("dd/MM/yyyy"))));
             chat.setHandler(new HandlerFinalizarCadastro(chat), true);
             return true;
+        } catch (DateTimeParseException e) {
+            return false;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            getChatBotDelivery().getChat().getDriver().onError(ex);
             return false;
         }
     }

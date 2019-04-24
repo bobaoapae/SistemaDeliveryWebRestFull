@@ -5,6 +5,8 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Conexao {
 
@@ -15,7 +17,7 @@ public class Conexao {
         try {
             return Conexao.getDataSource().getConnection();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
         }
         return null;
     }
@@ -27,7 +29,7 @@ public class Conexao {
                 ctx = new InitialContext();
                 dataSource = (DataSource) ctx.lookup("java:jboss/datasources/DeliverySistem");
             } catch (NamingException e) {
-                e.printStackTrace();
+                Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
             }
         }
         return dataSource;

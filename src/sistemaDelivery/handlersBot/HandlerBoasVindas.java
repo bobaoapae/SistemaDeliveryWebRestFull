@@ -47,27 +47,18 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
             Logger.getLogger(HandlerBoasVindas.class.getName()).log(Level.SEVERE, null, ex);
         }
         if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
-            if (!getChatBotDelivery().getEstabelecimento().isAgendamentoDePedidos()) {
-                if (getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() == null) {
-                    if (!getChatBotDelivery().getEstabelecimento().isReservasComPedidosFechados()) {
-                        chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, por favor retorne mais tarde._", 2000);
-                        chat.setHandler(new HandlerAdeus(chat), true);
-                    } else {
-                        chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você já pode realizar sua reserva de mesa._", 2000);
-                        chat.setHandler(new HandlerDesejaFazerUmaReserva(chat), true);
-                    }
-                } else {
-                    if (!getChatBotDelivery().getEstabelecimento().isReservasComPedidosFechados()) {
-                        chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._", 3500);
-                        chat.setHandler(new HandlerAdeus(chat), true);
-                    } else {
-                        chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_", 3500);
-                        chat.setHandler(new HandlerDesejaFazerUmaReserva(chat), true);
-                    }
-                }
-            } else {
+            if (getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() == null) {
+                chat.getChat().sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
+                chat.setHandler(new HandlerAdeus(chat), true);
+            } else if (getChatBotDelivery().getEstabelecimento().isAgendamentoDePedidos()) {
                 chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você pode deixar seu pedido agendado._", 3000);
                 chat.setHandler(new HandlerMenuPrincipal(chat), true);
+            } else if (getChatBotDelivery().getEstabelecimento().isReservas() && getChatBotDelivery().getEstabelecimento().isReservasComPedidosFechados()) {
+                chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_", 3500);
+                chat.setHandler(new HandlerDesejaFazerUmaReserva(chat), true);
+            } else {
+                chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._", 3500);
+                chat.setHandler(new HandlerAdeus(chat), true);
             }
         } else {
             chat.getChat().sendMessage("_Obs: Nosso prazo médio para entregas é de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos._", 3000);

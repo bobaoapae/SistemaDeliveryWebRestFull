@@ -54,7 +54,7 @@ public class ControleChatsAsync {
                     chats.add(chatt);
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
+                chat.getDriver().onError(ex);
             }
         }
     }

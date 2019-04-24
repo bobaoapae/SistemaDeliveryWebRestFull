@@ -92,10 +92,14 @@ public class HandlerMenuRodizios extends HandlerBotDelivery {
                 chat.setHandler(new HandlerDesejaFazerUmaReserva(chat), true);
                 return true;
             }
+        } catch (NumberFormatException e) {
+            getChatBotDelivery().getChat().getDriver().onError(e);
+            return false;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            getChatBotDelivery().getChat().getDriver().onError(ex);
             return false;
         }
+
     }
 
     @Override

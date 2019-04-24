@@ -36,6 +36,8 @@ import java.time.DayOfWeek;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author BOV-INOS
@@ -119,7 +121,7 @@ public class Utilitarios {
                 cla = cla.getSuperclass();
             }
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            e.printStackTrace();
+            Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
         }
     }
 

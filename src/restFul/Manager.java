@@ -4,6 +4,7 @@ import adapters.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import restFul.controle.ControleSessions;
 import restFul.controle.ControleTokens;
 import restFul.controle.ControleUsuarios;
@@ -22,12 +23,15 @@ import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Path("/manager")
 public class Manager {
@@ -50,11 +54,16 @@ public class Manager {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/login")
     public Response login(@QueryParam("login") String login, @QueryParam("senha") String senha) {
-        Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
-        if (usuario != null) {
-            return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).entity(builder.toJson(usuario)).build();
-        } else {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+        try {
+            Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
+            if (usuario != null) {
+                return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).entity(builder.toJson(usuario)).build();
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+        } catch (SQLException e) {
+            Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
         }
     }
 
@@ -83,6 +92,9 @@ public class Manager {
                 }
             } catch (LoginInUse ex) {
                 return Response.status(Response.Status.BAD_REQUEST).entity("{message: \"Login já está em uso\"}").build();
+            } catch (SQLException e) {
+                Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
             }
         }
     }
@@ -132,8 +144,8 @@ public class Manager {
                 return Response.status(Response.Status.UNAUTHORIZED).build();
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            Logger.getLogger("LogGeral").log(Level.SEVERE, ex.getMessage(), ex);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(ex)).build();
         }
     }
 
@@ -142,35 +154,40 @@ public class Manager {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/criarEstabelecimento")
     public Response criarEstabelecimento(@QueryParam("login") String login, @QueryParam("senha") String senha, @FormParam("estabelecimento") String estabelecimento) {
-        Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
-        if (usuario != null) {
-            if (usuario.getTipoUsuario() == TipoUsuario.SUPER_ADMIN || usuario.getEstabelecimentos().size() + 1 <= usuario.getMaxEstabelecimentos()) {
-                Estabelecimento estabelecimento1 = builder.fromJson(estabelecimento, Estabelecimento.class);
-                if (estabelecimento1.getUuid() != null && !usuario.getEstabelecimentos().contains(estabelecimento1)) {
+        try {
+            Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
+            if (usuario != null) {
+                if (usuario.getTipoUsuario() == TipoUsuario.SUPER_ADMIN || usuario.getEstabelecimentos().size() + 1 <= usuario.getMaxEstabelecimentos()) {
+                    Estabelecimento estabelecimento1 = builder.fromJson(estabelecimento, Estabelecimento.class);
+                    if (estabelecimento1.getUuid() != null && !usuario.getEstabelecimentos().contains(estabelecimento1)) {
+                        return Response.status(Response.Status.BAD_REQUEST).build();
+                    }
+                    if (estabelecimento1.getTiposEntregas() == null || estabelecimento1.getTiposEntregas().isEmpty()) {
+                        estabelecimento1.setTiposEntregas(new ArrayList<>());
+                        TipoEntrega tipoEntrega = new TipoEntrega();
+                        tipoEntrega.setNome("Retirada");
+                        estabelecimento1.getTiposEntregas().add(tipoEntrega);
+                        tipoEntrega = new TipoEntrega();
+                        tipoEntrega.setNome("Entrega");
+                        tipoEntrega.setSolicitarEndereco(true);
+                        estabelecimento1.getTiposEntregas().add(tipoEntrega);
+                    }
+                    if (ControleEstabelecimentos.getInstance().criarEstabelecimento(usuario, estabelecimento1)) {
+                        estabelecimento1 = ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(estabelecimento1.getUuid());
+                        usuario.getEstabelecimentos().add(estabelecimento1);
+                        return Response.status(Response.Status.CREATED).entity(builder.toJson(estabelecimento1)).build();
+                    } else {
+                        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                    }
+                } else {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
-                if (estabelecimento1.getTiposEntregas() == null || estabelecimento1.getTiposEntregas().isEmpty()) {
-                    estabelecimento1.setTiposEntregas(new ArrayList<>());
-                    TipoEntrega tipoEntrega = new TipoEntrega();
-                    tipoEntrega.setNome("Retirada");
-                    estabelecimento1.getTiposEntregas().add(tipoEntrega);
-                    tipoEntrega = new TipoEntrega();
-                    tipoEntrega.setNome("Entrega");
-                    tipoEntrega.setSolicitarEndereco(true);
-                    estabelecimento1.getTiposEntregas().add(tipoEntrega);
-                }
-                if (ControleEstabelecimentos.getInstance().criarEstabelecimento(usuario, estabelecimento1)) {
-                    estabelecimento1 = ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(estabelecimento1.getUuid());
-                    usuario.getEstabelecimentos().add(estabelecimento1);
-                    return Response.status(Response.Status.CREATED).entity(builder.toJson(estabelecimento1)).build();
-                } else {
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-                }
             } else {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             }
-        } else {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+        } catch (SQLException e) {
+            Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
         }
     }
 
@@ -178,22 +195,27 @@ public class Manager {
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/excluirEstabelecimento")
     public Response excluirEstabelecimento(@QueryParam("login") String login, @QueryParam("senha") String senha, @QueryParam("uuid") String uuid) {
-        Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
-        if (usuario != null) {
-            Estabelecimento estabelecimento1 = ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(uuid));
-            if (!usuario.getEstabelecimentos().contains(estabelecimento1)) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            }
-            if (ControleEstabelecimentos.getInstance().excluirEstabelecimento(estabelecimento1)) {
-                synchronized (usuario.getEstabelecimentos()) {
-                    usuario.getEstabelecimentos().remove(estabelecimento1);
+        try {
+            Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha);
+            if (usuario != null) {
+                Estabelecimento estabelecimento1 = ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(uuid));
+                if (!usuario.getEstabelecimentos().contains(estabelecimento1)) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
                 }
-                return Response.status(Response.Status.OK).build();
+                if (ControleEstabelecimentos.getInstance().excluirEstabelecimento(estabelecimento1)) {
+                    synchronized (usuario.getEstabelecimentos()) {
+                        usuario.getEstabelecimentos().remove(estabelecimento1);
+                    }
+                    return Response.status(Response.Status.OK).build();
+                } else {
+                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                }
             } else {
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+                return Response.status(Response.Status.UNAUTHORIZED).build();
             }
-        } else {
-            return Response.status(Response.Status.UNAUTHORIZED).build();
+        } catch (SQLException | IOException e) {
+            Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
         }
     }
 

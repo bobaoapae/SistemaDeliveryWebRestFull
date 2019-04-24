@@ -34,7 +34,7 @@ public class ControleAdicionais {
         }
     }
 
-    public AdicionalProduto getAdicionalByUUID(UUID uuid) {
+    public AdicionalProduto getAdicionalByUUID(UUID uuid) throws SQLException {
         if (adicionais.containsKey(uuid)) {
             return adicionais.get(uuid);
         }
@@ -50,13 +50,12 @@ public class ControleAdicionais {
                 adicional.setGrupoAdicional(ControleGruposAdicionais.getInstance().getGrupoByUUID(adicional.getUuid_grupo_adicional()));
                 return adicionais.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean salvarAdicional(AdicionalProduto adicionalProduto) {
+    public boolean salvarAdicional(AdicionalProduto adicionalProduto) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             if (adicionalProduto.getUuid() == null || this.getAdicionalByUUID(adicionalProduto.getUuid()) == null) {
@@ -101,12 +100,11 @@ public class ControleAdicionais {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
-    public boolean excluirAdicional(AdicionalProduto adicionalProduto) {
+    public boolean excluirAdicional(AdicionalProduto adicionalProduto) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Adicionais\" set ativo = ? where uuid = ?")) {
@@ -128,13 +126,12 @@ public class ControleAdicionais {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
 
-    public List<AdicionalProduto> getAdicionaisGrupo(GrupoAdicional grupo) {
+    public List<AdicionalProduto> getAdicionaisGrupo(GrupoAdicional grupo) throws SQLException {
         List<AdicionalProduto> adicionais = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Adicionais\" where uuid_grupo_adicional = ? and ativo order by \"dataCriacao\" ");
@@ -146,12 +143,12 @@ public class ControleAdicionais {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return adicionais;
     }
 
-    public List<AdicionalProduto> getAdicionaisItemPedido(ItemPedido item) {
+    public List<AdicionalProduto> getAdicionaisItemPedido(ItemPedido item) throws SQLException {
         List<AdicionalProduto> adicionais = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid_adicional from \"Adicionais_Items_Pedidos\" as a inner join \"Adicionais\" as b on a.uuid_adicional = b.uuid inner join \"Grupos_Adicionais\" as c on b.uuid_grupo_adicional = c.uuid where uuid_item_pedido = ? order by uuid_produto asc,b.nome asc");
@@ -163,7 +160,7 @@ public class ControleAdicionais {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return adicionais;
     }

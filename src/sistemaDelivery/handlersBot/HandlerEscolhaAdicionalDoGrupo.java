@@ -125,8 +125,10 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                         textNewLine("*2* - Não");
                 chat.getChat().sendMessage(builder.build());
                 return true;
+            } catch (NumberFormatException ex) {
+                return false;
             } catch (Exception ex) {
-                ex.printStackTrace();
+                getChatBotDelivery().getChat().getDriver().onError(ex);
                 return false;
             }
         } else {

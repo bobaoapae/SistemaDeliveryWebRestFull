@@ -37,7 +37,7 @@ public class ControleReservas {
         }
     }
 
-    public Reserva getReservaByUUID(UUID uuid) {
+    public Reserva getReservaByUUID(UUID uuid) throws SQLException {
         if (reservas.containsKey(uuid)) {
             return reservas.get(uuid);
         }
@@ -54,13 +54,12 @@ public class ControleReservas {
                 reserva.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(reserva.getUuid_estabelecimento()));
                 return reservas.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean salvarReserva(Reserva reserva) {
+    public boolean salvarReserva(Reserva reserva) throws IOException, SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             if (reserva.getUuid() == null) {
@@ -100,10 +99,10 @@ public class ControleReservas {
                             sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("nova-reserva", reserva.getUuid().toString()));
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        throw e;
                     }
                     return true;
-                } catch (SQLException ex) {
+                } catch (SQLException | IOException ex) {
                     connection.rollback();
                     throw ex;
                 } finally {
@@ -136,13 +135,12 @@ public class ControleReservas {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException | IOException ex) {
+            throw ex;
         }
-        return false;
     }
 
-    public boolean excluirReserva(Reserva reserva) {
+    public boolean excluirReserva(Reserva reserva) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("delete from \"Reservas\" where uuid = ? and uuid_estabelecimento = ?")) {
@@ -165,12 +163,11 @@ public class ControleReservas {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public List<Reserva> getReservasCliente(Cliente cliente, Estabelecimento estabelecimento) {
+    public List<Reserva> getReservasCliente(Cliente cliente, Estabelecimento estabelecimento) throws SQLException {
         List<Reserva> reservas = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select * from \"Reservas\" where uuid_cliente = ? and uuid_estabelecimento = ?")) {
@@ -182,12 +179,12 @@ public class ControleReservas {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return reservas;
     }
 
-    public List<Reserva> getReservasEstabelecimento(Estabelecimento estabelecimento) {
+    public List<Reserva> getReservasEstabelecimento(Estabelecimento estabelecimento) throws SQLException {
         List<Reserva> reservas = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select * from \"Reservas\" where uuid_estabelecimento = ?")) {
@@ -198,12 +195,12 @@ public class ControleReservas {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return reservas;
     }
 
-    public List<Reserva> getReservasImprimir(Estabelecimento estabelecimento) {
+    public List<Reserva> getReservasImprimir(Estabelecimento estabelecimento) throws SQLException {
         List<Reserva> reservas = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select * from \"Reservas\" where uuid_estabelecimento = ? and impresso = false")) {
@@ -214,12 +211,12 @@ public class ControleReservas {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return reservas;
     }
 
-    public List<Reserva> getReservasCliente(Cliente cliente) {
+    public List<Reserva> getReservasCliente(Cliente cliente) throws SQLException {
         List<Reserva> reservas = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select * from \"Reservas\" where uuid_cliente = ?")) {
@@ -230,7 +227,7 @@ public class ControleReservas {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return reservas;
     }

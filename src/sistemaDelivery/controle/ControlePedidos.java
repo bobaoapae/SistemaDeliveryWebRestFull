@@ -41,7 +41,7 @@ public class ControlePedidos {
         }
     }
 
-    public Pedido getPedidoByUUID(UUID uuid) {
+    public Pedido getPedidoByUUID(UUID uuid) throws SQLException {
         if (pedidos.containsKey(uuid)) {
             return pedidos.get(uuid);
         }
@@ -60,13 +60,12 @@ public class ControlePedidos {
                 pedido.setTipoEntrega(ControleTiposEntrega.getInstance().getTipoEntregaByUUID(pedido.getUuid_tipoEntrega()));
                 return pedidos.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean salvarPedido(Pedido pedido) {
+    public boolean salvarPedido(Pedido pedido) throws IOException, SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             if (pedido.getUuid() == null) {
@@ -137,10 +136,10 @@ public class ControlePedidos {
                             sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("novo-pedido", pedido.getUuid().toString()));
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        throw e;
                     }
                     return true;
-                } catch (SQLException ex) {
+                } catch (SQLException | IOException ex) {
                     connection.rollback();
                     throw ex;
                 } finally {
@@ -197,13 +196,12 @@ public class ControlePedidos {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException ex) {
-            ex.printStackTrace();
+        } catch (SQLException | IOException ex) {
+            throw ex;
         }
-        return false;
     }
 
-    public List<Pedido> getPedidosCliente(Cliente cliente) {
+    public List<Pedido> getPedidosCliente(Cliente cliente) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_cliente = ?  order by \"dataPedido\" asc");
@@ -215,12 +213,12 @@ public class ControlePedidos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return pedidos;
     }
 
-    public List<Pedido> getPedidosDoDia(Estabelecimento estabelecimento) {
+    public List<Pedido> getPedidosDoDia(Estabelecimento estabelecimento) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"dataPedido\" >= ? order by \"dataPedido\" asc");
@@ -233,12 +231,12 @@ public class ControlePedidos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return pedidos;
     }
 
-    public List<Pedido> getPedidosNaoImpressos(Estabelecimento estabelecimento) {
+    public List<Pedido> getPedidosNaoImpressos(Estabelecimento estabelecimento) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!='Cancelado' and \"estadoPedido\"!='Concluido' and not impresso order by \"dataPedido\" asc");
@@ -250,12 +248,12 @@ public class ControlePedidos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return pedidos;
     }
 
-    public List<Pedido> getPedidosAtivos(Estabelecimento estabelecimento) {
+    public List<Pedido> getPedidosAtivos(Estabelecimento estabelecimento) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!=? and \"estadoPedido\"!=? order by \"dataPedido\" asc");
@@ -269,12 +267,12 @@ public class ControlePedidos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return pedidos;
     }
 
-    public List<Pedido> getPedidosBetween(Estabelecimento estabelecimento, Date data1, Date data2) {
+    public List<Pedido> getPedidosBetween(Estabelecimento estabelecimento, Date data1, Date data2) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection connection = Conexao.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!='Cancelado' and \"dataPedido\" between ? and ?")
@@ -291,12 +289,12 @@ public class ControlePedidos {
                 pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
         return pedidos;
     }
 
-    public List<Pedido> getPedidosDoMes(Estabelecimento estabelecimento) {
+    public List<Pedido> getPedidosDoMes(Estabelecimento estabelecimento) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection connection = Conexao.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!='Cancelado' and EXTRACT(YEAR FROM \"dataPedido\") = EXTRACT(YEAR FROM current_timestamp) and EXTRACT(MONTH FROM \"dataPedido\") = EXTRACT(MONTH FROM current_timestamp)")
@@ -308,12 +306,12 @@ public class ControlePedidos {
                 pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
         return pedidos;
     }
 
-    public HashMap<String, Integer> getDadosDeliveryHoje(Estabelecimento estabelecimento) {
+    public HashMap<String, Integer> getDadosDeliveryHoje(Estabelecimento estabelecimento) throws SQLException {
         HashMap<String, Integer> map = new HashMap<>();
         map.put("Concluido", 0);
         map.put("Novo", 0);
@@ -326,12 +324,12 @@ public class ControlePedidos {
                 map.put(resultSet.getString(1), resultSet.getInt(2));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
         return map;
     }
 
-    public HashMap<Integer, Integer> getEntregasPorHorario(Estabelecimento estabelecimento, Date data1) {
+    public HashMap<Integer, Integer> getEntregasPorHorario(Estabelecimento estabelecimento, Date data1) throws SQLException {
         HashMap<Integer, Integer> map = new HashMap<>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(data1.getTime());
@@ -349,12 +347,12 @@ public class ControlePedidos {
                 map.put(resultSet.getInt("hora"), resultSet.getInt("total"));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
         return map;
     }
 
-    public HashMap<String, Integer> getEntregasPorDiaSemana(Estabelecimento estabelecimento, Date data1, Date data2) {
+    public HashMap<String, Integer> getEntregasPorDiaSemana(Estabelecimento estabelecimento, Date data1, Date data2) throws SQLException {
         HashMap<String, Integer> map = new HashMap<>();
         Calendar calendar = Calendar.getInstance();
         Calendar calendar2 = Calendar.getInstance();
@@ -373,12 +371,12 @@ public class ControlePedidos {
                 map.put(Utilitarios.getDayOfWeekName(resultSet.getInt("diaSemana")), resultSet.getInt("total"));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
         return map;
     }
 
-    public HashMap<String, HashMap<String, Double>> getReceitaPeriodo(Estabelecimento estabelecimento, Date data1, Date data2) {
+    public HashMap<String, HashMap<String, Double>> getReceitaPeriodo(Estabelecimento estabelecimento, Date data1, Date data2) throws SQLException {
         HashMap<String, HashMap<String, Double>> lista = new HashMap<>();
         HashMap<String, Double> map = new HashMap<>();
         HashMap<String, Double> map2 = new HashMap<>();
@@ -429,7 +427,7 @@ public class ControlePedidos {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
         for (Map.Entry<String, Double> entry : map.entrySet()) {
             map3.put(entry.getKey(), entry.getValue() + map2.get(entry.getKey()));
@@ -437,7 +435,7 @@ public class ControlePedidos {
         return lista;
     }
 
-    public List<Pedido> getPedidosComProduto(Produto produto) {
+    public List<Pedido> getPedidosComProduto(Produto produto) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection connection = Conexao.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("select distinct(b.uuid) from \"Items_Pedidos\" as a \n" +
@@ -451,12 +449,12 @@ public class ControlePedidos {
                 pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
         return pedidos;
     }
 
-    public List<Pedido> getPedidos(Estabelecimento estabelecimento) {
+    public List<Pedido> getPedidos(Estabelecimento estabelecimento) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? order by \"dataPedido\" asc");
@@ -468,7 +466,7 @@ public class ControlePedidos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return pedidos;
     }

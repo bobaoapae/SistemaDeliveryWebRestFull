@@ -13,6 +13,7 @@ import sistemaDelivery.modelo.Categoria;
 import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
 
+import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -39,24 +40,28 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
         Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
         LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
-        for (Categoria c : ControleCategorias.getInstance().getCategoriasEstabelecimento(getChatBotDelivery().getEstabelecimento())) {
-            if (c.equals(this.c) || !c.isVisivel() || (c.getProdutos().isEmpty() && c.getCategoriasFilhas().isEmpty())) {
-                continue;
-            }
-            if (c.getRestricaoVisibilidade() != null) {
-                if (c.getRestricaoVisibilidade().isRestricaoDia()) {
-                    if (!c.getRestricaoVisibilidade().getDiasSemana()[diaSemana]) {
-                        continue;
+        try {
+            for (Categoria c : ControleCategorias.getInstance().getCategoriasEstabelecimento(getChatBotDelivery().getEstabelecimento())) {
+                if (c.equals(this.c) || !c.isVisivel() || (c.getProdutos().isEmpty() && c.getCategoriasFilhas().isEmpty())) {
+                    continue;
+                }
+                if (c.getRestricaoVisibilidade() != null) {
+                    if (c.getRestricaoVisibilidade().isRestricaoDia()) {
+                        if (!c.getRestricaoVisibilidade().getDiasSemana()[diaSemana]) {
+                            continue;
+                        }
+                    }
+                    if (c.getRestricaoVisibilidade().isRestricaoHorario()) {
+                        if (!(horaAtual.isAfter(c.getRestricaoVisibilidade().getHorarioDe().toLocalTime()) && horaAtual.isBefore(c.getRestricaoVisibilidade().getHorarioAte().toLocalTime()))) {
+                            continue;
+                        }
                     }
                 }
-                if (c.getRestricaoVisibilidade().isRestricaoHorario()) {
-                    if (!(horaAtual.isAfter(c.getRestricaoVisibilidade().getHorarioDe().toLocalTime()) && horaAtual.isBefore(c.getRestricaoVisibilidade().getHorarioAte().toLocalTime()))) {
-                        continue;
-                    }
-                }
+                codigosMenu.add(new HandlerMenuCategoria(c, chat));
+                builder.textNewLine("*" + (codigosMenu.size()) + "* - Pedir " + c.getNomeCategoria());
             }
-            codigosMenu.add(new HandlerMenuCategoria(c, chat));
-            builder.textNewLine("*" + (codigosMenu.size()) + "* - Pedir " + c.getNomeCategoria());
+        } catch (SQLException e) {
+            getChatBotDelivery().getChat().getDriver().onError(e);
         }
         codigosMenu.add(new HandlerAdeus(chat));
         builder.textNewLine("*" + (codigosMenu.size()) + "* - Cancelar Pedido ❌");

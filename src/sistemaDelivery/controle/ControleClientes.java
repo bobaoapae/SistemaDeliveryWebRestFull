@@ -34,7 +34,7 @@ public class ControleClientes {
         }
     }
 
-    public Cliente getClienteByUUID(UUID uuid) {
+    public Cliente getClienteByUUID(UUID uuid) throws SQLException {
         if (clientes.containsKey(uuid)) {
             return clientes.get(uuid);
         }
@@ -50,13 +50,12 @@ public class ControleClientes {
                 cliente.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(cliente.getUuid_estabelecimento()));
                 return clientes.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public Cliente getClienteChatId(String chatid, Estabelecimento estabelecimento) {
+    public Cliente getClienteChatId(String chatid, Estabelecimento estabelecimento) throws SQLException {
         try (Connection connection = Conexao.getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("select uuid from \"Clientes\" where \"chatId\" !='' and \"chatId\" = ? and uuid_estabelecimento = ?")) {
             preparedStatement.setString(1, chatid);
             preparedStatement.setObject(2, estabelecimento.getUuid());
@@ -66,12 +65,12 @@ public class ControleClientes {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return null;
     }
 
-    public boolean salvarCliente(Cliente cliente) {
+    public boolean salvarCliente(Cliente cliente) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             if (cliente.getUuid() == null || getClienteByUUID(cliente.getUuid()) == null) {
@@ -148,13 +147,12 @@ public class ControleClientes {
                 }
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
 
-    public List<Cliente> getClientes(Estabelecimento estabelecimento) {
+    public List<Cliente> getClientes(Estabelecimento estabelecimento) throws SQLException {
         List<Cliente> clientes = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Clientes\" where uuid_estabelecimento = ?");
@@ -166,12 +164,12 @@ public class ControleClientes {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return clientes;
     }
 
-    public List<Cliente> getClientesCompraramEstabelecimento(Estabelecimento estabelecimento) {
+    public List<Cliente> getClientesCompraramEstabelecimento(Estabelecimento estabelecimento) throws SQLException {
         List<Cliente> clientes = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Clientes\" where uuid in (select uuid_cliente from \"Pedidos\" where uuid_estabelecimento = ?)");
@@ -183,7 +181,7 @@ public class ControleClientes {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return clientes;
     }

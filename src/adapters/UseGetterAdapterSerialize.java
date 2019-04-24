@@ -11,6 +11,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UseGetterAdapterSerialize<K> implements JsonSerializer<K> {
     @Override
@@ -25,11 +27,11 @@ public class UseGetterAdapterSerialize<K> implements JsonSerializer<K> {
                     Method method = o.getClass().getMethod(exposeGetter.methodName());
                     valoresAtualizar.put(exposeGetter.nameExpose(), jsonSerializationContext.serialize(method.invoke(o)));
                 } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
+                    Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
                 } catch (IllegalAccessException e) {
-                    e.printStackTrace();
+                    Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
                 } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
                 }
             }
         }

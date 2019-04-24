@@ -32,7 +32,7 @@ public class ControleRodizios {
         }
     }
 
-    public Rodizio getRodizioByUUID(UUID uuid) {
+    public Rodizio getRodizioByUUID(UUID uuid) throws SQLException {
         if (rodizios.containsKey(uuid)) {
             return rodizios.get(uuid);
         }
@@ -58,13 +58,12 @@ public class ControleRodizios {
                 rodizio.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(rodizio.getUuid_estabelecimento()));
                 return rodizios.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean salvarRodizio(Rodizio rodizio) {
+    public boolean salvarRodizio(Rodizio rodizio) throws SQLException {
         try (Connection connection = Conexao.getConnection();) {
             connection.setAutoCommit(false);
             if (rodizio.getUuid() == null) {
@@ -119,12 +118,11 @@ public class ControleRodizios {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public boolean excluirRodizio(Rodizio rodizio) {
+    public boolean excluirRodizio(Rodizio rodizio) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Rodizios\" set ativo = ? where uuid = ? and uuid_estabelecimento = ?")) {
@@ -151,12 +149,11 @@ public class ControleRodizios {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public List<Rodizio> getRodiziosEstabelecimento(Estabelecimento estabelecimento) {
+    public List<Rodizio> getRodiziosEstabelecimento(Estabelecimento estabelecimento) throws SQLException {
         List<Rodizio> rodizios = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Rodizios\" where uuid_estabelecimento = ? and ativo order by \"dataCriacao\" ");
@@ -168,7 +165,7 @@ public class ControleRodizios {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return rodizios;
     }

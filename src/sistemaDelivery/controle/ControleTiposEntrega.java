@@ -33,7 +33,7 @@ public class ControleTiposEntrega {
         }
     }
 
-    public TipoEntrega getTipoEntregaByUUID(UUID uuid) {
+    public TipoEntrega getTipoEntregaByUUID(UUID uuid) throws SQLException {
         if (tiposEntrega.containsKey(uuid)) {
             return tiposEntrega.get(uuid);
         }
@@ -49,9 +49,8 @@ public class ControleTiposEntrega {
                 tipoEntrega.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(tipoEntrega.getUuid_estabelecimento()));
                 return tiposEntrega.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
@@ -94,7 +93,7 @@ public class ControleTiposEntrega {
         }
     }
 
-    public boolean salvarTipoEntrega(TipoEntrega tipoEntrega) {
+    public boolean salvarTipoEntrega(TipoEntrega tipoEntrega) throws SQLException {
         try (Connection connection = Conexao.getConnection();) {
             connection.setAutoCommit(false);
             if (tipoEntrega.getUuid() == null || this.getTipoEntregaByUUID(tipoEntrega.getUuid()) == null) {
@@ -145,12 +144,11 @@ public class ControleTiposEntrega {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public List<TipoEntrega> getTiposEntregasEstabelecimento(Estabelecimento es) {
+    public List<TipoEntrega> getTiposEntregasEstabelecimento(Estabelecimento es) throws SQLException {
         List<TipoEntrega> tipoEntregas = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"TiposEntregas\" where uuid_estabelecimento = ? and ativo order by valor asc, uuid desc ");
@@ -162,12 +160,12 @@ public class ControleTiposEntrega {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return tipoEntregas;
     }
 
-    public boolean excluirTipoEntrega(TipoEntrega tipoEntrega) {
+    public boolean excluirTipoEntrega(TipoEntrega tipoEntrega) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("update \"TiposEntregas\" set ativo = ? where uuid = ? and uuid_estabelecimento = ?")) {
@@ -194,9 +192,8 @@ public class ControleTiposEntrega {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
 }

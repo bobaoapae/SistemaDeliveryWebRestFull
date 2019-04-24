@@ -2,6 +2,7 @@ package restFul.modelo;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import restFul.controle.ControleSessions;
 import restFul.controle.ControleTokens;
 import utils.DateUtils;
@@ -14,7 +15,10 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Provider
 @PreMatching
@@ -35,7 +39,14 @@ public class AuthenticationToken implements ContainerRequestFilter {
                 } else {
                     token = containerRequestContext.getCookies().get("token").getValue();
                 }
-                Token k = ControleTokens.getInstance().getToken(token);
+                Token k = null;
+                try {
+                    k = ControleTokens.getInstance().getToken(token);
+                } catch (SQLException e) {
+                    Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+                    containerRequestContext.abortWith(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build());
+                    return;
+                }
                 if (k != null) {
                     if (DateUtils.isAfterDay(k.getValidade(), new Date())) {
                         TokenSecurityContext securityContext = new TokenSecurityContext(k);

@@ -6,6 +6,8 @@ import modelo.MessageBuilder;
 import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.TipoEntrega;
 
+import java.sql.SQLException;
+
 public class HandlerRetiradaAutomatica extends HandlerBotDelivery {
     public HandlerRetiradaAutomatica(ChatBot chat) {
         super(chat);
@@ -40,9 +42,14 @@ public class HandlerRetiradaAutomatica extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message message) {
         if (message.getContent().trim().equals("1")) {
-            if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
-                chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
-            } else {
+            try {
+                if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
+                    chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
+                } else {
+                    chat.setHandler(new HandlerDesejaAgendar(chat), true);
+                }
+            } catch (SQLException e) {
+                getChatBotDelivery().getChat().getDriver().onError(e);
                 chat.setHandler(new HandlerDesejaAgendar(chat), true);
             }
             return true;

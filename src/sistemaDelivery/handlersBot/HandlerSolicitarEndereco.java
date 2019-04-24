@@ -49,6 +49,7 @@ public class HandlerSolicitarEndereco extends HandlerBotDelivery {
                 ((ChatBotDelivery) chat).getPedidoAtual().setEndereco(endereco);
             } catch (Exception ex) {
                 chat.getChat().sendMessage("Desculpe, não consegui achar seu endereço com base na sua localização.");
+                getChatBotDelivery().getChat().getDriver().onError(ex);
                 return false;
             }
         } else {

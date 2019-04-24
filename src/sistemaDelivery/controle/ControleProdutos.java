@@ -34,7 +34,7 @@ public class ControleProdutos {
         }
     }
 
-    public Produto getProdutoByUUID(UUID uuid) {
+    public Produto getProdutoByUUID(UUID uuid) throws SQLException {
         if (produtos.containsKey(uuid)) {
             return produtos.get(uuid);
         }
@@ -52,13 +52,12 @@ public class ControleProdutos {
                 produto.setGruposAdicionais(ControleGruposAdicionais.getInstance().getGruposProduto(produto));
                 return produtos.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean salvarProduto(Produto prod) {
+    public boolean salvarProduto(Produto prod) throws SQLException {
         try (Connection connection = Conexao.getConnection();) {
             connection.setAutoCommit(false);
             if (prod.getUuid() == null || this.getProdutoByUUID(prod.getUuid()) == null) {
@@ -129,12 +128,11 @@ public class ControleProdutos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public boolean excluirProduto(Produto prod) {
+    public boolean excluirProduto(Produto prod) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Produtos\" set ativo = ? where uuid = ? and uuid_categoria = ?")) {
@@ -161,13 +159,12 @@ public class ControleProdutos {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
 
-    public List<Produto> getProdutosCategoria(Categoria cat) {
+    public List<Produto> getProdutosCategoria(Categoria cat) throws SQLException {
         List<Produto> produtos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Produtos\" where uuid_categoria = ? and ativo order by \"dataCriacao\" ");
@@ -179,12 +176,12 @@ public class ControleProdutos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return produtos;
     }
 
-    public List<Produto> getProdutosEstabelecimento(Estabelecimento estabelecimento) {
+    public List<Produto> getProdutosEstabelecimento(Estabelecimento estabelecimento) throws SQLException {
         List<Produto> produtos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select a.uuid from \"Produtos\" as a inner join \"Categorias\" as b on a.uuid_categoria = b.uuid where b.uuid_estabelecimento = ? and a.ativo and b.ativo order by a.\"dataCriacao\" ");
@@ -196,7 +193,7 @@ public class ControleProdutos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return produtos;
     }

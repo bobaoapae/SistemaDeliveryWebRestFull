@@ -46,8 +46,8 @@ public class HandlerAgendamentoPedido extends HandlerBotDelivery {
             } else {
                 return false;
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        } catch (Exception e) {
+            getChatBotDelivery().getChat().getDriver().onError(e);
             return false;
         }
     }

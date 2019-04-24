@@ -33,7 +33,7 @@ public class ControleCategorias {
         }
     }
 
-    public Categoria getCategoriaByUUID(UUID uuid) {
+    public Categoria getCategoriaByUUID(UUID uuid) throws SQLException {
         if (categorias.containsKey(uuid)) {
             return categorias.get(uuid);
         }
@@ -59,13 +59,12 @@ public class ControleCategorias {
                 }
                 return categorias.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean salvarCategoria(Categoria cat) {
+    public boolean salvarCategoria(Categoria cat) throws SQLException {
         try (Connection connection = Conexao.getConnection();) {
             connection.setAutoCommit(false);
             if (cat.getUuid() == null || this.getCategoriaByUUID(cat.getUuid()) == null) {
@@ -187,12 +186,11 @@ public class ControleCategorias {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public boolean excluirCategoria(Categoria cat) {
+    public boolean excluirCategoria(Categoria cat) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Categorias\" set ativo = ? where uuid = ? and uuid_estabelecimento = ?")) {
@@ -225,12 +223,11 @@ public class ControleCategorias {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public List<Categoria> getCategoriasFilhas(Categoria cat) {
+    public List<Categoria> getCategoriasFilhas(Categoria cat) throws SQLException {
         List<Categoria> categorias = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Categorias\" where uuid_categoria_pai = ? and ativo order by \"dataCriacao\" ");
@@ -242,12 +239,12 @@ public class ControleCategorias {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return categorias;
     }
 
-    public List<Categoria> getCategoriasEstabelecimento(Estabelecimento es) {
+    public List<Categoria> getCategoriasEstabelecimento(Estabelecimento es) throws SQLException {
         List<Categoria> categorias = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Categorias\" where uuid_estabelecimento = ? and uuid_categoria_pai is null and ativo order by \"ordemExibicao\" asc, uuid desc ");
@@ -259,12 +256,12 @@ public class ControleCategorias {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return categorias;
     }
 
-    public List<Categoria> getCategoriasNecessariasEntrega(Categoria cat) {
+    public List<Categoria> getCategoriasNecessariasEntrega(Categoria cat) throws SQLException {
         List<Categoria> categorias = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid_categoria_necessaria from \"Categorias_Necessarias_Entrega\" where uuid_categoria = ?");
@@ -276,7 +273,7 @@ public class ControleCategorias {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return categorias;
     }

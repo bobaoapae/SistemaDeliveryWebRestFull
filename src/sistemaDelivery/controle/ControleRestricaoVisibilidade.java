@@ -35,7 +35,7 @@ public class ControleRestricaoVisibilidade {
         }
     }
 
-    public RestricaoVisibilidade getRestricaoByUUID(UUID uuid) {
+    public RestricaoVisibilidade getRestricaoByUUID(UUID uuid) throws SQLException {
         if (restricoes.containsKey(uuid)) {
             return restricoes.get(uuid);
         }
@@ -62,13 +62,12 @@ public class ControleRestricaoVisibilidade {
                 restricao.setProduto(ControleProdutos.getInstance().getProdutoByUUID(restricao.getUuid_produto()));
                 return restricoes.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean salvarRestricao(Connection connection, RestricaoVisibilidade restricaoVisibilidade) {
+    public boolean salvarRestricao(Connection connection, RestricaoVisibilidade restricaoVisibilidade) throws SQLException {
         try {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Restricoes_Visibilidade\" (uuid, uuid_categoria, uuid_produto, \"restricaoHorario\", \"restricaoDia\", \"horarioDe\", \"horarioAte\", domingo, segunda, terca, quarta, quinta, sexta, sabado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
@@ -95,20 +94,19 @@ public class ControleRestricaoVisibilidade {
                 return true;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public boolean excluirRestricao(Categoria cat) {
+    public boolean excluirRestricao(Categoria cat) throws SQLException {
         return excluirRestricao(this.getRestricaoCategoria(cat));
     }
 
-    public boolean excluirRestricao(Produto produto) {
+    public boolean excluirRestricao(Produto produto) throws SQLException {
         return excluirRestricao(this.getRestricaoProduto(produto));
     }
 
-    public boolean excluirRestricao(RestricaoVisibilidade restricaoVisibilidade) {
+    public boolean excluirRestricao(RestricaoVisibilidade restricaoVisibilidade) throws SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("delete from \"Restricoes_Visibilidade\" where uuid = ?")) {
@@ -128,12 +126,11 @@ public class ControleRestricaoVisibilidade {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public RestricaoVisibilidade getRestricaoCategoria(Categoria cat) {
+    public RestricaoVisibilidade getRestricaoCategoria(Categoria cat) throws SQLException {
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Restricoes_Visibilidade\" where uuid_categoria = ?");
         ) {
@@ -144,12 +141,12 @@ public class ControleRestricaoVisibilidade {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return null;
     }
 
-    public RestricaoVisibilidade getRestricaoProduto(Produto produto) {
+    public RestricaoVisibilidade getRestricaoProduto(Produto produto) throws SQLException {
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Restricoes_Visibilidade\" where uuid_produto = ?");
         ) {
@@ -160,7 +157,7 @@ public class ControleRestricaoVisibilidade {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return null;
     }

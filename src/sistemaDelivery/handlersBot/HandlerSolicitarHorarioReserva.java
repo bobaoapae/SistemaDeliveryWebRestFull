@@ -52,7 +52,9 @@ public class HandlerSolicitarHorarioReserva extends HandlerBotDelivery {
                 return false;
             }
         } catch (ParseException ex) {
-            ex.printStackTrace();
+            return false;
+        } catch (Exception e) {
+            getChatBotDelivery().getChat().getDriver().onError(e);
             return false;
         }
     }

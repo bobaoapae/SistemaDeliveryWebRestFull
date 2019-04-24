@@ -37,7 +37,7 @@ public class ControleEstabelecimentos {
         }
     }
 
-    public Estabelecimento getEstabelecimentoByUUID(UUID uuid) {
+    public Estabelecimento getEstabelecimentoByUUID(UUID uuid) throws SQLException {
         if (estabelecimentos.containsKey(uuid)) {
             return estabelecimentos.get(uuid);
         }
@@ -56,13 +56,12 @@ public class ControleEstabelecimentos {
                 estabelecimento.setHorariosFuncionamento(ControleHorariosFuncionamento.getInstance().getHorariosFuncionamento(estabelecimento));
                 return estabelecimentos.get(uuid);
             } catch (SQLException e) {
-                e.printStackTrace();
+                throw e;
             }
-            return null;
         }
     }
 
-    public boolean criarEstabelecimento(Usuario usuario, Estabelecimento estabelecimento) {
+    public boolean criarEstabelecimento(Usuario usuario, Estabelecimento estabelecimento) throws SQLException {
         if (estabelecimento.getUuid() != null && getEstabelecimentoByUUID(estabelecimento.getUuid()) != null) {
             return this.salvarEstabelecimento(estabelecimento);
         }
@@ -127,12 +126,11 @@ public class ControleEstabelecimentos {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            throw ex;
         }
-        return false;
     }
 
-    public boolean salvarEstabelecimento(Estabelecimento estabelecimento) {
+    public boolean salvarEstabelecimento(Estabelecimento estabelecimento) throws SQLException {
         try (Connection connection = Conexao.getConnection();) {
             if (estabelecimento.getUuid() != null) {
                 connection.setAutoCommit(false);
@@ -186,12 +184,11 @@ public class ControleEstabelecimentos {
                 return false;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
-        return false;
     }
 
-    public boolean excluirEstabelecimento(Estabelecimento estabelecimento) {
+    public boolean excluirEstabelecimento(Estabelecimento estabelecimento) throws IOException, SQLException {
         try (Connection connection = Conexao.getConnection()) {
             connection.setAutoCommit(false);
             try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Estabelecimentos\" set ativo = ? where uuid = ?")) {
@@ -203,7 +200,7 @@ public class ControleEstabelecimentos {
                     try {
                         ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento).logout();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        throw e;
                     }
                     ControleSessions.getInstance().finalizarSessionForEstabelecimento(estabelecimento);
                 }
@@ -211,19 +208,18 @@ public class ControleEstabelecimentos {
                     estabelecimentos.remove(estabelecimento.getUuid());
                 }
                 return true;
-            } catch (SQLException ex) {
+            } catch (SQLException | IOException ex) {
                 connection.rollback();
                 throw ex;
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException | IOException e) {
+            throw e;
         }
-        return false;
     }
 
-    public List<Estabelecimento> getEstabelecimentosChatBotAberto() {
+    public List<Estabelecimento> getEstabelecimentosChatBotAberto() throws SQLException {
         List<Estabelecimento> estabelecimentos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Estabelecimentos\" where \"openChatBot\" and ativo");
@@ -234,12 +230,12 @@ public class ControleEstabelecimentos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return estabelecimentos;
     }
 
-    public List<Estabelecimento> getEstabelecimentosUsuario(Usuario u) {
+    public List<Estabelecimento> getEstabelecimentosUsuario(Usuario u) throws SQLException {
         List<Estabelecimento> estabelecimentos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid_estabelecimento from \"Estabelecimentos_Usuario\" as a inner join \"Estabelecimentos\" as b on a.uuid_estabelecimento=b.uuid where uuid_usuario = ? and ativo order by b.\"dataCriacao\"");
@@ -251,7 +247,7 @@ public class ControleEstabelecimentos {
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw e;
         }
         return estabelecimentos;
     }
