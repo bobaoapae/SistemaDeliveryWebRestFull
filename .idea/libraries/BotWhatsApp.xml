@@ -1,7 +1,7 @@
 <component name="libraryTable">
   <library name="BotWhatsApp">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/../BotWhatsApp/dist/BotWhatsApp.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../BotWhatsApp/out/artifacts/BotWhatsApp_jar/BotWhatsApp.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

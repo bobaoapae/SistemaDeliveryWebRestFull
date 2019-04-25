@@ -5,7 +5,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import driver.WebWhatsDriver;
 import modelo.*;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import restFul.controle.ControleSessions;
 import sistemaDelivery.controle.ControleChatsAsync;
 import sistemaDelivery.controle.ControleClientes;
@@ -51,7 +50,7 @@ public class SistemaDelivery {
         try {
             FileHandler fh = new FileHandler("C:\\logs-web-whats\\" + estabelecimento.getNomeEstabelecimento() + " - " + estabelecimento.getUuid().toString().replaceAll("-", "") + ".txt", true);
             logger.addHandler(fh);
-            logger.addHandler(new Handler() {
+            /*logger.addHandler(new Handler() {
                 @Override
                 public void publish(LogRecord lr) {
                     try {
@@ -75,7 +74,7 @@ public class SistemaDelivery {
                 public void close() throws SecurityException {
                     //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
                 }
-            });
+            });*/
             logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
@@ -122,6 +121,13 @@ public class SistemaDelivery {
                 public void onNewMsg(Message msg) {
                     if (broadcasterWhats != null) {
                         broadcasterWhats.broadcast(sseWhats.newEvent("new-msg", builder.toJson(parser.parse(msg.getJsObject().toJSONString()))));
+                    }
+                }
+
+                @Override
+                public void onNewStatusV3Msg(Message msg) {
+                    if (broadcasterWhats != null) {
+                        broadcasterWhats.broadcast(sseWhats.newEvent("new-msg-v3", builder.toJson(parser.parse(msg.getJsObject().toJSONString()))));
                     }
                 }
             });
