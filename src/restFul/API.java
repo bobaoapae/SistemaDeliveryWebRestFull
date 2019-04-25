@@ -1575,7 +1575,7 @@ public class API {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
             Date dataInicio = dateFormat.parse(data1);
             Date dataFim = dateFormat.parse(data2);
-            HashMap<String, HashMap<String, Double>> lista = ControlePedidos.getInstance().getReceitaPeriodo(token.getEstabelecimento(), dataInicio, dataFim);
+            HashMap<String, LinkedHashMap<String, Double>> lista = ControlePedidos.getInstance().getReceitaPeriodo(token.getEstabelecimento(), dataInicio, dataFim);
             JsonObject object = new JsonObject();
             JsonArray array = new JsonArray();
             JsonArray array2 = new JsonArray();

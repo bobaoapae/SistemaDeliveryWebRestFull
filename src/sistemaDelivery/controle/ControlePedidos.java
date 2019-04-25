@@ -376,11 +376,11 @@ public class ControlePedidos {
         return map;
     }
 
-    public HashMap<String, HashMap<String, Double>> getReceitaPeriodo(Estabelecimento estabelecimento, Date data1, Date data2) throws SQLException {
-        HashMap<String, HashMap<String, Double>> lista = new HashMap<>();
-        HashMap<String, Double> map = new HashMap<>();
-        HashMap<String, Double> map2 = new HashMap<>();
-        HashMap<String, Double> map3 = new HashMap<>();
+    public HashMap<String, LinkedHashMap<String, Double>> getReceitaPeriodo(Estabelecimento estabelecimento, Date data1, Date data2) throws SQLException {
+        HashMap<String, LinkedHashMap<String, Double>> lista = new HashMap<>();
+        LinkedHashMap<String, Double> map = new LinkedHashMap<>();
+        LinkedHashMap<String, Double> map2 = new LinkedHashMap<>();
+        LinkedHashMap<String, Double> map3 = new LinkedHashMap<>();
         lista.put("entrega", map);
         lista.put("retirada", map2);
         lista.put("total", map3);
