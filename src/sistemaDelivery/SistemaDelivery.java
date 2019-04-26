@@ -195,6 +195,7 @@ public class SistemaDelivery {
                 logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
                 SimpleFormatter formatter = new SimpleFormatter();
                 fh.setFormatter(formatter);
+                loggers.put(estabelecimento, logger);
             } catch (SecurityException e) {
                 throw e;
             } catch (IOException e) {
