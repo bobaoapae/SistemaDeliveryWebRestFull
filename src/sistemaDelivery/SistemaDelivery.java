@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -44,45 +45,11 @@ public class SistemaDelivery {
     private TelaWhatsApp telaWhatsApp;
     private LocalDateTime timeStart;
     private Logger logger;
+    private static HashMap<Estabelecimento, Logger> loggers = new HashMap<>();
 
     public SistemaDelivery(Estabelecimento estabelecimento) throws IOException {
-        logger = Logger.getLogger(estabelecimento.getUuid().toString());
-        try {
-            FileHandler fh = new FileHandler("C:\\logs-web-whats\\" + estabelecimento.getNomeEstabelecimento() + " - " + estabelecimento.getUuid().toString().replaceAll("-", "") + ".txt", true);
-            logger.addHandler(fh);
-            /*logger.addHandler(new Handler() {
-                @Override
-                public void publish(LogRecord lr) {
-                    try {
-                        if (driver != null && driver.getEstadoDriver() != null && driver.getEstadoDriver() == EstadoDriver.LOGGED) {
-                            Chat c = driver.getFunctions().getChatByNumber("554491050665");
-                            if (c != null) {
-                                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Erro-> " + ExceptionUtils.getStackTrace(lr.getThrown()));
-                            }
-                        }
-                    } catch (Exception ex) {
+        logger = SistemaDelivery.createOrGetLogger(estabelecimento);
 
-                    }
-                }
-
-                @Override
-                public void flush() {
-                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-
-                @Override
-                public void close() throws SecurityException {
-                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-            });*/
-            logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
-            SimpleFormatter formatter = new SimpleFormatter();
-            fh.setFormatter(formatter);
-        } catch (SecurityException e) {
-            throw e;
-        } catch (IOException e) {
-            throw e;
-        }
         timeStart = estabelecimento.getDataComHoraAtual();
         this.estabelecimento = estabelecimento;
         parser = new JsonParser();
@@ -192,6 +159,49 @@ public class SistemaDelivery {
                 broadcaster.broadcast(sse.newEvent("none"));
             }
         }, 0, 20, TimeUnit.SECONDS);
+    }
+
+    private static Logger createOrGetLogger(Estabelecimento estabelecimento) throws IOException {
+        if (!loggers.containsKey(estabelecimento)) {
+            try {
+                Logger logger = Logger.getLogger(estabelecimento.getUuid().toString());
+                FileHandler fh = new FileHandler("C:\\logs-web-whats\\" + estabelecimento.getNomeEstabelecimento() + " - " + estabelecimento.getUuid().toString().replaceAll("-", "") + ".txt", true);
+                logger.addHandler(fh);
+            /*logger.addHandler(new Handler() {
+                @Override
+                public void publish(LogRecord lr) {
+                    try {
+                        if (driver != null && driver.getEstadoDriver() != null && driver.getEstadoDriver() == EstadoDriver.LOGGED) {
+                            Chat c = driver.getFunctions().getChatByNumber("554491050665");
+                            if (c != null) {
+                                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Erro-> " + ExceptionUtils.getStackTrace(lr.getThrown()));
+                            }
+                        }
+                    } catch (Exception ex) {
+
+                    }
+                }
+
+                @Override
+                public void flush() {
+                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+
+                @Override
+                public void close() throws SecurityException {
+                    //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+            });*/
+                logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
+                SimpleFormatter formatter = new SimpleFormatter();
+                fh.setFormatter(formatter);
+            } catch (SecurityException e) {
+                throw e;
+            } catch (IOException e) {
+                throw e;
+            }
+        }
+        return loggers.get(estabelecimento);
     }
 
     public boolean abrirPedidos() throws SQLException {
