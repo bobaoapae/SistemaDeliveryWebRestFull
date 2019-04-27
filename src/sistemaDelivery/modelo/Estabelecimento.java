@@ -16,7 +16,7 @@ public class Estabelecimento {
     private String nomeEstabelecimento, nomeBot, numeroAviso, webHookNovoPedido, webHookNovaReserva, logo;
     private int tempoMedioRetirada, tempoMedioEntrega;
     private boolean openPedidos, openChatBot, reservas, reservasComPedidosFechados, abrirFecharPedidosAutomatico;
-    private boolean agendamentoDePedidos, ativo;
+    private boolean agendamentoDePedidos, ativo, iniciarAutomaticamente;
     @Ignore
     private Date horaAberturaPedidos;
     private Time horaInicioReservas;
@@ -102,6 +102,14 @@ public class Estabelecimento {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public boolean isIniciarAutomaticamente() {
+        return iniciarAutomaticamente;
+    }
+
+    public void setIniciarAutomaticamente(boolean iniciarAutomaticamente) {
+        this.iniciarAutomaticamente = iniciarAutomaticamente;
     }
 
     public String getNomeEstabelecimento() {

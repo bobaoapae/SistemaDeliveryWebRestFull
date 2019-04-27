@@ -5,6 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import driver.WebWhatsDriver;
 import modelo.*;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import restFul.controle.ControleSessions;
 import restFul.modelo.Token;
 import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.*;
@@ -1356,7 +1357,7 @@ public class API {
     @GET
     @Path("/pedidoSaiuEntrega")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response pedidoSaiuEntrega(@QueryParam("uuid") String uuid) {
+    public Response pedidoSaiuEntrega(@QueryParam("uuid") String uuid, @QueryParam("notificar") @DefaultValue("false") boolean notificar) {
         try {
             if (uuid == null || uuid.isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
@@ -1370,6 +1371,12 @@ public class API {
             }
             pedido.setEstadoPedido(EstadoPedido.SaiuEntrega);
             if (ControlePedidos.getInstance().salvarPedido(pedido)) {
+                if (notificar) {
+                    Chat c = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatById(pedido.getCliente().getChatId());
+                    if (c != null) {
+                        c.sendMessage("Ótimas notícias " + c.getContact().getSafeName() + ", seu pedido já esta pronto e está saindo para a entrega!!");
+                    }
+                }
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -1383,7 +1390,7 @@ public class API {
     @GET
     @Path("/pedidoConcluido")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response pedidoConcluido(@QueryParam("uuid") String uuid) {
+    public Response pedidoConcluido(@QueryParam("uuid") String uuid, @QueryParam("notificar") @DefaultValue("false") boolean notificar) {
         try {
             if (uuid == null || uuid.isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
@@ -1397,6 +1404,14 @@ public class API {
             }
             pedido.setEstadoPedido(EstadoPedido.Concluido);
             if (ControlePedidos.getInstance().salvarPedido(pedido)) {
+                if (notificar) {
+                    if (!pedido.isEntrega()) {
+                        Chat c = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatById(pedido.getCliente().getChatId());
+                        if (c != null) {
+                            c.sendMessage("Ótimas notícias " + c.getContact().getSafeName() + ", seu pedido já esta pronto e aguardando a retirada!!");
+                        }
+                    }
+                }
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

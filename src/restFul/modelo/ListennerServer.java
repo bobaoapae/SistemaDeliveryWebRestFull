@@ -26,7 +26,7 @@ public class ListennerServer implements ServletContextListener {
             Logger logger = Logger.getLogger("LogGeral");
             FileHandler fh = new FileHandler("C:\\logs-web-whats\\LogGeral.txt", true);
             logger.addHandler(fh);
-            for (Estabelecimento estabelecimento : ControleEstabelecimentos.getInstance().getEstabelecimentosChatBotAberto()) {
+            for (Estabelecimento estabelecimento : ControleEstabelecimentos.getInstance().getEstabelecimentosIniciarAutomaticamente()) {
                 new Thread() {
                     public void run() {
                         try {

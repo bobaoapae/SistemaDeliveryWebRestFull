@@ -43,20 +43,17 @@ public class SistemaDelivery {
     private JsonParser parser;
     private Gson builder;
     private TelaWhatsApp telaWhatsApp;
-    private LocalDateTime timeStart;
     private Logger logger;
     private static HashMap<Estabelecimento, Logger> loggers = new HashMap<>();
 
     public SistemaDelivery(Estabelecimento estabelecimento) throws IOException {
         logger = SistemaDelivery.createOrGetLogger(estabelecimento);
-
-        timeStart = estabelecimento.getDataComHoraAtual();
         this.estabelecimento = estabelecimento;
         parser = new JsonParser();
         builder = Utilitarios.getDefaultGsonBuilder(null).create();
         onConnect = () -> {
-            if (!estabelecimento.isOpenChatBot()) {
-                estabelecimento.setOpenChatBot(true);
+            if (!estabelecimento.isIniciarAutomaticamente()) {
+                estabelecimento.setIniciarAutomaticamente(true);
                 try {
                     ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento);
                 } catch (SQLException e) {
@@ -118,21 +115,6 @@ public class SistemaDelivery {
         executores.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
-                if ((!estabelecimento.isOpenChatBot() || driver.getEstadoDriver() != EstadoDriver.LOGGED) && timeStart.plusMinutes(5).isBefore(estabelecimento.getDataComHoraAtual())) {
-                    if (estabelecimento.isOpenChatBot()) {
-                        estabelecimento.setOpenChatBot(false);
-                        try {
-                            ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento);
-                        } catch (SQLException e) {
-                            Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
-                        }
-                    }
-                    new Thread() {
-                        public void run() {
-                            ControleSessions.getInstance().finalizarSessionForEstabelecimento(estabelecimento);
-                        }
-                    }.start();
-                }
                 if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
                     LocalDateTime localDateTime = estabelecimento.getDataComHoraAtual();
                     if (estabelecimento.isTimeBeetwenHorarioFuncionamento(localDateTime.toLocalTime(), localDateTime.getDayOfWeek())) {
@@ -159,6 +141,23 @@ public class SistemaDelivery {
                 broadcaster.broadcast(sse.newEvent("none"));
             }
         }, 0, 20, TimeUnit.SECONDS);
+        executores.scheduleWithFixedDelay(() -> {
+            if ((!estabelecimento.isOpenChatBot() || driver.getEstadoDriver() != EstadoDriver.LOGGED) && (driver.getLastTimeLogged() == null || driver.getLastTimeLogged().plusMinutes(5).isBefore(LocalDateTime.now()))) {
+                if (estabelecimento.isIniciarAutomaticamente()) {
+                    estabelecimento.setIniciarAutomaticamente(false);
+                    try {
+                        ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento);
+                    } catch (SQLException e) {
+                        Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+                    }
+                }
+                new Thread() {
+                    public void run() {
+                        ControleSessions.getInstance().finalizarSessionForEstabelecimento(estabelecimento);
+                    }
+                }.start();
+            }
+        }, 5, 5, TimeUnit.MINUTES);
     }
 
     private static Logger createOrGetLogger(Estabelecimento estabelecimento) throws IOException {

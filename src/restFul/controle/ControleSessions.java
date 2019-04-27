@@ -14,7 +14,7 @@ public class ControleSessions {
     private Map<Estabelecimento, SistemaDelivery> sessions;
     private static final Object syncroniseGetInstance = new Object();
     private static boolean finalizado = false;
-    private Map<Estabelecimento, Integer> esperasGetEstabelecimento;
+    private Map<Estabelecimento, Long> esperasGetEstabelecimento;
 
     private ControleSessions() {
         this.sessions = Collections.synchronizedMap(new HashMap<>());
@@ -33,10 +33,12 @@ public class ControleSessions {
     public boolean checkSessionAtiva(Estabelecimento estabelecimento) {
         synchronized (esperasGetEstabelecimento) {
             if (esperasGetEstabelecimento.containsKey(estabelecimento)) {
-                try {
-                    Thread.sleep(esperasGetEstabelecimento.get(estabelecimento));
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                while (esperasGetEstabelecimento.get(estabelecimento) + 15000 < System.currentTimeMillis()) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 esperasGetEstabelecimento.remove(estabelecimento);
             }
@@ -52,10 +54,12 @@ public class ControleSessions {
         }
         synchronized (esperasGetEstabelecimento) {
             if (esperasGetEstabelecimento.containsKey(estabelecimento)) {
-                try {
-                    Thread.sleep(esperasGetEstabelecimento.get(estabelecimento));
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                while (esperasGetEstabelecimento.get(estabelecimento) + 15000 < System.currentTimeMillis()) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
                 esperasGetEstabelecimento.remove(estabelecimento);
             }
@@ -92,7 +96,7 @@ public class ControleSessions {
             return;
         }
         synchronized (esperasGetEstabelecimento) {
-            esperasGetEstabelecimento.put(estabelecimento, 15000);
+            esperasGetEstabelecimento.put(estabelecimento, System.currentTimeMillis());
         }
         synchronized (sessions) {
             if (sessions.containsKey(estabelecimento)) {

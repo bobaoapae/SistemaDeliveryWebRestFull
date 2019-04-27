@@ -140,7 +140,7 @@ public class ControleEstabelecimentos {
                         "       \"openChatBot\"=?, reservas=?, \"reservasComPedidosFechados\"=?, \n" +
                         "       \"abrirFecharPedidosAutomatico\"=?, \"agendamentoDePedidos\"=?, \"horaAberturaPedidos\"=?, \n" +
                         "       \"horaInicioReservas\"=?, \n" +
-                        "       \"webHookNovaReserva\"=? , \"webHookNovoPedido\"=?, logo=?,  \"valorSelo\"=?, \"maximoSeloPorCompra\"=?, \"validadeSeloFidelidade\"=?, \"timeZone\" = ?\n" +
+                        "       \"webHookNovaReserva\"=? , \"webHookNovoPedido\"=?, logo=?,  \"valorSelo\"=?, \"maximoSeloPorCompra\"=?, \"validadeSeloFidelidade\"=?, \"timeZone\" = ?, \"iniciarAutomaticamente\" = ? \n" +
                         " WHERE uuid=?;")) {
                     preparedStatement.setString(1, estabelecimento.getNomeEstabelecimento());
                     preparedStatement.setString(2, estabelecimento.getNomeBot());
@@ -166,7 +166,8 @@ public class ControleEstabelecimentos {
                     preparedStatement.setInt(18, estabelecimento.getMaximoSeloPorCompra());
                     preparedStatement.setInt(19, estabelecimento.getValidadeSeloFidelidade());
                     preparedStatement.setString(20, estabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
-                    preparedStatement.setObject(21, estabelecimento.getUuid());
+                    preparedStatement.setBoolean(21, estabelecimento.isIniciarAutomaticamente());
+                    preparedStatement.setObject(22, estabelecimento.getUuid());
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
                     connection.commit();
@@ -219,10 +220,10 @@ public class ControleEstabelecimentos {
         }
     }
 
-    public List<Estabelecimento> getEstabelecimentosChatBotAberto() throws SQLException {
+    public List<Estabelecimento> getEstabelecimentosIniciarAutomaticamente() throws SQLException {
         List<Estabelecimento> estabelecimentos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Estabelecimentos\" where \"openChatBot\" and ativo");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Estabelecimentos\" where \"iniciarAutomaticamente\" and ativo");
         ) {
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
