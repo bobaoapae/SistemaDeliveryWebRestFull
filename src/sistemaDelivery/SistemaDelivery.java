@@ -89,7 +89,7 @@ public class SistemaDelivery {
                 }
 
                 @Override
-                public void onNewStatusV3Msg(Message msg) {
+                public void onNewStatusV3(Message msg) {
                     if (broadcasterWhats != null) {
                         broadcasterWhats.broadcast(sseWhats.newEvent("new-msg-v3", builder.toJson(parser.parse(msg.getJsObject().toJSONString()))));
                     }

@@ -31,18 +31,6 @@ public class ControleSessions {
     }
 
     public boolean checkSessionAtiva(Estabelecimento estabelecimento) {
-        synchronized (esperasGetEstabelecimento) {
-            if (esperasGetEstabelecimento.containsKey(estabelecimento)) {
-                while (esperasGetEstabelecimento.get(estabelecimento) + 15000 < System.currentTimeMillis()) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                esperasGetEstabelecimento.remove(estabelecimento);
-            }
-        }
         synchronized (sessions) {
             return sessions.containsKey(estabelecimento);
         }
@@ -51,18 +39,6 @@ public class ControleSessions {
     public SistemaDelivery getSessionForEstabelecimento(Estabelecimento estabelecimento) throws IOException {
         if (finalizado) {
             return null;
-        }
-        synchronized (esperasGetEstabelecimento) {
-            if (esperasGetEstabelecimento.containsKey(estabelecimento)) {
-                while (esperasGetEstabelecimento.get(estabelecimento) + 15000 < System.currentTimeMillis()) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-                esperasGetEstabelecimento.remove(estabelecimento);
-            }
         }
         synchronized (sessions) {
             if (!sessions.containsKey(estabelecimento)) {
@@ -82,7 +58,7 @@ public class ControleSessions {
                 entry.getValue().finalizar();
                 System.out.println("Finalizado para - " + entry.getKey().getNomeEstabelecimento());
                 try {
-                    Thread.sleep(500);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
