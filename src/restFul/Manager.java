@@ -67,10 +67,10 @@ public class Manager {
         }
     }
 
-    @POST
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/create")
-    public Response create(@QueryParam("securePass") @DefaultValue("") String securePass, @FormParam("login") @DefaultValue("") String login, @FormParam("senha") @DefaultValue("") String senha, @FormParam("qtdEstabelecimentos") @DefaultValue("1") int qtdEstabelecimentos) {
+    public Response create(@QueryParam("securePass") @DefaultValue("") String securePass, @QueryParam("login") @DefaultValue("") String login, @QueryParam("senha") @DefaultValue("") String senha, @QueryParam("qtdEstabelecimentos") @DefaultValue("1") int qtdEstabelecimentos) {
         if (!securePass.equals("mkQZUJbvda8NDUAfqUhjc48PQjB5mvV5psxae6uBhvUG4eQcYCfarb9bWC9S3W4HDyaH3CUgqPgeerqr5dYW8ZdhFgUyTCAEvqq8hr5xDqybeUqKwxHjJ2kWKF5vAkz8")) {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         } else if (login.isEmpty() || senha.isEmpty()) {

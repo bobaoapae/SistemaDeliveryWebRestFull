@@ -102,7 +102,7 @@ public class ControleUsuarios {
                     throw new LoginInUse();
                 }
                 try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Usuarios\" (uuid, uuid_usuario_indicacao, usuario, senha, \"tipoUsuario\", \"maxEstabelecimentos\")" +
-                        "values (?,?,?,?,?,md5(?))")) {
+                        "values (?,?,?,md5(?),?,?)")) {
                     preparedStatement.setObject(1, usuario.getUuid());
                     preparedStatement.setObject(2, usuario.getUuid_usuario_indicacao());
                     preparedStatement.setString(3, usuario.getUsuario());
@@ -111,6 +111,7 @@ public class ControleUsuarios {
                     preparedStatement.setInt(6, usuario.getMaxEstabelecimentos());
                     preparedStatement.executeUpdate();
                     connection.commit();
+                    return true;
                 } catch (SQLException e) {
                     connection.rollback();
                     throw e;
@@ -126,6 +127,7 @@ public class ControleUsuarios {
                     preparedStatement.setObject(4, usuario.getUuid());
                     preparedStatement.executeUpdate();
                     connection.commit();
+                    return true;
                 } catch (SQLException e) {
                     connection.rollback();
                     throw e;
@@ -136,7 +138,6 @@ public class ControleUsuarios {
         } catch (SQLException ex) {
             throw ex;
         }
-        return false;
     }
 
 }

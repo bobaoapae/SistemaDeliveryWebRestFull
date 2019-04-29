@@ -14,11 +14,9 @@ public class ControleSessions {
     private Map<Estabelecimento, SistemaDelivery> sessions;
     private static final Object syncroniseGetInstance = new Object();
     private static boolean finalizado = false;
-    private Map<Estabelecimento, Long> esperasGetEstabelecimento;
 
     private ControleSessions() {
         this.sessions = Collections.synchronizedMap(new HashMap<>());
-        this.esperasGetEstabelecimento = Collections.synchronizedMap(new HashMap<>());
     }
 
     public static ControleSessions getInstance() {
@@ -70,9 +68,6 @@ public class ControleSessions {
     public void finalizarSessionForEstabelecimento(Estabelecimento estabelecimento) {
         if (finalizado) {
             return;
-        }
-        synchronized (esperasGetEstabelecimento) {
-            esperasGetEstabelecimento.put(estabelecimento, System.currentTimeMillis());
         }
         synchronized (sessions) {
             if (sessions.containsKey(estabelecimento)) {

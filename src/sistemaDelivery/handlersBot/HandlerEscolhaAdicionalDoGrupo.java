@@ -40,10 +40,14 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
         adicionaisEscolhidos.clear();
         synchronized (grupoAtual.getAdicionais()) {
             if (!grupoAtual.getAdicionais().isEmpty()) {
-                if (grupoAtual.getQtdMax() > 1) {
-                    chat.getChat().sendMessage("Quais " + grupoAtual.getNomeGrupo() + " você quer?");
+                if (grupoAtual.getDescricaoGrupo().isEmpty()) {
+                    if (grupoAtual.getQtdMax() > 1) {
+                        chat.getChat().sendMessage("Quais " + grupoAtual.getNomeGrupo() + " você quer?");
+                    } else {
+                        chat.getChat().sendMessage("Qual " + grupoAtual.getNomeGrupo() + " você quer?");
+                    }
                 } else {
-                    chat.getChat().sendMessage("Qual " + grupoAtual.getNomeGrupo() + " você quer?");
+                    chat.getChat().sendMessage(grupoAtual.getDescricaoGrupo());
                 }
                 String adicionais = "";
                 for (AdicionalProduto ad : grupoAtual.getAdicionais()) {
