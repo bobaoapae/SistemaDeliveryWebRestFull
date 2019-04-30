@@ -7,6 +7,7 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
+import modelo.MessageBuilder;
 import sistemaDelivery.controle.ControlePedidos;
 import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
@@ -29,20 +30,25 @@ public class HandlerConcluirPedido extends HandlerBotDelivery {
         p.setCelular(((ChatBotDelivery) chat).getCliente().getTelefoneMovel());
         try {
             if (ControlePedidos.getInstance().salvarPedido(p)) {
-                chat.getChat().sendMessage("Pronto, " + p.getNomeCliente() + ". Seu pedido de numero #" + p.getCod() + " foi registrado e já está em produção\nCaso deseje realizar um novo pedido, basta me enviar uma mensagem");
+                MessageBuilder builder = new MessageBuilder();
+                builder.textNewLine("Pronto, " + p.getNomeCliente() + ". Seu pedido de numero #" + p.getCod() + " foi registrado e já está em produção.").newLine();
                 if (p.getHoraAgendamento() == null) {
-                    if (!p.isEntrega()) {
-                        chat.getChat().sendMessage("Em cerca de " + getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos você já pode vir busca-lo.");
+                    if (p.isEntrega()) {
+                        builder.text("E não se preocupe, você receberá um aviso assim que seu pedido estiver saindo para a entrega, normalmente não demoramos mais do que ")
+                                .textBold(p.getEstabelecimento().getTempoMedioEntrega() + " minutos");
                     } else {
-                        chat.getChat().sendMessage("Em cerca de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos ele sera entrege no endereço informado.");
+                        builder.text("E não se preocupe, você receberá um aviso assim que seu pedido estiver pronto para a retirada, normalmente não demoramos mais do que ")
+                                .textBold(p.getEstabelecimento().getTempoMedioRetirada() + " minutos");
                     }
                 } else {
-                    if (!p.isEntrega()) {
-                        chat.getChat().sendMessage("Às " + p.getHoraAgendamento().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " você já pode vir busca-lo.");
+                    if (p.isEntrega()) {
+                        builder.textNewLine("A partir das " + p.getHoraAgendamento().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " ele sera entregue no endereço informado.")
+                                .text("E não se preocupe, você recebera um aviso assim que seu pedido estiver saindo para a entrega.");
                     } else {
-                        chat.getChat().sendMessage("Às " + p.getHoraAgendamento().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " ele sera entregue no endereço informado.");
+                        builder.text("A partir das " + p.getHoraAgendamento().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " você recebera um aviso para buscar seu pedido.");
                     }
                 }
+                chat.getChat().sendMessage(builder.build(), 3500);
                 chat.setHandler(new HandlerPedidoConcluido(chat), true);
             } else {
                 this.reset();

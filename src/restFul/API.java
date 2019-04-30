@@ -1374,7 +1374,7 @@ public class API {
                 if (notificar) {
                     Chat c = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatById(pedido.getCliente().getChatId());
                     if (c != null) {
-                        c.sendMessage("Ótimas notícias " + c.getContact().getSafeName() + ", seu pedido já esta pronto e está saindo para a entrega!!");
+                        c.sendMessage("Ótima notícia " + c.getContact().getSafeName() + ", seu pedido já esta pronto e está saindo para a entrega!!");
                     }
                 }
                 return Response.status(Response.Status.CREATED).build();
@@ -1408,7 +1408,7 @@ public class API {
                     if (!pedido.isEntrega()) {
                         Chat c = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatById(pedido.getCliente().getChatId());
                         if (c != null) {
-                            c.sendMessage("Ótimas notícias " + c.getContact().getSafeName() + ", seu pedido já esta pronto e aguardando a retirada!!");
+                            c.sendMessage("Ótima notícia " + c.getContact().getSafeName() + ", você já pode vir buscar o seu pedido!");
                         }
                     }
                 }
