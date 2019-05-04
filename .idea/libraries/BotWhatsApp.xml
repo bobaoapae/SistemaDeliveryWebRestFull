@@ -4,8 +4,6 @@
       <root url="jar://$PROJECT_DIR$/../BotWhatsApp/out/artifacts/BotWhatsApp_jar/BotWhatsApp.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="file://$PROJECT_DIR$/../BotWhatsApp/src" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>
