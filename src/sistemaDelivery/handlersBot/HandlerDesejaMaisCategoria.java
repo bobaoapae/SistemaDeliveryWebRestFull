@@ -34,7 +34,11 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         MessageBuilder builder = new MessageBuilder();
-        builder.textNewLine("Blz, o que você quer fazer agora?");
+        if (getChatBotDelivery().getPedidoAtual().getComentarioPedido().isEmpty()) {
+            builder.textNewLine("Blz, o que você quer fazer agora?");
+        } else {
+            builder.textNewLine("O que você quer fazer agora?");
+        }
         codigosMenu.add(new HandlerMenuCategoria(c, chat));
         builder.textNewLine("*" + (codigosMenu.size()) + "* - Pedir mais " + c.getNomeCategoria());
         Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
