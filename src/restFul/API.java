@@ -148,6 +148,7 @@ public class API {
             token.getEstabelecimento().setValorSelo(novosValoresEstabelecimento.getValorSelo());
             token.getEstabelecimento().setMaximoSeloPorCompra(novosValoresEstabelecimento.getMaximoSeloPorCompra());
             token.getEstabelecimento().setTimeZone(novosValoresEstabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
+            token.getEstabelecimento().setEndereco(novosValoresEstabelecimento.getEndereco());
             if (ControleEstabelecimentos.getInstance().salvarEstabelecimento(token.getEstabelecimento())) {
                 return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento())).build();
             } else {

@@ -38,7 +38,10 @@ public class HandlerConcluirPedido extends HandlerBotDelivery {
                                 .textBold(p.getEstabelecimento().getTempoMedioEntrega() + " minutos");
                     } else {
                         builder.text("E não se preocupe, você receberá um aviso assim que seu pedido estiver pronto para a retirada, normalmente não demoramos mais do que ")
-                                .textBold(p.getEstabelecimento().getTempoMedioRetirada() + " minutos");
+                                .textBoldNewLine(p.getEstabelecimento().getTempoMedioRetirada() + " minutos")
+                                .newLine()
+                                .text("Nosso endereço é o seguinte: ")
+                                .textBold(p.getEstabelecimento().getEndereco());
                     }
                 } else {
                     if (p.isEntrega()) {

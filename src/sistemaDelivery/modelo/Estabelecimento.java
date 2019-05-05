@@ -13,7 +13,7 @@ public class Estabelecimento {
 
     @Ignore
     private UUID uuid;
-    private String nomeEstabelecimento, nomeBot, numeroAviso, webHookNovoPedido, webHookNovaReserva, logo;
+    private String nomeEstabelecimento, nomeBot, numeroAviso, webHookNovoPedido, webHookNovaReserva, logo, endereco;
     private int tempoMedioRetirada, tempoMedioEntrega;
     private boolean openPedidos, openChatBot, reservas, reservasComPedidosFechados, abrirFecharPedidosAutomatico;
     private boolean agendamentoDePedidos, ativo, iniciarAutomaticamente;
@@ -32,6 +32,13 @@ public class Estabelecimento {
     @Ignore
     private Map<DayOfWeek, List<HorarioFuncionamento>> horariosFuncionamento;
 
+    public String getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(String endereco) {
+        this.endereco = endereco;
+    }
 
     public void addHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) {
         List<HorarioFuncionamento> horarios = getHorariosFuncionamento(horarioFuncionamento.getDiaDaSemana());

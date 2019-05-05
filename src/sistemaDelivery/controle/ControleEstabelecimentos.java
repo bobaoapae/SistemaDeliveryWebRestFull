@@ -73,12 +73,14 @@ public class ControleEstabelecimentos {
                     "            \"reservasComPedidosFechados\", \"abrirFecharPedidosAutomatico\", \n" +
                     "            \"agendamentoDePedidos\", \n" +
                     "            \"horaInicioReservas\", \n" +
-                    "            \"webHookNovaReserva\",\"webHookNovoPedido\", \"logo\",\"valorSelo\",\"maximoSeloPorCompra\",\"validadeSeloFidelidade\",\"timeZone\")\n" +
+                    "            \"webHookNovaReserva\",\"webHookNovoPedido\", " +
+                    "            \"logo\",\"valorSelo\",\"maximoSeloPorCompra\"," +
+                    "            \"validadeSeloFidelidade\",\"timeZone\",endereco)\n" +
                     "    VALUES (?, ?, ?, ?, ?, \n" +
                     "            ?, ?, ?, ?, \n" +
                     "            ?, ?, \n" +
                     "            ?, ?, ?, \n" +
-                    "            ?,?,?,?);")) {
+                    "            ?, ?, ?, ?, ?);")) {
                 if (estabelecimento.getUuid() == null) {
                     estabelecimento.setUuid(UUID.randomUUID());
                 }
@@ -104,6 +106,7 @@ public class ControleEstabelecimentos {
                 preparedStatement.setInt(16, estabelecimento.getMaximoSeloPorCompra());
                 preparedStatement.setInt(17, estabelecimento.getValidadeSeloFidelidade());
                 preparedStatement.setString(18, estabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
+                preparedStatement.setString(19, estabelecimento.getEndereco());
                 preparedStatement.executeUpdate();
 
                 try (PreparedStatement preparedStatement2 = connection.prepareStatement("insert into \"Estabelecimentos_Usuario\" (uuid_usuario, uuid_estabelecimento) values (?,?)");) {
@@ -140,7 +143,8 @@ public class ControleEstabelecimentos {
                         "       \"openChatBot\"=?, reservas=?, \"reservasComPedidosFechados\"=?, \n" +
                         "       \"abrirFecharPedidosAutomatico\"=?, \"agendamentoDePedidos\"=?, \"horaAberturaPedidos\"=?, \n" +
                         "       \"horaInicioReservas\"=?, \n" +
-                        "       \"webHookNovaReserva\"=? , \"webHookNovoPedido\"=?, logo=?,  \"valorSelo\"=?, \"maximoSeloPorCompra\"=?, \"validadeSeloFidelidade\"=?, \"timeZone\" = ?, \"iniciarAutomaticamente\" = ? \n" +
+                        "       \"webHookNovaReserva\"=? , \"webHookNovoPedido\"=?, logo=?,  \"valorSelo\"=?, \"maximoSeloPorCompra\"=?," +
+                        " \"validadeSeloFidelidade\"=?, \"timeZone\" = ?, \"iniciarAutomaticamente\" = ?, endereco = ? \n" +
                         " WHERE uuid=?;")) {
                     preparedStatement.setString(1, estabelecimento.getNomeEstabelecimento());
                     preparedStatement.setString(2, estabelecimento.getNomeBot());
@@ -167,7 +171,8 @@ public class ControleEstabelecimentos {
                     preparedStatement.setInt(19, estabelecimento.getValidadeSeloFidelidade());
                     preparedStatement.setString(20, estabelecimento.getTimeZoneObject().toZoneId().getDisplayName(TextStyle.NARROW, Locale.forLanguageTag("pt-BR")));
                     preparedStatement.setBoolean(21, estabelecimento.isIniciarAutomaticamente());
-                    preparedStatement.setObject(22, estabelecimento.getUuid());
+                    preparedStatement.setString(22, estabelecimento.getEndereco());
+                    preparedStatement.setObject(23, estabelecimento.getUuid());
                     preparedStatement.executeUpdate();
                     preparedStatement.close();
                     connection.commit();
