@@ -1370,6 +1370,9 @@ public class API {
             if (!pedido.getEstabelecimento().equals(token.getEstabelecimento())) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
+            if (pedido.getEstadoPedido() == EstadoPedido.SaiuEntrega) {
+                return Response.status(Response.Status.CREATED).build();
+            }
             pedido.setEstadoPedido(EstadoPedido.SaiuEntrega);
             if (ControlePedidos.getInstance().salvarPedido(pedido)) {
                 if (notificar) {
@@ -1378,6 +1381,8 @@ public class API {
                         c.sendMessage("Ótima notícia " + c.getContact().getSafeName() + ", seu pedido já esta pronto e está saindo para a entrega!!");
                     }
                 }
+                SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
+                sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -1403,6 +1408,9 @@ public class API {
             if (!pedido.getEstabelecimento().equals(token.getEstabelecimento())) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
+            if (pedido.getEstadoPedido() == EstadoPedido.Concluido) {
+                return Response.status(Response.Status.CREATED).build();
+            }
             pedido.setEstadoPedido(EstadoPedido.Concluido);
             if (ControlePedidos.getInstance().salvarPedido(pedido)) {
                 if (notificar) {
@@ -1413,6 +1421,8 @@ public class API {
                         }
                     }
                 }
+                SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
+                sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -1438,8 +1448,13 @@ public class API {
             if (!pedido.getEstabelecimento().equals(token.getEstabelecimento())) {
                 return Response.status(Response.Status.BAD_REQUEST).build();
             }
+            if (pedido.getEstadoPedido() == EstadoPedido.Cancelado) {
+                return Response.status(Response.Status.CREATED).build();
+            }
             pedido.setEstadoPedido(EstadoPedido.Cancelado);
             if (ControlePedidos.getInstance().salvarPedido(pedido)) {
+                SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
+                sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
