@@ -2024,7 +2024,7 @@ public class API {
                     object.addProperty("mediaBase64", sb.toString());
                     array.add(object);
                 } else {
-                    array.add(builder.toJsonTree(parser.parse(msg.getJsObject().toJSONString())));
+                    array.add(builder.toJsonTree(parser.parse(msg.toJson())));
                 }
             }
             return Response.status(Response.Status.OK).entity(builder.toJson(array)).build();
