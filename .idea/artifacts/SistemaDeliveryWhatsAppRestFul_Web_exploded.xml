@@ -10,7 +10,6 @@
         <element id="directory" name="lib">
           <element id="library" level="project" name="WebWhatsNew" />
           <element id="library" level="project" name="BotWhatsApp" />
-          <element id="library" level="project" name="jsoup-1.11.3" />
           <element id="library" level="project" name="com.google.code.gson:gson:2.8.5" />
           <element id="library" level="project" name="org.apache.commons:commons-collections4:4.2" />
           <element id="library" level="project" name="org.postgresql:postgresql:42.2.5" />
@@ -18,6 +17,7 @@
           <element id="library" level="project" name="javax.inject:javax.inject:1" />
           <element id="library" level="project" name="org.apache.poi:poi-ooxml:4.0.0" />
           <element id="library" level="project" name="tika-app-1.19.1" />
+          <element id="library" level="project" name="org.jsoup:jsoup:1.12.1" />
         </element>
       </element>
     </root>

@@ -21,14 +21,14 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="WebWhatsNew" level="project" />
     <orderEntry type="library" name="BotWhatsApp" level="project" />
-    <orderEntry type="library" name="jsoup-1.11.3" level="project" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.8.5" level="project" />
     <orderEntry type="library" name="org.apache.commons:commons-collections4:4.2" level="project" />
     <orderEntry type="library" name="org.postgresql:postgresql:42.2.5" level="project" />
     <orderEntry type="library" name="commons-dbutils:commons-dbutils:1.7" level="project" />
     <orderEntry type="library" name="javax.inject:javax.inject:1" level="project" />
     <orderEntry type="library" name="org.apache.poi:poi-ooxml:4.0.0" level="project" />
-    <orderEntry type="library" name="Java EE 6-Java EE 6" level="project" />
     <orderEntry type="library" name="tika-app-1.19.1" level="project" />
+    <orderEntry type="library" name="org.jsoup:jsoup:1.12.1" level="project" />
+    <orderEntry type="library" name="Java EE 6-Java EE 6" level="project" />
   </component>
 </module>
