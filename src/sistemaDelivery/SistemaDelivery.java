@@ -46,7 +46,7 @@ public class SistemaDelivery {
     private Logger logger;
     private static HashMap<Estabelecimento, Logger> loggers = new HashMap<>();
 
-    public SistemaDelivery(Estabelecimento estabelecimento) throws IOException {
+    public SistemaDelivery(Estabelecimento estabelecimento, boolean headless) throws IOException {
         logger = SistemaDelivery.createOrGetLogger(estabelecimento);
         this.estabelecimento = estabelecimento;
         parser = new JsonParser();
@@ -109,9 +109,13 @@ public class SistemaDelivery {
         onErrorInDriver = (e) -> {
             logger.log(Level.SEVERE, e.getMessage(), e);
         };
-        telaWhatsApp = new TelaWhatsApp(estabelecimento);
-        telaWhatsApp.setVisible(true);
-        this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), "C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+        if (!headless) {
+            telaWhatsApp = new TelaWhatsApp(estabelecimento);
+            telaWhatsApp.setVisible(true);
+            this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), "C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+        } else {
+            this.driver = new WebWhatsDriver("C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+        }
         executores.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -299,6 +303,21 @@ public class SistemaDelivery {
             return false;
         }
         return true;
+    }
+
+    public Estabelecimento getEstabelecimento() {
+        return estabelecimento;
+    }
+
+    public int getUsuariosAtivos() {
+        int total = 0;
+        for (ChatBotDelivery chat : ControleChatsAsync.getInstance(estabelecimento).getChats()) {
+            if (!((HandlerBotDelivery) chat.getHandler()).notificaPedidosFechados()) {
+                continue;
+            }
+            total++;
+        }
+        return total;
     }
 
     public SseBroadcaster getBroadcasterWhats() {

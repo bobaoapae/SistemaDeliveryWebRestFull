@@ -204,9 +204,10 @@ public class ChatBotDelivery extends ChatBot {
     @Override
     public void processNewMsg(Message m) {
         if (m.getChat().getContact().getId().equals("554491050665@c.us")) {
-            if (m.getContent().toLowerCase().equals("/encerrar")) {
-
-            }
+        }
+        if (m.getContent().toLowerCase().equals("/testar")) {
+            m.getChat().sendMessage("Online");
+            return;
         }
         if (!estabelecimento.isOpenChatBot()) {
             return;
@@ -227,10 +228,14 @@ public class ChatBotDelivery extends ChatBot {
         if (this.checkMsgs != null && !this.checkMsgs.isCancelled() && !this.checkMsgs.isDone()) {
             this.checkMsgs.cancel(true);
         }
+        if (this.checkMsgsStatusV3 != null && !this.checkMsgsStatusV3.isCancelled() && !this.checkMsgsStatusV3.isDone()) {
+            this.checkMsgsStatusV3.cancel(true);
+        }
         if (((HandlerBotDelivery) handler).notificaPedidosFechados()) {
             this.sendEncerramos();
         }
         this.executor.shutdown();
+        this.executor2.shutdown();
     }
 
 }

@@ -3,7 +3,10 @@ package restFul;
 import adapters.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import modelo.Chat;
+import modelo.EstadoDriver;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import restFul.controle.ControleSessions;
 import restFul.controle.ControleTokens;
@@ -12,6 +15,7 @@ import restFul.modelo.LoginInUse;
 import restFul.modelo.TipoUsuario;
 import restFul.modelo.Token;
 import restFul.modelo.Usuario;
+import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.ControleEstabelecimentos;
 import sistemaDelivery.modelo.Estabelecimento;
 import sistemaDelivery.modelo.TipoEntrega;
@@ -48,6 +52,33 @@ public class Manager {
                 registerTypeAdapter(Time.class, new TimeAdapterDeserialize()).
                 setDateFormat("dd/MM/yyyy HH:mm:ss").
                 create();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/status")
+    public Response status(@DefaultValue("false") @QueryParam("msgTeste") boolean msgTeste) {
+        try {
+            JsonArray jsonArray = new JsonArray();
+            for (SistemaDelivery sistemaDelivery : ControleSessions.getInstance().getSessionsAtivas()) {
+                JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("estabelecimento", sistemaDelivery.getEstabelecimento().getNomeEstabelecimento());
+                jsonObject.addProperty("usuariosAtivos", sistemaDelivery.getUsuariosAtivos());
+                jsonObject.addProperty("estadoWhatsApp", sistemaDelivery.getDriver().getEstadoDriver().name());
+                if (sistemaDelivery.getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
+                    jsonObject.addProperty("idWhatsApp", sistemaDelivery.getDriver().getFunctions().getMyChat().getId());
+                }
+                jsonArray.add(jsonObject);
+                if (msgTeste && sistemaDelivery.getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
+                    Chat chat = sistemaDelivery.getDriver().getFunctions().getChatByNumber("5544991050665");
+                    chat.sendMessage("Mensagem para verificar se o sistema esta ativo");
+                }
+            }
+            return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).entity(builder.toJson(jsonArray)).build();
+        } catch (Exception e) {
+            Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+        }
     }
 
     @GET

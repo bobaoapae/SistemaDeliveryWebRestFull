@@ -48,7 +48,11 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
         }
         if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
             if (getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() == null) {
-                chat.getChat().sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
+                if (getChatBotDelivery().getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
+                    chat.getChat().sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
+                } else {
+                    chat.getChat().sendMessage("_Obs: Já ecenrramos os atendimentos por hoje_", 3500);
+                }
                 chat.setHandler(new HandlerAdeus(chat), true);
             } else if (getChatBotDelivery().getEstabelecimento().isAgendamentoDePedidos()) {
                 chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você pode deixar seu pedido agendado._", 3000);

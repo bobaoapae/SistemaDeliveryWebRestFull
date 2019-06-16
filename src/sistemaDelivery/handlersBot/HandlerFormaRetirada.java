@@ -82,6 +82,7 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
             if (escolha >= 0 && codigosMenu.size() > escolha) {
                 TipoEntrega tipoEntrega = codigosMenu.get(escolha);
                 ((ChatBotDelivery) chat).getPedidoAtual().setTipoEntrega(tipoEntrega);
+                ((ChatBotDelivery) chat).getPedidoAtual().calcularValor();
                 if (tipoEntrega.isSolicitarEndereco()) {
                     ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(true);
                     chat.getChat().sendMessage("Blz");

@@ -327,6 +327,10 @@ public class Estabelecimento {
         return false;
     }
 
+    public boolean checkTemHorarioFuncionamentoHoje() {
+        return getHorariosFuncionamento(getDataComHoraAtual().getDayOfWeek()).size() > 0;
+    }
+
     public HorarioFuncionamento nextOrCurrentHorarioAbertoOfDay() {
         List<HorarioFuncionamento> horarioFuncionamentos = getHorariosFuncionamento(getDataComHoraAtual().getDayOfWeek());
         synchronized (horarioFuncionamentos) {

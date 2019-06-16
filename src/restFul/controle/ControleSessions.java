@@ -6,7 +6,9 @@ import sistemaDelivery.modelo.Estabelecimento;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ControleSessions {
 
@@ -28,6 +30,12 @@ public class ControleSessions {
         }
     }
 
+    public List<SistemaDelivery> getSessionsAtivas() {
+        synchronized (sessions) {
+            return sessions.values().stream().collect(Collectors.toList());
+        }
+    }
+
     public boolean checkSessionAtiva(Estabelecimento estabelecimento) {
         synchronized (sessions) {
             return sessions.containsKey(estabelecimento);
@@ -40,7 +48,7 @@ public class ControleSessions {
         }
         synchronized (sessions) {
             if (!sessions.containsKey(estabelecimento)) {
-                sessions.put(estabelecimento, new SistemaDelivery(estabelecimento));
+                sessions.put(estabelecimento, new SistemaDelivery(estabelecimento, true));
             }
             return sessions.get(estabelecimento);
         }
