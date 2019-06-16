@@ -245,12 +245,15 @@ public class SistemaDelivery {
         }
         new Thread() {
             public void run() {
-                for (ChatBotDelivery chat : ControleChatsAsync.getInstance(estabelecimento).getChats()) {
-                    if (!((HandlerBotDelivery) chat.getHandler()).notificaPedidosFechados()) {
-                        continue;
+                List<ChatBotDelivery> chats = ControleChatsAsync.getInstance(estabelecimento).getChats();
+                synchronized (chats) {
+                    for (ChatBotDelivery chat : chats) {
+                        if (!((HandlerBotDelivery) chat.getHandler()).notificaPedidosFechados()) {
+                            continue;
+                        }
+                        chat.sendEncerramos();
+                        chat.setHandler(new HandlerBoasVindas(chat), false);
                     }
-                    chat.sendEncerramos();
-                    chat.setHandler(new HandlerBoasVindas(chat), false);
                 }
             }
         }.start();
@@ -311,11 +314,14 @@ public class SistemaDelivery {
 
     public int getUsuariosAtivos() {
         int total = 0;
-        for (ChatBotDelivery chat : ControleChatsAsync.getInstance(estabelecimento).getChats()) {
-            if (!((HandlerBotDelivery) chat.getHandler()).notificaPedidosFechados()) {
-                continue;
+        List<ChatBotDelivery> chats = ControleChatsAsync.getInstance(estabelecimento).getChats();
+        synchronized (chats) {
+            for (ChatBotDelivery chat : chats) {
+                if (!((HandlerBotDelivery) chat.getHandler()).notificaPedidosFechados()) {
+                    continue;
+                }
+                total++;
             }
-            total++;
         }
         return total;
     }
