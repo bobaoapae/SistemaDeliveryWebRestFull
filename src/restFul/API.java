@@ -1821,7 +1821,7 @@ public class API {
     @POST
     @Path("/enviarMsg")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response enviarMsg(@FormParam("msg") String msg, @QueryParam("uuid-cliente") String uuid, @QueryParam("chatId") String chatid) {
+    public Response enviarMsg(@DefaultValue("") @FormParam("msg") String msg, @QueryParam("uuid-cliente") String uuid, @QueryParam("chatId") String chatid, @DefaultValue("") @FormParam("media") String media, @DefaultValue("") @FormParam("fileName") String fileName) {
         try {
             Cliente cliente = null;
             if (uuid != null && !uuid.isEmpty()) {
@@ -1851,12 +1851,24 @@ public class API {
             if (driver.getEstadoDriver() != EstadoDriver.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
+            Chat chat = null;
             if (cliente != null) {
-                driver.getFunctions().getChatById(cliente.getChatId()).sendMessage(msg);
+                chat = driver.getFunctions().getChatById(cliente.getChatId());
             } else {
-                driver.getFunctions().getChatById(chatid).sendMessage(msg);
+                chat = driver.getFunctions().getChatById(chatid);
             }
-            return Response.status(Response.Status.OK).build();
+            if (chat != null) {
+                if (media == null || media.isEmpty()) {
+                    chat.sendMessage(msg);
+                } else if (fileName != null && !fileName.isEmpty()) {
+                    chat.sendFile(media, fileName, msg);
+                } else {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+                return Response.status(Response.Status.OK).build();
+            } else {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
         } catch (Exception e) {
             Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
