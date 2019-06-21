@@ -1382,7 +1382,9 @@ public class API {
                     }
                 }
                 SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
-                sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
+                if (sistemaDelivery.getBroadcaster() != null) {
+                    sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
+                }
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -1422,7 +1424,9 @@ public class API {
                     }
                 }
                 SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
-                sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
+                if (sistemaDelivery.getBroadcaster() != null) {
+                    sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
+                }
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -1454,7 +1458,9 @@ public class API {
             pedido.setEstadoPedido(EstadoPedido.Cancelado);
             if (ControlePedidos.getInstance().salvarPedido(pedido)) {
                 SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
-                sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
+                if (sistemaDelivery.getBroadcaster() != null) {
+                    sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
+                }
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -2057,6 +2063,19 @@ public class API {
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
+        } catch (Exception e) {
+            Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+        }
+    }
+
+    @GET
+    @Path("/finalizarDriver")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response finalizarDriver() {
+        try {
+            token.getSistemaDelivery().finalizar();
+            return Response.status(Response.Status.CREATED).build();
         } catch (Exception e) {
             Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();

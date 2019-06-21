@@ -56,12 +56,34 @@ public class Manager {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/reiniciarSistema")
+    public Response reiniciarSistema(@QueryParam("securePass") @DefaultValue("") String securePass, @QueryParam("uuid") @DefaultValue("") String uuid) {
+        if (!securePass.equals("mkQZUJbvda8NDUAfqUhjc48PQjB5mvV5psxae6uBhvUG4eQcYCfarb9bWC9S3W4HDyaH3CUgqPgeerqr5dYW8ZdhFgUyTCAEvqq8hr5xDqybeUqKwxHjJ2kWKF5vAkz8")) {
+            return Response.status(Response.Status.UNAUTHORIZED).build();
+        } else if (uuid.isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        } else {
+            try {
+                ControleSessions.getInstance().finalizarSessionForEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(uuid)));
+                Thread.sleep(2000);
+                ControleSessions.getInstance().getSessionForEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(uuid)));
+                return Response.status(Response.Status.OK).build();
+            } catch (Exception e) {
+                Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+            }
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/status")
     public Response status(@DefaultValue("false") @QueryParam("msgTeste") boolean msgTeste) {
         try {
             JsonArray jsonArray = new JsonArray();
             for (SistemaDelivery sistemaDelivery : ControleSessions.getInstance().getSessionsAtivas()) {
                 JsonObject jsonObject = new JsonObject();
+                jsonObject.addProperty("uuid-estabelecimento", sistemaDelivery.getEstabelecimento().getUuid().toString());
                 jsonObject.addProperty("estabelecimento", sistemaDelivery.getEstabelecimento().getNomeEstabelecimento());
                 jsonObject.addProperty("usuariosAtivos", sistemaDelivery.getUsuariosAtivos());
                 jsonObject.addProperty("estadoWhatsApp", sistemaDelivery.getDriver().getEstadoDriver().name());
