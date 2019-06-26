@@ -123,6 +123,7 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
                 }
                 MessageBuilder builder = new MessageBuilder();
                 builder.textNewLine("*1* - Sim").

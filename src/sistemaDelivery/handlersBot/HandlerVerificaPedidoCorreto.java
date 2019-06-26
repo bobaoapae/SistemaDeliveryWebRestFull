@@ -29,6 +29,7 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
         }
         Pedido p = ((ChatBotDelivery) chat).getPedidoAtual();
         MessageBuilder builder = new MessageBuilder();

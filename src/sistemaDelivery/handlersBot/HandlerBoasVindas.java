@@ -45,13 +45,14 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
             Logger.getLogger(HandlerBoasVindas.class.getName()).log(Level.SEVERE, null, ex);
+            Thread.currentThread().interrupt();
         }
         if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
             if (getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() == null) {
-                if (getChatBotDelivery().getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
+                if (!getChatBotDelivery().getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
                     chat.getChat().sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
                 } else {
-                    chat.getChat().sendMessage("_Obs: Já ecenrramos os atendimentos por hoje_", 3500);
+                    chat.getChat().sendMessage("_Obs: Já encerramos os atendimentos por hoje_", 3500);
                 }
                 chat.setHandler(new HandlerAdeus(chat), true);
             } else if (getChatBotDelivery().getEstabelecimento().isAgendamentoDePedidos()) {

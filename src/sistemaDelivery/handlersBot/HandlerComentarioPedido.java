@@ -46,6 +46,7 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
         }
         Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;

@@ -48,7 +48,7 @@ public class ControleSessions {
         }
         synchronized (sessions) {
             if (!sessions.containsKey(estabelecimento)) {
-                sessions.put(estabelecimento, new SistemaDelivery(estabelecimento, true));
+                sessions.put(estabelecimento, new SistemaDelivery(estabelecimento, false));
             }
             return sessions.get(estabelecimento);
         }
@@ -67,6 +67,7 @@ public class ControleSessions {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    Thread.currentThread().interrupt();
                 }
             }
             sessions.clear();

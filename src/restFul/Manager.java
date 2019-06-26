@@ -68,6 +68,10 @@ public class Manager {
                 Thread.sleep(2000);
                 ControleSessions.getInstance().getSessionForEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(uuid)));
                 return Response.status(Response.Status.OK).build();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
             } catch (Exception e) {
                 Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();

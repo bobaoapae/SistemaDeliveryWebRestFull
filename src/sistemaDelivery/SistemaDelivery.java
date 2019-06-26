@@ -369,6 +369,7 @@ public class SistemaDelivery {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+                Thread.currentThread().interrupt();
             }
             broadcaster.close();
             broadcaster = null;

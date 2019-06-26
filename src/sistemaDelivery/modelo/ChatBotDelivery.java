@@ -9,7 +9,6 @@ import handlersBot.HandlerBot;
 import modelo.Chat;
 import modelo.ChatBot;
 import modelo.Message;
-import modelo.UserChat;
 import restFul.controle.ControleSessions;
 import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.ControleClientes;
@@ -23,7 +22,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Objects;
 
 /**
  * @author jvbor
@@ -46,7 +44,7 @@ public class ChatBotDelivery extends ChatBot {
         if (cliente != null) {
             this.cliente = cliente;
             if (cliente.getTelefoneMovel().isEmpty()) {
-                this.cliente.setTelefoneMovel(((UserChat) chat).getContact().getPhoneNumber());
+                this.cliente.setTelefoneMovel(chat.getContact().getPhoneNumber());
             }
             if (!cliente.isCadastroRealizado()) {
                 this.cliente.setNome(chat.getContact().getSafeName());
@@ -54,7 +52,7 @@ public class ChatBotDelivery extends ChatBot {
             ControleClientes.getInstance().salvarCliente(this.cliente);
         } else {
             this.cliente = new Cliente(chat.getId(), estabelecimento);
-            this.cliente.setTelefoneMovel(((UserChat) chat).getContact().getPhoneNumber());
+            this.cliente.setTelefoneMovel(chat.getContact().getPhoneNumber());
             this.cliente.setNome(chat.getContact().getSafeName());
             ControleClientes.getInstance().salvarCliente(this.cliente);
             this.cliente = ControleClientes.getInstance().getClienteByUUID(this.cliente.getUuid());
@@ -134,26 +132,8 @@ public class ChatBotDelivery extends ChatBot {
         if (cliente.isCadastroRealizado()) {
             return cliente.getNome();
         } else {
-            return chat.getContact().getSafeName();
+            return getChat().getContact().getSafeName();
         }
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final ChatBot other = (ChatBot) obj;
-        if (!Objects.equals(this.chat, other.getChat())) {
-            return false;
-        }
-        return true;
     }
 
     public void sendEncerramos() {
@@ -235,7 +215,10 @@ public class ChatBotDelivery extends ChatBot {
             this.sendEncerramos();
         }
         this.executor.shutdown();
-        this.executor2.shutdown();
     }
 
+    @Override
+    public void atualizarChat(Chat chat) {
+        this.chat = chat;
+    }
 }
