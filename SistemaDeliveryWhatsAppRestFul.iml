@@ -30,5 +30,6 @@
     <orderEntry type="library" name="tika-app-1.19.1" level="project" />
     <orderEntry type="library" name="org.jsoup:jsoup:1.12.1" level="project" />
     <orderEntry type="library" name="Java EE 6-Java EE 6" level="project" />
+    <orderEntry type="library" name="org.threadly:threadly:5.38" level="project" />
   </component>
 </module>

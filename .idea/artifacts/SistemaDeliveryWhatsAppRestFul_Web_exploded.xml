@@ -18,6 +18,7 @@
           <element id="library" level="project" name="org.apache.poi:poi-ooxml:4.0.0" />
           <element id="library" level="project" name="tika-app-1.19.1" />
           <element id="library" level="project" name="org.jsoup:jsoup:1.12.1" />
+          <element id="library" level="project" name="org.threadly:threadly:5.38" />
         </element>
       </element>
     </root>

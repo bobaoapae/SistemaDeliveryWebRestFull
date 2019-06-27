@@ -3,9 +3,9 @@
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/../WebWhatsNew/out/artifacts/WebWhatsNew_jar/WebWhatsNew.jar!/" />
       <root url="jar://$PROJECT_DIR$/../tika-app-1.19.1.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../jxbrowser/7.0/jxbrowser-7.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../jxbrowser/7.0/jxbrowser-swing-7.0.jar!/" />
-      <root url="jar://$PROJECT_DIR$/../jxbrowser/7.0/jxbrowser-win64-7.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../jxbrowser/6.23.1/jxbrowser-6.23.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../jxbrowser/6.23.1/jxbrowser-win64-6.23.1.jar!/" />
+      <root url="jar://$PROJECT_DIR$/../jxbrowser/licenseCrack.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
