@@ -47,7 +47,7 @@ public class HandlerComecarNovoPedido extends HandlerBotDelivery {
                     if (getChatBotDelivery().getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
                         chat.getChat().sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
                     } else {
-                        chat.getChat().sendMessage("_Obs: Já ecenrramos os atendimentos por hoje_", 3500);
+                        chat.getChat().sendMessage("_Obs: Já encerramos os atendimentos por hoje_", 3500);
                     }
                     chat.setHandler(new HandlerAdeus(chat), true);
                 } else if (getChatBotDelivery().getEstabelecimento().isAgendamentoDePedidos()) {
