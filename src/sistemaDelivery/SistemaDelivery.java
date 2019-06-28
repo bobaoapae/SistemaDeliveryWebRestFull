@@ -112,9 +112,9 @@ public class SistemaDelivery {
         if (!headless) {
             telaWhatsApp = new TelaWhatsApp(estabelecimento);
             telaWhatsApp.setVisible(true);
-            this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), "C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+            this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), "C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
         } else {
-            this.driver = new WebWhatsDriver("C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), false, onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+            this.driver = new WebWhatsDriver("C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
         }
         executores.scheduleWithFixedDelay(new Runnable() {
             @Override
@@ -125,13 +125,13 @@ public class SistemaDelivery {
                         try {
                             abrirPedidos();
                         } catch (SQLException e) {
-                            Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+                            logger.log(Level.SEVERE, e.getMessage(), e);
                         }
                     } else {
                         try {
                             fecharPedidos();
                         } catch (SQLException e) {
-                            Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+                            logger.log(Level.SEVERE, e.getMessage(), e);
                         }
                     }
                 }
@@ -152,7 +152,7 @@ public class SistemaDelivery {
                     try {
                         ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento);
                     } catch (SQLException e) {
-                        Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+                        logger.log(Level.SEVERE, e.getMessage(), e);
                     }
                 }
                 new Thread() {
