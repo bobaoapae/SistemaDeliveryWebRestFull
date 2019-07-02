@@ -8,6 +8,7 @@ package utils;
 import adapters.*;
 import com.google.gson.GsonBuilder;
 import jdk.nashorn.internal.ir.annotations.Ignore;
+import restFul.controle.ControleSistema;
 import sistemaDelivery.modelo.HorarioFuncionamento;
 import sistemaDelivery.modelo.ItemPedido;
 import sistemaDelivery.modelo.Produto;
@@ -37,7 +38,6 @@ import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author BOV-INOS
@@ -121,7 +121,7 @@ public class Utilitarios {
                 cla = cla.getSuperclass();
             }
         } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+            ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
         }
     }
 

@@ -24,6 +24,7 @@ public class RestFul extends Application {
         h.add(CorsFilter.class);
         h.add(Manager.class);
         h.add(API.class);
+        h.add(Adm.class);
         return h;
     }
 }

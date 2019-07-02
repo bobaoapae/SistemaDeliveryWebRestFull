@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import restFul.controle.ControleSistema;
 import utils.Utilitarios;
 
 import java.lang.reflect.InvocationTargetException;
@@ -12,7 +13,6 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class UseGetterAdapterSerialize<K> implements JsonSerializer<K> {
     @Override
@@ -27,11 +27,11 @@ public class UseGetterAdapterSerialize<K> implements JsonSerializer<K> {
                     Method method = o.getClass().getMethod(exposeGetter.methodName());
                     valoresAtualizar.put(exposeGetter.nameExpose(), jsonSerializationContext.serialize(method.invoke(o)));
                 } catch (NoSuchMethodException e) {
-                    Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+                    ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
                 } catch (IllegalAccessException e) {
-                    Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+                    ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
                 } catch (InvocationTargetException e) {
-                    Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+                    ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
                 }
             }
         }

@@ -1,6 +1,7 @@
 package restFul.modelo;
 
 import restFul.controle.ControleSessions;
+import restFul.controle.ControleSistema;
 import sistemaDelivery.controle.ControleEstabelecimentos;
 import sistemaDelivery.modelo.Estabelecimento;
 
@@ -26,6 +27,7 @@ public class ListennerServer implements ServletContextListener {
             Logger logger = Logger.getLogger("LogGeral");
             FileHandler fh = new FileHandler("C:\\logs-web-whats\\LogGeral.txt", true);
             logger.addHandler(fh);
+            ControleSistema.getInstance().setLogger(logger);
             for (Estabelecimento estabelecimento : ControleEstabelecimentos.getInstance().getEstabelecimentosIniciarAutomaticamente()) {
                 new Thread() {
                     public void run() {
@@ -40,7 +42,7 @@ public class ListennerServer implements ServletContextListener {
                 }.start();
             }
         } catch (SQLException e) {
-            Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+            ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
         } catch (IOException e) {
             e.printStackTrace();
         }

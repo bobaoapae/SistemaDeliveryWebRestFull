@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import restFul.controle.ControleSessions;
+import restFul.controle.ControleSistema;
 import restFul.controle.ControleTokens;
 import utils.DateUtils;
 
@@ -18,7 +19,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Provider
 @PreMatching
@@ -43,7 +43,7 @@ public class AuthenticationToken implements ContainerRequestFilter {
                 try {
                     k = ControleTokens.getInstance().getToken(token);
                 } catch (SQLException e) {
-                    Logger.getLogger("LogGeral").log(Level.SEVERE, e.getMessage(), e);
+                    ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
                     containerRequestContext.abortWith(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build());
                     return;
                 }
@@ -65,6 +65,24 @@ public class AuthenticationToken implements ContainerRequestFilter {
             } else {
                 JsonObject ob = new JsonObject();
                 ob.addProperty("status", "tokenMissing");
+                containerRequestContext.abortWith(Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON).entity(gson.toJson(ob)).build());
+            }
+        } else if (path.startsWith("/adm")) {
+            MultivaluedMap<String, String> queryParameters = containerRequestContext.getUriInfo().getQueryParameters();
+            if (queryParameters.containsKey("securePass")) {
+                String securePass = queryParameters.get("securePass").get(0);
+                try {
+                    if (securePass.equals(ControleSistema.getInstance().getSecurePass())) {
+
+                    }
+                } catch (SQLException e) {
+                    ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
+                    containerRequestContext.abortWith(Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build());
+                    return;
+                }
+            } else {
+                JsonObject ob = new JsonObject();
+                ob.addProperty("status", "securePass missing");
                 containerRequestContext.abortWith(Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON).entity(gson.toJson(ob)).build());
             }
         }

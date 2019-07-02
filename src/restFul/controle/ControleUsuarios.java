@@ -74,9 +74,9 @@ public class ControleUsuarios {
         return null;
     }
 
-    public Usuario getUsuario(String login, String senha) throws SQLException {
+    public Usuario getUsuario(String login, String senha, boolean apenasAtivos) throws SQLException {
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Usuarios\" where usuario = ? and senha = md5(?) ");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Usuarios\" where usuario = ? and senha = md5(?)" + (apenasAtivos ? " and ativo" : ""));
         ) {
             preparedStatement.setString(1, login);
             preparedStatement.setString(2, senha);
