@@ -36,20 +36,6 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
         for (int x = 0; x < p.getProdutos().size(); x++) {
             ItemPedido produto = p.getProdutos().get(x);
             builder.textNewLine(produto.getProduto().getNomeWithCategories() + (produto.getComentario().isEmpty() ? "" : " Obs: " + produto.getComentario()));
-            /*if (produto.getAdicionais().size() > 0) {
-                String adicionais = "";
-                for (int y = 0; y < produto.getAdicionais().size(); y++) {
-                    AdicionalProduto adicional = produto.getAdicionais().get(y);
-                    adicionais += adicional.getNome();
-                    if (y < produto.getAdicionais().size() - 1) {
-                        adicionais += ",";
-                    }
-                }
-                if (adicionais.endsWith(",")) {
-                    adicionais = adicionais.substring(0, adicionais.lastIndexOf(","));
-                }
-                builder.textNewLine("Adicionais: " + adicionais);
-            }*/
             Map<GrupoAdicional, List<AdicionalProduto>> hashMap = produto.getAdicionaisGroupByGrupo();
             for (Map.Entry<GrupoAdicional, List<AdicionalProduto>> entry : hashMap.entrySet()) {
                 builder.textBold(entry.getKey().getNomeGrupo()).text(": ");
@@ -58,11 +44,11 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
                     AdicionalProduto adicional = entry.getValue().get(y);
                     adicionais += adicional.getNome();
                     if (y < entry.getValue().size() - 1) {
-                        adicionais += ",";
+                        adicionais += ", ";
                     }
                 }
-                if (adicionais.endsWith(",")) {
-                    adicionais = adicionais.substring(0, adicionais.lastIndexOf(","));
+                if (adicionais.endsWith(", ")) {
+                    adicionais = adicionais.substring(0, adicionais.lastIndexOf(", "));
                 }
                 builder.textNewLine(adicionais + ".");
             }
