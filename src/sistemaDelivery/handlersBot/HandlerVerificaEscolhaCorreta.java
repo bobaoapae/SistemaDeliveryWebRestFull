@@ -38,7 +38,7 @@ public class HandlerVerificaEscolhaCorreta extends HandlerBotDelivery {
         chat.getChat().sendMessage("*_Obs¹: Envie somente o número da sua escolha_*");
         boolean flagMsg = false;
         if (!this.produtoEscolhido.getCategoria().isFazEntrega() || !this.produtoEscolhido.getCategoria().getRootCategoria().isFazEntrega()) {
-            chat.getChat().sendMessage("*_Obs²: Não é feita a entrega dos produtos abaixo_*", 3000);
+            chat.getChat().sendMessage("*_Obs²: Não é feita a entrega do produto escolhido_*", 3000);
         } else {
             List<ItemPedido> pedidos = new ArrayList<>(((ChatBotDelivery) chat).getPedidoAtual().getProdutos());
             for (ItemPedido item : pedidos) {
