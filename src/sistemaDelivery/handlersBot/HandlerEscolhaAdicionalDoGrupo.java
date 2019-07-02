@@ -111,11 +111,11 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                     AdicionalProduto adicional = adicionaisEscolhidos.get(x);
                     adicionais += adicional.getNome();
                     if (x < adicionaisEscolhidos.size() - 1) {
-                        adicionais += ",";
+                        adicionais += ", ";
                     }
                 }
                 if (adicionais.endsWith(",")) {
-                    adicionais = adicionais.substring(0, adicionais.lastIndexOf(","));
+                    adicionais = adicionais.substring(0, adicionais.lastIndexOf(", "));
                 }
                 chat.getChat().sendMessage(grupoAtual.getNomeGrupo() + " do pedido: " + adicionais);
                 chat.getChat().sendMessage("Sua escolha está correta? 🤞");

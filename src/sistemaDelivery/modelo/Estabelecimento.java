@@ -87,6 +87,20 @@ public class Estabelecimento {
         return TimeZone.getTimeZone(timeZone);
     }
 
+    public String getTiposEntregasConcatenados() {
+        synchronized (getTiposEntregas()) {
+            String formasRetiradas = "";
+            for (TipoEntrega tipoEntrega : getTiposEntregas()) {
+                formasRetiradas += tipoEntrega.getNome() + ", ";
+            }
+            formasRetiradas = formasRetiradas.trim().substring(0, formasRetiradas.lastIndexOf(","));
+            if (formasRetiradas.contains(", ")) {
+                formasRetiradas = formasRetiradas.substring(0, formasRetiradas.lastIndexOf(",")) + " ou" + formasRetiradas.substring(formasRetiradas.lastIndexOf(",") + 1);
+            }
+            return formasRetiradas;
+        }
+    }
+
     public List<TipoEntrega> getTiposEntregas() {
         return tiposEntregas;
     }
@@ -350,6 +364,17 @@ public class Estabelecimento {
             }
         }
         return null;
+    }
+
+    public boolean possuiEntrega() {
+        synchronized (getTiposEntregas()) {
+            for (TipoEntrega tipoEntrega : getTiposEntregas()) {
+                if (tipoEntrega.isSolicitarEndereco()) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     @Override

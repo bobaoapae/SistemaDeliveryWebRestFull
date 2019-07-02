@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-@Path("/Adm")
+@Path("/adm")
 public class Adm {
 
     JsonParser parser;

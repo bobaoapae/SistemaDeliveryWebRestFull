@@ -66,7 +66,12 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
                 chat.setHandler(new HandlerAdeus(chat), true);
             }
         } else {
-            chat.getChat().sendMessage("_Obs: Nosso prazo médio para entregas é de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos._", 3000);
+            boolean possuiEntrega = getChatBotDelivery().getEstabelecimento().possuiEntrega();
+            if (possuiEntrega) {
+                chat.getChat().sendMessage("Informo que nosso prazo médio para entrega é de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
+            } else {
+                chat.getChat().sendMessage("Informo que nosso prazo médio para retirada é de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
+            }
             chat.setHandler(new HandlerMenuPrincipal(chat), true);
         }
         return true;

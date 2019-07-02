@@ -35,7 +35,7 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
         chat.getChat().sendMessage("*_Obs¹: Envie somente o número da sua escolha_*");
         chat.getChat().sendMessage("*_Obs²: Escolha um item por vez_*", 2000);
         if (!c.isFazEntrega()) {
-            chat.getChat().sendMessage("*_Obs³: Não é feita a entrega dos produtos à baixo_*", 3000);
+            chat.getChat().sendMessage("*_Obs³: Não é feita a entrega dos produtos abaixo_*", 3000);
         } else {
             boolean temCategoriaPrecisa = false;
             boolean msg = false;

@@ -27,23 +27,9 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         codigosMenu.clear();
-        String formasRetiradas = "";
+        String formasRetiradas = getChatBotDelivery().getEstabelecimento().getTiposEntregasConcatenados();
+        boolean possuiEntrega = getChatBotDelivery().getEstabelecimento().possuiEntrega();
         synchronized (getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
-
-            boolean possuiEntrega = false;
-
-            for (TipoEntrega tipoEntrega : getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
-                formasRetiradas += tipoEntrega.getNome() + ", ";
-                if (tipoEntrega.isSolicitarEndereco()) {
-                    possuiEntrega = true;
-                    break;
-                }
-            }
-
-            formasRetiradas = formasRetiradas.trim().substring(0, formasRetiradas.lastIndexOf(","));
-            if (formasRetiradas.contains(", ")) {
-                formasRetiradas = formasRetiradas.substring(0, formasRetiradas.lastIndexOf(",")) + " ou" + formasRetiradas.substring(formasRetiradas.lastIndexOf(",") + 1);
-            }
 
             if (possuiEntrega) {
                 chat.getChat().sendMessage("Informo que nosso prazo médio para entrega é de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
