@@ -72,8 +72,10 @@ public class AuthenticationToken implements ContainerRequestFilter {
             if (queryParameters.containsKey("securePass")) {
                 String securePass = queryParameters.get("securePass").get(0);
                 try {
-                    if (securePass.equals(ControleSistema.getInstance().getSecurePass())) {
-
+                    if (!securePass.equals(ControleSistema.getInstance().getSecurePass())) {
+                        JsonObject ob = new JsonObject();
+                        ob.addProperty("status", "securePass invalid");
+                        containerRequestContext.abortWith(Response.status(Response.Status.UNAUTHORIZED).type(MediaType.APPLICATION_JSON).entity(gson.toJson(ob)).build());
                     }
                 } catch (SQLException e) {
                     ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
