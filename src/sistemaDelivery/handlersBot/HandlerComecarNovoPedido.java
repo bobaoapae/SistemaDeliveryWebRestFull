@@ -28,6 +28,7 @@ public class HandlerComecarNovoPedido extends HandlerBotDelivery {
     protected boolean runFirstTime(Message m) {
         if (m.getContent().toLowerCase().contains("vlw") || m.getContent().toLowerCase().contains("obrigado")) {
             chat.getChat().sendMessage(agradecimentos[new Random().nextInt(agradecimentos.length - 1)]);
+            this.reset();
             return true;
         }
         chat.getChat().sendMessage("Olá, " + ((ChatBotDelivery) chat).getNome() + " 😄");

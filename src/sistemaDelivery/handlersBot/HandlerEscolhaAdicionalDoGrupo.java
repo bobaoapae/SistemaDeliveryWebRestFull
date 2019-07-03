@@ -63,12 +63,19 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                     adicionais += "\n";
                 }
                 chat.getChat().sendMessage(adicionais);
+                String exemploEscolhas = "";
+                for (int x = 1; x <= grupoAtual.getQtdMax(); x++) {
+                    exemploEscolhas += x + ", ";
+                }
+                if (exemploEscolhas.endsWith(", ")) {
+                    exemploEscolhas = exemploEscolhas.substring(0, exemploEscolhas.lastIndexOf(", "));
+                }
                 if (grupoAtual.getQtdMax() > 1) {
-                    chat.getChat().sendMessage("*_Obs¹: Você pode escolher no máximo " + grupoAtual.getQtdMax() + ". Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*", 2000);
+                    chat.getChat().sendMessage("*_Obs¹: Você pode escolher no máximo " + grupoAtual.getQtdMax() + " " + grupoAtual.getNomeGrupo() + ". Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: " + exemploEscolhas + "_*", 2000);
                 } else if (grupoAtual.getQtdMax() == 1) {
                     chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha._*", 2000);
                 } else {
-                    chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: 1, 2, 3_*", 2000);
+                    chat.getChat().sendMessage("*_Obs¹: Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: " + exemploEscolhas + "_*", 2000);
                 }
                 if (grupoAtual.getQtdMin() == 0) {
                     chat.getChat().sendMessage("*_Obs²: Caso não deseje nada, basta enviar NÃO._*", 2000);

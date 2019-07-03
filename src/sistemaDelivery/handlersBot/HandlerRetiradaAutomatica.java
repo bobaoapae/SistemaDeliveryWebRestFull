@@ -29,34 +29,42 @@ public class HandlerRetiradaAutomatica extends HandlerBotDelivery {
                 }
             }
         }
-        chat.getChat().sendMessage("O seu pedido foi marcado automaticamente como para retirada, pois algum produto que você pediu não pode ser entregue.", 2000);
-        chat.getChat().sendMessage("Deseja prosseguir com o pedido?");
-        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-        MessageBuilder builder = new MessageBuilder();
-        builder.textNewLine("*1* - Sim.").
-                textNewLine("*2* - Não.");
-        chat.getChat().sendMessage(builder.build());
+        if (getChatBotDelivery().getEstabelecimento().possuiEntrega()) {
+            chat.getChat().sendMessage("O seu pedido foi marcado automaticamente como para retirada, pois algum produto que você pediu não pode ser entregue.", 2000);
+            chat.getChat().sendMessage("Deseja prosseguir com o pedido?");
+            chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
+            MessageBuilder builder = new MessageBuilder();
+            builder.textNewLine("*1* - Sim.").
+                    textNewLine("*2* - Não.");
+            chat.getChat().sendMessage(builder.build());
+        } else {
+            irParaProximaEtapa();
+        }
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message message) {
         if (message.getContent().trim().equals("1")) {
-            try {
-                if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
-                    chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
-                } else {
-                    chat.setHandler(new HandlerDesejaAgendar(chat), true);
-                }
-            } catch (SQLException e) {
-                getChatBotDelivery().getChat().getDriver().onError(e);
-                chat.setHandler(new HandlerDesejaAgendar(chat), true);
-            }
+            irParaProximaEtapa();
             return true;
         } else if (message.getContent().trim().equals("2")) {
             chat.setHandler(new HandlerAdeus(chat), true);
             return true;
         }
         return false;
+    }
+
+    private void irParaProximaEtapa() {
+        try {
+            if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
+                chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
+            } else {
+                chat.setHandler(new HandlerDesejaAgendar(chat), true);
+            }
+        } catch (SQLException e) {
+            getChatBotDelivery().getChat().getDriver().onError(e);
+            chat.setHandler(new HandlerDesejaAgendar(chat), true);
+        }
     }
 }
