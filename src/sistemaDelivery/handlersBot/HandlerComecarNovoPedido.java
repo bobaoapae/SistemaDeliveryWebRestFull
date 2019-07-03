@@ -10,7 +10,6 @@ import modelo.Message;
 import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
 
-import java.time.format.DateTimeFormatter;
 import java.util.Random;
 
 /**
@@ -36,40 +35,13 @@ public class HandlerComecarNovoPedido extends HandlerBotDelivery {
         chat.getChat().sendMessage("1 - Sim");
         chat.getChat().sendMessage("2 - Não");
         return true;
-
     }
 
     @Override
     protected boolean runSecondTime(Message msg) {
         if (msg.getContent().trim().equals("1") || msg.getContent().toLowerCase().trim().equals("sim") || msg.getContent().toLowerCase().trim().equals("s")) {
             ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(((ChatBotDelivery) chat).getCliente(), getChatBotDelivery().getEstabelecimento()));
-            if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
-                if (getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() == null) {
-                    if (getChatBotDelivery().getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
-                        chat.getChat().sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
-                    } else {
-                        chat.getChat().sendMessage("_Obs: Já encerramos os atendimentos por hoje_", 3500);
-                    }
-                    chat.setHandler(new HandlerAdeus(chat), true);
-                } else if (getChatBotDelivery().getEstabelecimento().isAgendamentoDePedidos()) {
-                    chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você pode deixar seu pedido agendado._", 3000);
-                    chat.setHandler(new HandlerMenuPrincipal(chat), true);
-                } else if (getChatBotDelivery().getEstabelecimento().isReservas() && getChatBotDelivery().getEstabelecimento().isReservasComPedidosFechados()) {
-                    chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_", 3500);
-                    chat.setHandler(new HandlerDesejaFazerUmaReserva(chat), true);
-                } else {
-                    chat.getChat().sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._", 3500);
-                    chat.setHandler(new HandlerAdeus(chat), true);
-                }
-            } else {
-                boolean possuiEntrega = getChatBotDelivery().getEstabelecimento().possuiEntrega();
-                if (possuiEntrega) {
-                    chat.getChat().sendMessage("Informo que nosso prazo médio para entrega é de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
-                } else {
-                    chat.getChat().sendMessage("Informo que nosso prazo médio para retirada é de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
-                }
-                chat.setHandler(new HandlerMenuPrincipal(chat), true);
-            }
+            getChatBotDelivery().enviarMensageInformesIniciais();
         } else if (msg.getContent().trim().equals("2") || msg.getContent().toLowerCase().trim().equals("não") || msg.getContent().toLowerCase().trim().equals("nao") || msg.getContent().toLowerCase().trim().equals("n")) {
             chat.setHandler(new HandlerAdeus(chat), true);
         } else {

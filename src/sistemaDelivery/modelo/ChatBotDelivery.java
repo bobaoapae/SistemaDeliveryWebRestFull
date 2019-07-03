@@ -12,16 +12,14 @@ import modelo.Message;
 import restFul.controle.ControleSessions;
 import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.ControleClientes;
-import sistemaDelivery.handlersBot.HandlerAdeus;
-import sistemaDelivery.handlersBot.HandlerBoasVindas;
-import sistemaDelivery.handlersBot.HandlerBotDelivery;
-import sistemaDelivery.handlersBot.HandlerChatExpirado;
+import sistemaDelivery.handlersBot.*;
 import utils.Utilitarios;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author jvbor
@@ -140,6 +138,36 @@ public class ChatBotDelivery extends ChatBot {
         setHandler(new HandlerBoasVindas(this), false);
         getChat().sendMessage(getNome() + ", sinto muito...Vejo que você estava no meio de um pedido, mas infelizmente encerramos os pedidos por hoje.");
         getChat().sendMessage("Aguardamos seu retorno.");
+    }
+
+    public void enviarMensageInformesIniciais() {
+        if (!this.getEstabelecimento().isOpenPedidos()) {
+            if (this.getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() == null) {
+                if (!this.getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
+                    chat.sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
+                } else {
+                    chat.sendMessage("_Obs: Já encerramos os atendimentos por hoje_", 3500);
+                }
+                this.setHandler(new HandlerAdeus(this), true);
+            } else if (this.getEstabelecimento().isAgendamentoDePedidos()) {
+                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você pode deixar seu pedido agendado._", 3000);
+                this.setHandler(new HandlerMenuPrincipal(this), true);
+            } else if (this.getEstabelecimento().isReservas() && this.getEstabelecimento().isReservasComPedidosFechados()) {
+                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_", 3500);
+                this.setHandler(new HandlerDesejaFazerUmaReserva(this), true);
+            } else {
+                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._", 3500);
+                this.setHandler(new HandlerAdeus(this), true);
+            }
+        } else {
+            boolean possuiEntrega = this.getEstabelecimento().possuiEntrega();
+            if (possuiEntrega) {
+                chat.sendMessage("Informo que nosso prazo médio para entrega é de " + this.getEstabelecimento().getTempoMedioEntrega() + " à " + (this.getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (this.getEstabelecimento().getTempoMedioRetirada()) + " à " + (this.getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
+            } else {
+                chat.sendMessage("Informo que nosso prazo médio para retirada é de " + (this.getEstabelecimento().getTempoMedioRetirada()) + " à " + (this.getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
+            }
+            this.setHandler(new HandlerMenuPrincipal(this), true);
+        }
     }
 
     @Override
