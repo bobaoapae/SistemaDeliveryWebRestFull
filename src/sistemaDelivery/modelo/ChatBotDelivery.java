@@ -142,12 +142,11 @@ public class ChatBotDelivery extends ChatBot {
 
     public void enviarMensageInformesIniciais() {
         if (!this.getEstabelecimento().isOpenPedidos()) {
-            if (this.getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() == null) {
-                if (!this.getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
-                    chat.sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
-                } else {
-                    chat.sendMessage("_Obs: Já encerramos os atendimentos por hoje_", 3500);
-                }
+            if (!this.getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
+                chat.sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
+                this.setHandler(new HandlerAdeus(this), true);
+            } else if (this.getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() == null) {
+                chat.sendMessage("_Obs: Já encerramos os atendimentos por hoje_", 3500);
                 this.setHandler(new HandlerAdeus(this), true);
             } else if (this.getEstabelecimento().isAgendamentoDePedidos()) {
                 chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você pode deixar seu pedido agendado._", 3000);

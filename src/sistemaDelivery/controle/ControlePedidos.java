@@ -82,11 +82,11 @@ public class ControlePedidos {
                         "            uuid, uuid_cliente, uuid_estabelecimento, \"comentarioPedido\", \n" +
                         "            entrega, cartao, impresso, \"valorPago\", desconto, \"pgCreditos\", \n" +
                         "            \"subTotal\", total, \"horaAgendamento\", \"estadoPedido\", \n" +
-                        "            troco, \"totalRemovido\", logradouro, bairro, referencia, numero,cod,\"taxaEntrega\",\"uuid_tipoEntrega\")\n" +
+                        "            troco, \"totalRemovido\", logradouro, bairro, referencia, numero,cod,\"taxaEntrega\",\"uuid_tipoEntrega\",\"dataPedido\")\n" +
                         "    VALUES (?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, ?, ?,?,?);\n")) {
+                        "            ?, ?, ?, ?, ?, ?,?,?,?);\n")) {
                     pedido.setUuid(UUID.randomUUID());
                     pedido.calcularValor();
                     preparedStatement.setObject(1, pedido.getUuid());
@@ -119,6 +119,7 @@ public class ControlePedidos {
                     preparedStatement.setLong(21, pedido.getCod());
                     preparedStatement.setDouble(22, pedido.getTaxaEntrega());
                     preparedStatement.setObject(23, pedido.getTipoEntrega().getUuid());
+                    preparedStatement.setTimestamp(24, pedido.getDataPedido());
                     preparedStatement.executeUpdate();
                     for (ItemPedido itemPedido : pedido.getProdutos()) {
                         itemPedido.calcularValor();
