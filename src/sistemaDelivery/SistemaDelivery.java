@@ -13,6 +13,7 @@ import sistemaDelivery.controle.ControlePedidos;
 import sistemaDelivery.handlersBot.HandlerBoasVindas;
 import sistemaDelivery.handlersBot.HandlerBotDelivery;
 import sistemaDelivery.modelo.*;
+import utils.Propriedades;
 import utils.Utilitarios;
 
 import javax.swing.*;
@@ -112,9 +113,9 @@ public class SistemaDelivery {
         if (!headless) {
             telaWhatsApp = new TelaWhatsApp(estabelecimento);
             telaWhatsApp.setVisible(true);
-            this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), "C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+            this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
         } else {
-            this.driver = new WebWhatsDriver("C:\\cache-web-whats\\" + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+            this.driver = new WebWhatsDriver(Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
         }
         executores.scheduleWithFixedDelay(new Runnable() {
             @Override
@@ -168,7 +169,7 @@ public class SistemaDelivery {
         if (!loggers.containsKey(estabelecimento)) {
             try {
                 Logger logger = Logger.getLogger(estabelecimento.getUuid().toString());
-                FileHandler fh = new FileHandler("C:\\logs-web-whats\\" + estabelecimento.getNomeEstabelecimento() + " - " + estabelecimento.getUuid().toString().replaceAll("-", "") + ".txt", true);
+                FileHandler fh = new FileHandler(Propriedades.pathLogs() + estabelecimento.getNomeEstabelecimento() + " - " + estabelecimento.getUuid().toString().replaceAll("-", "") + ".txt", true);
                 logger.addHandler(fh);
             /*logger.addHandler(new Handler() {
                 @Override

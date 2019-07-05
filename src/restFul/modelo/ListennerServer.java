@@ -4,6 +4,7 @@ import restFul.controle.ControleSessions;
 import restFul.controle.ControleSistema;
 import sistemaDelivery.controle.ControleEstabelecimentos;
 import sistemaDelivery.modelo.Estabelecimento;
+import utils.Propriedades;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -20,12 +21,17 @@ public class ListennerServer implements ServletContextListener {
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         try {
-            File file = new File("C:\\logs-web-whats\\");
+            Propriedades.inicializar(sce.getServletContext());
+            File file = new File(Propriedades.pathLogs());
             if (!file.exists()) {
                 file.mkdir();
             }
             Logger logger = Logger.getLogger("LogGeral");
-            FileHandler fh = new FileHandler("C:\\logs-web-whats\\LogGeral.txt", true);
+            file = new File(Propriedades.pathLogs());
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            FileHandler fh = new FileHandler(Propriedades.pathLogs() + "LogGeral.txt", true);
             logger.addHandler(fh);
             ControleSistema.getInstance().setLogger(logger);
             for (Estabelecimento estabelecimento : ControleEstabelecimentos.getInstance().getEstabelecimentosIniciarAutomaticamente()) {
