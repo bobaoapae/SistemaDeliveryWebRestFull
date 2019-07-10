@@ -10,7 +10,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="SistemaDeliveryWhatsAppRestFul" target="8" />
+      <module name="SistemaDeliveryWhatsAppRestFul" target="12" />
     </bytecodeTargetLevel>
   </component>
 </project>
