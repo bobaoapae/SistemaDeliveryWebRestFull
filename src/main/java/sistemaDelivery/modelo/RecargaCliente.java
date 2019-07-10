@@ -5,7 +5,7 @@
  */
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.util.Date;
 import java.util.Objects;
@@ -17,12 +17,12 @@ import java.util.UUID;
 public class RecargaCliente {
 
     boolean ativo;
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_cliente, uuid_estabelecimento;
     private Date dataRecarga;
-    @Ignore
+    @Ignorar
     private transient Estabelecimento estabelecimento;
-    @Ignore
+    @Ignorar
     private transient Cliente cliente;
     private TipoRecarga tipoRecarga;
     private double valor;

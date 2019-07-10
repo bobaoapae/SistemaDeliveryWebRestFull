@@ -1,7 +1,7 @@
 package sistemaDelivery.modelo;
 
 import adapters.ExposeGetter;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.sql.Time;
 import java.time.DayOfWeek;
@@ -13,12 +13,12 @@ import java.util.UUID;
 @ExposeGetter(methodName = "diaDaSemanaTraduzido", nameExpose = "diaDaSemanaTraduzido")
 public class HorarioFuncionamento {
 
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_estabelecimento;
     private DayOfWeek diaDaSemana;
     private Time horaAbrir, horaFechar;
     private boolean ativo;
-    @Ignore
+    @Ignorar
     private transient Estabelecimento estabelecimento;
 
     public String diaDaSemanaTraduzido() {

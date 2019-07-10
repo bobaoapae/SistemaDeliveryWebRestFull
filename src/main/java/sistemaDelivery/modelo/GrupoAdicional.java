@@ -1,22 +1,22 @@
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.util.*;
 
 public class GrupoAdicional {
 
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_categoria, uuid_produto;
     private String nomeGrupo, descricaoGrupo;
     private int qtdMin, qtdMax;
     private boolean ativo;
-    @Ignore
+    @Ignorar
     private transient Categoria categoria;
-    @Ignore
+    @Ignorar
     private transient Produto produto;
     private FormaCobranca formaCobranca;
-    @Ignore
+    @Ignorar
     private List<AdicionalProduto> adicionais;
 
     public List<AdicionalProduto> getAdicionais() {

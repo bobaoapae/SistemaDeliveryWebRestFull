@@ -9,7 +9,7 @@ import adapters.ExposeGetter;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 import utils.Utilitarios;
 
 import java.util.*;
@@ -21,17 +21,17 @@ import java.util.stream.Collectors;
 @ExposeGetter(methodName = "getAdicionaisGroupByGrupoJson", nameExpose = "adicionaisPorGrupo")
 public class ItemPedido implements Comparable<ItemPedido> {
 
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_pedido, uuid_produto;
-    @Ignore
+    @Ignorar
     private Produto produto;
     private int qtd, qtdPago;
     private String comentario;
-    @Ignore
+    @Ignorar
     private List<AdicionalProduto> adicionais;
     private boolean removido;
     private double subTotal, valorPago;
-    @Ignore
+    @Ignorar
     private transient Pedido pedido;
 
     public ItemPedido() {

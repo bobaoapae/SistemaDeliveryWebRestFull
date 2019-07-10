@@ -1,6 +1,6 @@
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.sql.Time;
 import java.util.Objects;
@@ -8,14 +8,14 @@ import java.util.UUID;
 
 public class RestricaoVisibilidade {
 
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_categoria, uuid_produto;
     private Time horarioDe, horarioAte;
     private boolean restricaoHorario, restricaoDia;
     private boolean[] diasSemana;
-    @Ignore
+    @Ignorar
     private transient Produto produto;
-    @Ignore
+    @Ignorar
     private transient Categoria categoria;
 
     public RestricaoVisibilidade(Produto produto) {

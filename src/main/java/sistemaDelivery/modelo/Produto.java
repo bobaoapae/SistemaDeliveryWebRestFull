@@ -1,22 +1,22 @@
 package sistemaDelivery.modelo;
 
 import adapters.ExposeGetter;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.util.*;
 
 @ExposeGetter(methodName = "getNomeWithCategories", nameExpose = "nomeWithCategories")
 public class Produto implements Comparable<Produto> {
 
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_categoria;
-    @Ignore
+    @Ignorar
     private transient Categoria categoria;
     private String nome, descricao, foto;
     private double valor;
     private boolean onlyLocal, ativo, visivel;
     private RestricaoVisibilidade restricaoVisibilidade;
-    @Ignore
+    @Ignorar
     private List<GrupoAdicional> gruposAdicionais;
 
     public String getFoto() {

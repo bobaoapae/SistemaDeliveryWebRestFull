@@ -5,9 +5,9 @@
  */
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import sistemaDelivery.controle.ControlePedidos;
 import sistemaDelivery.controle.ControleRecargas;
+import utils.Ignorar;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -21,7 +21,7 @@ import java.util.UUID;
  */
 public class Cliente {
 
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_estabelecimento;
     private String nome, chatId, telefoneMovel, telefoneFixo;
     private java.sql.Date dataAniversario;
@@ -29,7 +29,7 @@ public class Cliente {
     private Timestamp dataUltimaCompra;
     private boolean cadastroRealizado;
     private Endereco endereco;
-    @Ignore
+    @Ignorar
     private transient Estabelecimento estabelecimento;
 
     public Cliente(String chatId, Estabelecimento estabelecimento) {

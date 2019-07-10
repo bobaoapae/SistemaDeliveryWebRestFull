@@ -1,6 +1,6 @@
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -8,16 +8,16 @@ import java.util.UUID;
 
 public class Reserva {
 
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_estabelecimento, uuid_cliente;
     private String telefoneContato, nomeContato, comentario;
     private Timestamp dataReserva;
     private int qtdPessoas;
     private long cod;
     private boolean impresso;
-    @Ignore
+    @Ignorar
     private transient Estabelecimento estabelecimento;
-    @Ignore
+    @Ignorar
     private transient Cliente cliente;
 
     public Reserva() {

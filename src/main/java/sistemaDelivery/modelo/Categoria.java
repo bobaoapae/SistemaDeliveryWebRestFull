@@ -1,30 +1,30 @@
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.util.*;
 
 public class Categoria {
 
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_estabelecimento, uuid_categoria_pai;
     private String nomeCategoria, exemplosComentarioPedido;
     private int qtdMinEntrega, ordemExibicao;
     private boolean fazEntrega, precisaPedirOutraCategoria, entregaGratis, ativo, visivel;
-    @Ignore
+    @Ignorar
     private List<Categoria> categoriasFilhas;
-    @Ignore
+    @Ignorar
     private transient List<Produto> produtos;
-    @Ignore
+    @Ignorar
     private transient Categoria categoriaPai;
     private RestricaoVisibilidade restricaoVisibilidade;
-    @Ignore
+    @Ignorar
     private List<GrupoAdicional> gruposAdicionais;
-    @Ignore
+    @Ignorar
     private transient Estabelecimento estabelecimento;
-    @Ignore
+    @Ignorar
     private List<Categoria> categoriasNecessarias;
-    @Ignore
+    @Ignorar
     private List<UUID> uuidsCategoriasNecessarias;
 
     public List<UUID> getUuidsCategoriasNecessarias() {

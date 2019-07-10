@@ -1,6 +1,6 @@
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.sql.Time;
 import java.time.DayOfWeek;
@@ -11,25 +11,25 @@ import java.util.*;
 
 public class Estabelecimento {
 
-    @Ignore
+    @Ignorar
     private UUID uuid;
     private String nomeEstabelecimento, nomeBot, numeroAviso, webHookNovoPedido, webHookNovaReserva, logo, endereco;
     private int tempoMedioRetirada, tempoMedioEntrega;
     private boolean openPedidos, openChatBot, reservas, reservasComPedidosFechados, abrirFecharPedidosAutomatico;
     private boolean agendamentoDePedidos, ativo, iniciarAutomaticamente;
-    @Ignore
+    @Ignorar
     private Date horaAberturaPedidos;
     private Time horaInicioReservas;
     private double valorSelo;
-    @Ignore
+    @Ignorar
     private transient List<Categoria> categorias;
-    @Ignore
+    @Ignorar
     private transient List<Rodizio> rodizios;
-    @Ignore
+    @Ignorar
     private List<TipoEntrega> tiposEntregas;
     private int maximoSeloPorCompra, validadeSeloFidelidade;
     private String timeZone;
-    @Ignore
+    @Ignorar
     private Map<DayOfWeek, List<HorarioFuncionamento>> horariosFuncionamento;
 
     public String getEndereco() {

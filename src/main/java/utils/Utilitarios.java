@@ -7,7 +7,6 @@ package utils;
 
 import adapters.*;
 import com.google.gson.GsonBuilder;
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import restFul.controle.ControleSistema;
 import sistemaDelivery.modelo.HorarioFuncionamento;
 import sistemaDelivery.modelo.ItemPedido;
@@ -94,7 +93,7 @@ public class Utilitarios {
         try {
             for (Field[] listaField : listaFields) {
                 for (Field listaField1 : listaField) {
-                    if (listaField1.isAnnotationPresent(Ignore.class)) {
+                    if (listaField1.isAnnotationPresent(Ignorar.class)) {
                         continue;
                     }
                     Method metodoGet;

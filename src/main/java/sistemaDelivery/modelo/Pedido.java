@@ -5,8 +5,8 @@
  */
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.apache.commons.collections4.CollectionUtils;
+import utils.Ignorar;
 
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -17,7 +17,7 @@ import java.util.*;
  */
 public class Pedido {
 
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_estabelecimento, uuid_cliente, uuid_tipoEntrega;
     private String nomeCliente;
     private boolean entrega, cartao, impresso;
@@ -29,14 +29,14 @@ public class Pedido {
     private String celular, fixo;
     private Time horaAgendamento;
     private long cod;
-    @Ignore
+    @Ignorar
     private List<ItemPedido> produtos;
-    @Ignore
+    @Ignorar
     private Cliente cliente;
-    @Ignore
+    @Ignorar
     private transient Estabelecimento estabelecimento;
     private Endereco endereco;
-    @Ignore
+    @Ignorar
     private TipoEntrega tipoEntrega;
 
     public Pedido(Cliente cliente, Estabelecimento estabelecimento) {

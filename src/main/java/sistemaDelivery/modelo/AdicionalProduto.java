@@ -1,18 +1,18 @@
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.util.Objects;
 import java.util.UUID;
 
 public class AdicionalProduto {
 
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_grupo_adicional;
     private String nome, descricao;
     private double valor;
     private boolean ativo;
-    @Ignore
+    @Ignorar
     private transient GrupoAdicional grupoAdicional;
 
     public UUID getUuid() {

@@ -1,14 +1,14 @@
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.util.Objects;
 import java.util.UUID;
 
 public class TipoEntrega {
-    @Ignore
+    @Ignorar
     private UUID uuid, uuid_estabelecimento;
-    @Ignore
+    @Ignorar
     private transient Estabelecimento estabelecimento;
     private String nome;
     private boolean solicitarEndereco;

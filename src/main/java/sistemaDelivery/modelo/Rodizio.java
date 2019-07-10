@@ -5,7 +5,7 @@
  */
 package sistemaDelivery.modelo;
 
-import jdk.nashorn.internal.ir.annotations.Ignore;
+import utils.Ignorar;
 
 import java.sql.Time;
 import java.util.UUID;
@@ -15,11 +15,11 @@ import java.util.UUID;
  */
 public class Rodizio extends Produto {
 
-    @Ignore
+    @Ignorar
     private UUID uuid_estabelecimento;
     private Time horaInicio;
     private boolean diasSemana[];
-    @Ignore
+    @Ignorar
     private transient Estabelecimento estabelecimento;
 
     public Rodizio() {
