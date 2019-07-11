@@ -32,7 +32,7 @@ public class Propriedades {
         if (!producao) {
             path += "-homologacao";
         }
-        return path += "\\";
+        return path + "\\";
     }
 
     public static String pathLogs() {
@@ -41,7 +41,7 @@ public class Propriedades {
         if (!producao) {
             path += "-homologacao";
         }
-        return path += "\\";
+        return path + "\\";
     }
 
     public static String pathBinarios() {
@@ -50,6 +50,6 @@ public class Propriedades {
         if (!producao) {
             path += "-homologacao";
         }
-        return path += "\\";
+        return path + "\\";
     }
 }
