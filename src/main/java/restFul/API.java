@@ -1041,6 +1041,22 @@ public class API {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
+    @Path("/horarioFuncionamento")
+    public Response horarioFuncionamento(@QueryParam("uuid") String uuid) {
+        try {
+            HorarioFuncionamento horarioFuncionamento = ControleHorariosFuncionamento.getInstance().getHorarioFuncionamentoByUUID(UUID.fromString(uuid));
+            if (!horarioFuncionamento.getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            return Response.status(Response.Status.OK).entity(builder.toJson(horarioFuncionamento)).build();
+        } catch (Exception e) {
+            Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+        }
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/horariosFuncionamento")
     public Response horariosFuncionamento() {
         List<HorarioFuncionamento> horarios = new ArrayList<>();
