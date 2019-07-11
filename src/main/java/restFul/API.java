@@ -860,6 +860,40 @@ public class API {
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/alterarEstadoAdicional")
+    public Response alterarEstadoAdicional(@QueryParam("uuid") String uuid) {
+        try {
+            if (uuid == null || uuid.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            AdicionalProduto adicionalProduto = ControleAdicionais.getInstance().getAdicionalByUUID(UUID.fromString(uuid));
+            if (adicionalProduto == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            GrupoAdicional grupoAdicional = adicionalProduto.getGrupoAdicional();
+            if (grupoAdicional.getCategoria() != null) {
+                if (!grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+            } else if (grupoAdicional.getProduto() != null) {
+                if (!grupoAdicional.getProduto().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+            }
+            adicionalProduto.setAtivo(!adicionalProduto.isAtivo());
+            if (ControleAdicionais.getInstance().salvarAdicional(adicionalProduto)) {
+                return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleAdicionais.getInstance().getAdicionalByUUID(adicionalProduto.getUuid()))).build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
+        } catch (Exception e) {
+            Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+        }
+    }
+
+    @GET
     @Path("/reservaImpressa")
     @Produces(MediaType.TEXT_PLAIN)
     public Response reservaImpressa(@QueryParam("uuid") String uuid) {

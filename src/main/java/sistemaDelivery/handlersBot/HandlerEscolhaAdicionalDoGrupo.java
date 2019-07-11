@@ -42,7 +42,7 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
         adicionaisDisponiveis.clear();
         adicionaisEscolhidos.clear();
         synchronized (grupoAtual.getAdicionais()) {
-            if (!grupoAtual.getAdicionais().isEmpty()) {
+            if (!grupoAtual.getAdicionais().isEmpty() || !grupoAtual.getAdicionais().stream().anyMatch(adicionalProduto -> adicionalProduto.isAtivo())) {
                 if (grupoAtual.getDescricaoGrupo().isEmpty()) {
                     if (grupoAtual.getQtdMax() > 2 || grupoAtual.getQtdMax() == 0) {
                         chat.getChat().sendMessage("Quais " + grupoAtual.getNomeGrupo() + " você quer?", 2000);
@@ -54,6 +54,9 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                 }
                 String adicionais = "";
                 for (AdicionalProduto ad : grupoAtual.getAdicionais()) {
+                    if (!ad.isAtivo()) {
+                        continue;
+                    }
                     adicionaisDisponiveis.add(ad);
                     if (ad.getValor() > 0) {
                         adicionais += "*" + adicionaisDisponiveis.size() + "* - " + ad.getNome() + " - R$ " + moneyFormat.format(ad.getValor()) + "\n";
