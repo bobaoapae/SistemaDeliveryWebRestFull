@@ -9,9 +9,7 @@
         <webroots>
           <root url="file://$MODULE_DIR$/web" relative="/" />
         </webroots>
-        <sourceRoots>
-          <root url="file://$MODULE_DIR$/src" />
-        </sourceRoots>
+        <sourceRoots />
       </configuration>
     </facet>
   </component>
@@ -30,12 +28,12 @@
     <orderEntry type="library" name="commons-dbutils:commons-dbutils:1.7" level="project" />
     <orderEntry type="library" name="Maven: br.com.zapia:BotWhatsApp:1.0" level="project" />
     <orderEntry type="library" name="Maven: br.com.zapia:WebWhatsAppLib:1.0" level="project" />
-    <orderEntry type="library" name="Maven: br.com.zapia:JxBrowserCrack:6.23.1" level="project" />
-    <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser-win32:6.23.1" level="project" />
-    <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser:6.23.1" level="project" />
-    <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser-win64:6.23.1" level="project" />
-    <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser-linux64:6.23.1" level="project" />
-    <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser-mac:6.23.1" level="project" />
+    <orderEntry type="library" name="Maven: br.com.zapia:JxBrowserCrack:6.24" level="project" />
+    <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser-win32:6.24" level="project" />
+    <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser:6.24" level="project" />
+    <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser-win64:6.24" level="project" />
+    <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser-linux64:6.24" level="project" />
+    <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser-mac:6.24" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tika:tika-app:1.21" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tika:tika-parsers:1.21" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tika:tika-core:1.21" level="project" />

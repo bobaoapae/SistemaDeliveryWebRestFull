@@ -11,12 +11,6 @@
           <element id="library" level="project" name="Maven: org.jdom:jdom2:2.0.6" />
           <element id="library" level="project" name="Maven: br.com.zapia:BotWhatsApp:1.0" />
           <element id="library" level="project" name="Maven: br.com.zapia:WebWhatsAppLib:1.0" />
-          <element id="library" level="project" name="Maven: br.com.zapia:JxBrowserCrack:6.23.1" />
-          <element id="library" level="project" name="Maven: com.teamdev.jxbrowser:jxbrowser-win32:6.23.1" />
-          <element id="library" level="project" name="Maven: com.teamdev.jxbrowser:jxbrowser:6.23.1" />
-          <element id="library" level="project" name="Maven: com.teamdev.jxbrowser:jxbrowser-win64:6.23.1" />
-          <element id="library" level="project" name="Maven: com.teamdev.jxbrowser:jxbrowser-linux64:6.23.1" />
-          <element id="library" level="project" name="Maven: com.teamdev.jxbrowser:jxbrowser-mac:6.23.1" />
           <element id="library" level="project" name="Maven: org.apache.tika:tika-app:1.21" />
           <element id="library" level="project" name="Maven: org.apache.tika:tika-parsers:1.21" />
           <element id="library" level="project" name="Maven: org.apache.tika:tika-core:1.21" />
@@ -153,6 +147,12 @@
           <element id="library" level="project" name="Maven: commons-dbutils:commons-dbutils:1.7" />
           <element id="library" level="project" name="Maven: javax.inject:javax.inject:1" />
           <element id="library" level="project" name="Maven: commons-lang:commons-lang:2.6" />
+          <element id="library" level="project" name="Maven: br.com.zapia:JxBrowserCrack:6.24" />
+          <element id="library" level="project" name="Maven: com.teamdev.jxbrowser:jxbrowser-linux64:6.24" />
+          <element id="library" level="project" name="Maven: com.teamdev.jxbrowser:jxbrowser-mac:6.24" />
+          <element id="library" level="project" name="Maven: com.teamdev.jxbrowser:jxbrowser-win32:6.24" />
+          <element id="library" level="project" name="Maven: com.teamdev.jxbrowser:jxbrowser-win64:6.24" />
+          <element id="library" level="project" name="Maven: com.teamdev.jxbrowser:jxbrowser:6.24" />
         </element>
       </element>
     </root>

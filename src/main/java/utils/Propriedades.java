@@ -43,4 +43,13 @@ public class Propriedades {
         }
         return path += "\\";
     }
+
+    public static String pathBinarios() {
+        boolean producao = Boolean.getBoolean(getProperty("producao"));
+        String path = getProperty("binarios");
+        if (!producao) {
+            path += "-homologacao";
+        }
+        return path += "\\";
+    }
 }

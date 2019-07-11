@@ -31,6 +31,11 @@ public class ListennerServer implements ServletContextListener {
             if (!file.exists()) {
                 file.mkdir();
             }
+            file = new File(Propriedades.pathBinarios());
+            if (!file.exists()) {
+                file.mkdir();
+            }
+            System.setProperty("jxbrowser.chromium.dir", Propriedades.pathBinarios());
             FileHandler fh = new FileHandler(Propriedades.pathLogs() + "LogGeral.txt", true);
             logger.addHandler(fh);
             ControleSistema.getInstance().setLogger(logger);

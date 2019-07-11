@@ -12,6 +12,10 @@
         <param-value>C:\logs-web-whats</param-value>
     </context-param>
     <context-param>
+        <param-name>binarios</param-name>
+        <param-value>C:\binarios-jx-browser</param-value>
+    </context-param>
+    <context-param>
         <param-name>producao</param-name>
         <param-value>true</param-value>
     </context-param>
