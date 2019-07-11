@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import modelo.MessageBuilder;
 import sistemaDelivery.modelo.Categoria;
 import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.ItemPedido;
@@ -19,25 +18,29 @@ import java.util.List;
 /**
  * @author jvbor
  */
-public class HandlerVerificaEscolhaCorreta extends HandlerBotDelivery {
+public class HandlerInformesProdutoEscolhido extends HandlerBotDelivery {
 
-    private HandlerBotDelivery nextHandler, oldHandler;
+    private HandlerBotDelivery nextHandler;
     private Produto produtoEscolhido;
 
-    public HandlerVerificaEscolhaCorreta(Produto produtoEscolhido, ChatBot chat, HandlerBotDelivery oldHandler, HandlerBotDelivery nextHandler) {
+    public HandlerInformesProdutoEscolhido(Produto produtoEscolhido, ChatBot chat, HandlerBotDelivery nextHandler) {
         super(chat);
         this.nextHandler = nextHandler;
-        this.oldHandler = oldHandler;
         this.produtoEscolhido = produtoEscolhido;
     }
 
     @Override
     protected boolean runFirstTime(Message m) {
         chat.getChat().sendMessage("Você escolheu: " + this.produtoEscolhido.getNomeWithCategories());
-        chat.getChat().sendMessage("O item escolhido está correto? 🤞");
-        chat.getChat().sendMessage("*_Obs¹: Envie somente o número da sua escolha_*");
+        chat.getChat().sendMessage("*_Obs¹: Caso a escolha esteja incorreta envie: VOLTAR_*", 1500);
+        getChatBotDelivery().setHandlerVoltar(new HandlerVoltar(new HandlerMenuCategoria(produtoEscolhido.getCategoria(), chat), new Runnable() {
+            @Override
+            public void run() {
+                getChatBotDelivery().setLastPedido(null);
+            }
+        }, false));
         boolean flagMsg = false;
-        if (!this.produtoEscolhido.getCategoria().isFazEntrega() || !this.produtoEscolhido.getCategoria().getRootCategoria().isFazEntrega()) {
+        if (getChatBotDelivery().getEstabelecimento().possuiEntrega() && (!this.produtoEscolhido.getCategoria().isFazEntrega() || !this.produtoEscolhido.getCategoria().getRootCategoria().isFazEntrega())) {
             chat.getChat().sendMessage("*_Obs²: Não é feita a entrega do produto escolhido_*", 3000);
         } else {
             List<ItemPedido> pedidos = new ArrayList<>(((ChatBotDelivery) chat).getPedidoAtual().getProdutos());
@@ -85,30 +88,16 @@ public class HandlerVerificaEscolhaCorreta extends HandlerBotDelivery {
                 }
             }
         }
-        MessageBuilder builder = new MessageBuilder();
-        builder.textNewLine("*1* - Sim").
-                textNewLine("*2* - Não").
-                textNewLine("*3* - Cancelar Pedido");
-        chat.getChat().sendMessage(builder.build());
+        ItemPedido item = new ItemPedido();
+        item.setProduto(produtoEscolhido);
+        ((ChatBotDelivery) chat).setLastPedido(item);
+        chat.setHandler(nextHandler, true);
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message msg) {
-        if (msg.getContent().trim().toLowerCase().equals("1") || msg.getContent().trim().toLowerCase().equals("sim") || msg.getContent().trim().toLowerCase().equals("s")) {
-            ItemPedido item = new ItemPedido();
-            item.setProduto(produtoEscolhido);
-            ((ChatBotDelivery) chat).setLastPedido(item);
-            chat.setHandler(nextHandler, true);
-        } else if (msg.getContent().trim().toLowerCase().equals("2") || msg.getContent().trim().toLowerCase().equals("nao") || msg.getContent().trim().toLowerCase().equals("n") || msg.getContent().trim().toLowerCase().equals("não")) {
-            chat.getChat().sendMessage("Certo, informe sua escolha novamente por favor");
-            chat.setHandler(oldHandler, false);
-        } else if (msg.getContent().trim().toLowerCase().equals("3") || msg.getContent().trim().toLowerCase().contains("cancela")) {
-            chat.setHandler(new HandlerAdeus(chat), true);
-        } else {
-            return false;
-        }
-        return true;
+        return runFirstTime(msg);
     }
 
     @Override

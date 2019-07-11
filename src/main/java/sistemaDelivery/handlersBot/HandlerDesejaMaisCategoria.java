@@ -78,6 +78,7 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message m) {
         try {
+            getChatBotDelivery().setHandlerVoltar(null);
             int escolha = Integer.parseInt(m.getContent().trim()) - 1;
             if (escolha >= 0 && codigosMenu.size() > escolha) {
                 Pedido p = ((ChatBotDelivery) chat).getPedidoAtual();

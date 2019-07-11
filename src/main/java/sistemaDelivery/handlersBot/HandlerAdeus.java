@@ -21,6 +21,7 @@ public class HandlerAdeus extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
+        getChatBotDelivery().setHandlerVoltar(null);
         ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(((ChatBotDelivery) chat).getCliente(), getChatBotDelivery().getEstabelecimento()));
         chat.setHandler(new HandlerComecarNovoPedido(chat), false);
         chat.getChat().sendMessage("Até mais, " + ((ChatBotDelivery) chat).getNome() + ". Obrigado pela preferência");

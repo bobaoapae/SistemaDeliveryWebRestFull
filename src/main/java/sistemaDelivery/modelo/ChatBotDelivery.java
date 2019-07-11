@@ -34,6 +34,7 @@ public class ChatBotDelivery extends ChatBot {
     private Cliente cliente;
     private Reserva reservaAtual;
     private Estabelecimento estabelecimento;
+    private HandlerVoltar handlerVoltar;
 
     public ChatBotDelivery(Chat chat, Estabelecimento estabelecimento, boolean autoPause) throws SQLException {
         super(chat, autoPause);
@@ -219,6 +220,15 @@ public class ChatBotDelivery extends ChatBot {
         if (!estabelecimento.isOpenChatBot()) {
             return;
         }
+        if (m.getContent().trim().equalsIgnoreCase("voltar")) {
+            if (handlerVoltar != null) {
+                handlerVoltar.execute(this, m);
+                setHandlerVoltar(null);
+            } else {
+                chat.sendMessage("Não é possível voltar para a etapa anterior, caso queira cancelar envie: CANCELAR");
+            }
+            return;
+        }
         if (m.getContent().trim().toLowerCase().equals("cancelar")) {
             setHandler(new HandlerAdeus(this), true);
             return;
@@ -247,5 +257,9 @@ public class ChatBotDelivery extends ChatBot {
     @Override
     public void atualizarChat(Chat chat) {
         this.chat = chat;
+    }
+
+    public void setHandlerVoltar(HandlerVoltar handlerVoltar) {
+        this.handlerVoltar = handlerVoltar;
     }
 }

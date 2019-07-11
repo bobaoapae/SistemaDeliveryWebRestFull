@@ -33,9 +33,9 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
         MessageBuilder builder = new MessageBuilder();
         chat.getChat().sendMessage("Segue as opções de: " + c.getNomeCategoria() + ".");
         chat.getChat().sendMessage("*_Obs¹: Envie somente o número da sua escolha_*");
-        chat.getChat().sendMessage("*_Obs²: Escolha um item por vez_*", 2000);
+        chat.getChat().sendMessage("*_Obs²: Escolha um item por vez_*");
         if (!c.isFazEntrega()) {
-            chat.getChat().sendMessage("*_Obs³: Não é feita a entrega dos produtos abaixo_*", 3000);
+            chat.getChat().sendMessage("*_Obs³: Não é feita a entrega dos produtos abaixo_*", 1500);
         } else {
             boolean temCategoriaPrecisa = false;
             boolean msg = false;
@@ -56,11 +56,11 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
                 msg = true;
             }
             if (c.getRootCategoria().getQtdMinEntrega() > 1 && !c.getRootCategoria().isPrecisaPedirOutraCategoria() && msg) {
-                chat.getChat().sendMessage("*_Obs³: A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens_*", 3000);
+                chat.getChat().sendMessage("*_Obs³: A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens_*", 1500);
             } else if (c.getRootCategoria().getQtdMinEntrega() > 1 && c.getRootCategoria().isPrecisaPedirOutraCategoria() && msg) {
-                chat.getChat().sendMessage("*_Obs³: A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens ou pedir junto algum produto de outro cardapio_*", 3000);
+                chat.getChat().sendMessage("*_Obs³: A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens ou pedir junto algum produto de outro cardapio_*", 1500);
             } else if (c.getRootCategoria().isPrecisaPedirOutraCategoria() && msg) {
-                chat.getChat().sendMessage("*_Obs³: A entrega só e feita se você pedir junto algum produto de outro cardapio_*", 3000);
+                chat.getChat().sendMessage("*_Obs³: A entrega só e feita se você pedir junto algum produto de outro cardapio_*", 1500);
             }
         }
         gerarMenu(c, builder);
@@ -133,7 +133,7 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
                     }
                 }
             }
-            codigosMenu.add(new HandlerVerificaEscolhaCorreta(l, chat, this, new HandlerAdicionaisProduto(l, chat)));
+            codigosMenu.add(new HandlerInformesProdutoEscolhido(l, chat, new HandlerAdicionaisProduto(l, chat)));
             if (l.getValor() > 0) {
                 builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + " R$" + moneyFormat.format(l.getValor()) + "*");
 

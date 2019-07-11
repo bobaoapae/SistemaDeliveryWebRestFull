@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.AdicionalProduto;
 import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.GrupoAdicional;
 import sistemaDelivery.modelo.Produto;
@@ -21,14 +20,12 @@ import java.util.List;
 public class HandlerAdicionaisProduto extends HandlerBotDelivery {
 
     private Produto p;
-    private List<AdicionalProduto> adicionaisDisponiveis;
     private List<GrupoAdicional> gruposDisponiveis;
     private List<GrupoAdicional> gruposJaForam;
 
     public HandlerAdicionaisProduto(Produto p, ChatBot chat) {
         super(chat);
         this.p = p;
-        adicionaisDisponiveis = new ArrayList<>();
         gruposDisponiveis = p.getAllGruposAdicionais();
         gruposJaForam = new ArrayList<>();
     }
@@ -53,6 +50,15 @@ public class HandlerAdicionaisProduto extends HandlerBotDelivery {
         }
         chat.setHandler(new HandlerComentarioPedido(chat, new HandlerDesejaMaisCategoria(p.getCategoria(), chat)), true);
         return true;
+    }
+
+    public void pedirGrupoNovamente(GrupoAdicional grupoAdicional) {
+        List<GrupoAdicional> grupoAdicionals = new ArrayList<>();
+        int index = gruposJaForam.indexOf(grupoAdicional);
+        for (int x = index; x < gruposJaForam.size(); x++) {
+            grupoAdicionals.add(gruposJaForam.get(x));
+        }
+        gruposJaForam.removeAll(grupoAdicionals);
     }
 
     @Override

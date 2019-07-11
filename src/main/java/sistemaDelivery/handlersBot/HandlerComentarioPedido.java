@@ -87,6 +87,7 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
 
     @Override
     protected boolean runSecondTime(Message msg) {
+        getChatBotDelivery().setHandlerVoltar(null);
         if (msg.getContent().toLowerCase().trim().equals("não") || msg.getContent().toLowerCase().trim().equals("nao") || msg.getContent().toLowerCase().trim().equals("n")) {
             ((ChatBotDelivery) chat).getLastPedido().setComentario("");
         } else {
