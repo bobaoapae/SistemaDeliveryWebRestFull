@@ -20,7 +20,7 @@ public class ListennerServer implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         try {
             Propriedades.inicializar(sce.getServletContext());
-            File file = new File(Propriedades.pathLogs());
+            File file = new File(Propriedades.pathCacheWebWhats());
             if (!file.exists()) {
                 file.mkdir();
             }

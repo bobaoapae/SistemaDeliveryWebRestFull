@@ -27,7 +27,7 @@ public class Propriedades {
     }
 
     public static String pathCacheWebWhats() {
-        boolean producao = Boolean.getBoolean(getProperty("producao"));
+        boolean producao = Boolean.valueOf(getProperty("producao"));
         String path = getProperty("cache-web-whats");
         if (!producao) {
             path += "-homologacao";
@@ -36,7 +36,7 @@ public class Propriedades {
     }
 
     public static String pathLogs() {
-        boolean producao = Boolean.getBoolean(getProperty("producao"));
+        boolean producao = Boolean.valueOf(getProperty("producao"));
         String path = getProperty("logs");
         if (!producao) {
             path += "-homologacao";
@@ -45,7 +45,7 @@ public class Propriedades {
     }
 
     public static String pathBinarios() {
-        boolean producao = Boolean.getBoolean(getProperty("producao"));
+        boolean producao = Boolean.valueOf(getProperty("producao"));
         String path = getProperty("binarios");
         if (!producao) {
             path += "-homologacao";
