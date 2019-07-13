@@ -254,11 +254,6 @@ public class ChatBotDelivery extends ChatBot {
         this.executor.shutdown();
     }
 
-    @Override
-    public void atualizarChat(Chat chat) {
-        this.chat = chat;
-    }
-
     public void setHandlerVoltar(HandlerVoltar handlerVoltar) {
         this.handlerVoltar = handlerVoltar;
     }

@@ -10,8 +10,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -46,16 +44,14 @@ public class ListennerServer implements ServletContextListener {
                             System.out.println("Iniciando para - " + estabelecimento.getNomeEstabelecimento());
                             ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
                             System.out.println("Iniciado para - " + estabelecimento.getNomeEstabelecimento());
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        } catch (Exception e) {
+                            ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
                         }
                     }
                 }.start();
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         System.out.println("Sistema Delivery WhatsApp Web Iniciado");
     }
