@@ -345,6 +345,44 @@ public class Estabelecimento {
         return getHorariosFuncionamento(getDataComHoraAtual().getDayOfWeek()).size() > 0;
     }
 
+    public HorarioFuncionamento currentHorarioAbertoOfDay() {
+        List<HorarioFuncionamento> horarioFuncionamentos = getHorariosFuncionamento(getDataComHoraAtual().getDayOfWeek());
+        synchronized (horarioFuncionamentos) {
+            if (horarioFuncionamentos.isEmpty()) {
+                return null;
+            } else {
+                for (HorarioFuncionamento horarioFuncionamento : horarioFuncionamentos) {
+                    if (!horarioFuncionamento.isAtivo()) {
+                        continue;
+                    }
+                    if (getDataComHoraAtual().toLocalTime().isAfter(horarioFuncionamento.getHoraAbrir().toLocalTime()) && getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraFechar().toLocalTime())) {
+                        return horarioFuncionamento;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public HorarioFuncionamento nextHorarioAbertoOfDay() {
+        List<HorarioFuncionamento> horarioFuncionamentos = getHorariosFuncionamento(getDataComHoraAtual().getDayOfWeek());
+        synchronized (horarioFuncionamentos) {
+            if (horarioFuncionamentos.isEmpty()) {
+                return null;
+            } else {
+                for (HorarioFuncionamento horarioFuncionamento : horarioFuncionamentos) {
+                    if (!horarioFuncionamento.isAtivo()) {
+                        continue;
+                    }
+                    if (getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraAbrir().toLocalTime())) {
+                        return horarioFuncionamento;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     public HorarioFuncionamento nextOrCurrentHorarioAbertoOfDay() {
         List<HorarioFuncionamento> horarioFuncionamentos = getHorariosFuncionamento(getDataComHoraAtual().getDayOfWeek());
         synchronized (horarioFuncionamentos) {

@@ -146,17 +146,17 @@ public class ChatBotDelivery extends ChatBot {
             if (!this.getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
                 chat.sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
                 this.setHandler(new HandlerAdeus(this), true);
-            } else if (this.getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() == null) {
+            } else if (this.getEstabelecimento().nextHorarioAbertoOfDay() == null) {
                 chat.sendMessage("_Obs: Já encerramos os atendimentos por hoje_", 3500);
                 this.setHandler(new HandlerAdeus(this), true);
             } else if (this.getEstabelecimento().isAgendamentoDePedidos()) {
                 chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você pode deixar seu pedido agendado._", 3000);
                 this.setHandler(new HandlerMenuPrincipal(this), true);
             } else if (this.getEstabelecimento().isReservas() && this.getEstabelecimento().isReservasComPedidosFechados()) {
-                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_", 3500);
+                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_", 3500);
                 this.setHandler(new HandlerDesejaFazerUmaReserva(this), true);
             } else {
-                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._", 3500);
+                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._", 3500);
                 this.setHandler(new HandlerAdeus(this), true);
             }
         } else {

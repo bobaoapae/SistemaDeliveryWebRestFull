@@ -5,6 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import driver.WebWhatsDriver;
 import modelo.*;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import restFul.controle.ControleSessions;
 import sistemaDelivery.controle.ControleChatsAsync;
 import sistemaDelivery.controle.ControleClientes;
@@ -12,6 +14,8 @@ import sistemaDelivery.controle.ControleEstabelecimentos;
 import sistemaDelivery.controle.ControlePedidos;
 import sistemaDelivery.handlersBot.HandlerBoasVindas;
 import sistemaDelivery.handlersBot.HandlerBotDelivery;
+import sistemaDelivery.jobs.AbrirPedidoJob;
+import sistemaDelivery.jobs.FecharPedidoJob;
 import sistemaDelivery.modelo.*;
 import utils.Propriedades;
 import utils.Utilitarios;
@@ -23,9 +27,13 @@ import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.time.format.TextStyle;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -46,6 +54,8 @@ public class SistemaDelivery {
     private Gson builder;
     private TelaWhatsApp telaWhatsApp;
     private Logger logger;
+    private StdSchedulerFactory schedulerFactory;
+    private Scheduler scheduler;
 
     public SistemaDelivery(Estabelecimento estabelecimento, boolean headless) throws IOException {
         logger = SistemaDelivery.createOrGetLogger(estabelecimento);
@@ -117,27 +127,6 @@ public class SistemaDelivery {
         } else {
             this.driver = new WebWhatsDriver(Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
         }
-        executores.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
-                    LocalDateTime localDateTime = estabelecimento.getDataComHoraAtual();
-                    if (estabelecimento.isTimeBeetwenHorarioFuncionamento(localDateTime.toLocalTime(), localDateTime.getDayOfWeek())) {
-                        try {
-                            abrirPedidos();
-                        } catch (SQLException e) {
-                            logger.log(Level.SEVERE, e.getMessage(), e);
-                        }
-                    } else {
-                        try {
-                            fecharPedidos();
-                        } catch (SQLException e) {
-                            logger.log(Level.SEVERE, e.getMessage(), e);
-                        }
-                    }
-                }
-            }
-        }, 0, 1, TimeUnit.MINUTES);
         executores.scheduleWithFixedDelay(() -> {
             if (broadcasterWhats != null) {
                 broadcasterWhats.broadcast(sseWhats.newEvent("none"));
@@ -163,6 +152,22 @@ public class SistemaDelivery {
                 }.start();
             }
         }, 5, 5, TimeUnit.MINUTES);
+        schedulerFactory = new StdSchedulerFactory();
+        try {
+            atualizarJobsHorariosFuncionamento();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
+        LocalDateTime localDateTime = estabelecimento.getDataComHoraAtual();
+        try {
+            if (estabelecimento.isTimeBeetwenHorarioFuncionamento(localDateTime.toLocalTime(), localDateTime.getDayOfWeek())) {
+                abrirPedidos();
+            } else {
+                fecharPedidos();
+            }
+        } catch (SQLException s) {
+            logger.log(Level.SEVERE, s.getMessage(), s);
+        }
     }
 
     private static Logger createOrGetLogger(Estabelecimento estabelecimento) throws IOException {
@@ -327,6 +332,43 @@ public class SistemaDelivery {
         return total;
     }
 
+    public void atualizarJobsHorariosFuncionamento() throws SchedulerException {
+        Map<DayOfWeek, List<HorarioFuncionamento>> horarioFuncionamentos = estabelecimento.getHorariosFuncionamento();
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdown();
+        }
+        scheduler = schedulerFactory.getScheduler();
+        scheduler.start();
+        synchronized (horarioFuncionamentos) {
+            for (Map.Entry<DayOfWeek, List<HorarioFuncionamento>> enty : horarioFuncionamentos.entrySet()) {
+                List<HorarioFuncionamento> horariosDoDia = enty.getValue();
+                synchronized (horariosDoDia) {
+                    for (HorarioFuncionamento horario : horariosDoDia) {
+                        if (!horario.isAtivo()) {
+                            continue;
+                        }
+                        JobDetail jobAbrir = JobBuilder.newJob(AbrirPedidoJob.class)
+                                .withIdentity("abrirPedidoJob" + horario.getUuid(), "abrirFecharPedidos")
+                                .build();
+                        jobAbrir.getJobDataMap().put("sistemaDelivery", this);
+                        JobDetail jobFechar = JobBuilder.newJob(FecharPedidoJob.class)
+                                .withIdentity("fecharPedidoJob" + horario.getUuid(), "abrirFecharPedidos")
+                                .build();
+                        jobFechar.getJobDataMap().put("sistemaDelivery", this);
+                        Trigger triggerAbrir = TriggerBuilder.newTrigger()
+                                .withSchedule(CronScheduleBuilder.cronSchedule("0 " + horario.getHoraAbrir().toLocalTime().getMinute() + " " + horario.getHoraAbrir().toLocalTime().getHour() + " ? * " + horario.getDiaDaSemana().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("en-US")).toUpperCase() + " *"))
+                                .build();
+                        Trigger triggerFechar = TriggerBuilder.newTrigger()
+                                .withSchedule(CronScheduleBuilder.cronSchedule("0 " + horario.getHoraFechar().toLocalTime().getMinute() + " " + horario.getHoraFechar().toLocalTime().getHour() + " ? * " + horario.getDiaDaSemana().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("en-US")).toUpperCase() + " *"))
+                                .build();
+                        scheduler.scheduleJob(jobAbrir, triggerAbrir);
+                        scheduler.scheduleJob(jobFechar, triggerFechar);
+                    }
+                }
+            }
+        }
+    }
+
     public SseBroadcaster getBroadcasterWhats() {
         return broadcasterWhats;
     }
@@ -361,6 +403,10 @@ public class SistemaDelivery {
 
     public WebWhatsDriver getDriver() {
         return driver;
+    }
+
+    public Logger getLogger() {
+        return logger;
     }
 
     public void finalizar() {

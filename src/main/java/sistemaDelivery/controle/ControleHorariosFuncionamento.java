@@ -4,16 +4,21 @@ import DAO.Conexao;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
+import org.quartz.SchedulerException;
+import restFul.controle.ControleSessions;
+import restFul.controle.ControleSistema;
 import sistemaDelivery.modelo.Estabelecimento;
 import sistemaDelivery.modelo.HorarioFuncionamento;
 import utils.Utilitarios;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.DayOfWeek;
 import java.util.*;
+import java.util.logging.Level;
 
 public class ControleHorariosFuncionamento {
 
@@ -56,7 +61,7 @@ public class ControleHorariosFuncionamento {
     }
 
 
-    public boolean salvarHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) throws SQLException {
+    public boolean salvarHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) throws SQLException, SchedulerException, IOException {
         if (horarioFuncionamento.getHoraAbrir().after(horarioFuncionamento.getHoraFechar())) {
             return false;
         }
@@ -76,6 +81,7 @@ public class ControleHorariosFuncionamento {
                     preparedStatement.executeUpdate();
                     connection.commit();
                     horarioFuncionamento.getEstabelecimento().addHorarioFuncionamento(getHorarioFuncionamentoByUUID(horarioFuncionamento.getUuid()));
+                    ControleSessions.getInstance().getSessionForEstabelecimento(horarioFuncionamento.getEstabelecimento()).atualizarJobsHorariosFuncionamento();
                     return true;
                 } catch (SQLException ex) {
                     connection.rollback();
@@ -98,6 +104,7 @@ public class ControleHorariosFuncionamento {
                     if (horariosFuncionamento.containsKey(horarioFuncionamento.getUuid())) {
                         Utilitarios.atualizarObjeto(horariosFuncionamento.get(horarioFuncionamento.getUuid()), horarioFuncionamento);
                     }
+                    ControleSessions.getInstance().getSessionForEstabelecimento(horarioFuncionamento.getEstabelecimento()).atualizarJobsHorariosFuncionamento();
                     return true;
                 } catch (SQLException ex) {
                     connection.rollback();
@@ -106,7 +113,7 @@ public class ControleHorariosFuncionamento {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException e) {
+        } catch (SQLException | SchedulerException | IOException e) {
             throw e;
         }
     }
@@ -149,6 +156,11 @@ public class ControleHorariosFuncionamento {
                     if (horariosFuncionamento.containsKey(horarioFuncionamento.getUuid())) {
                         horariosFuncionamento.remove(horarioFuncionamento.getUuid());
                     }
+                }
+                try {
+                    ControleSessions.getInstance().getSessionForEstabelecimento(horarioFuncionamento.getEstabelecimento()).atualizarJobsHorariosFuncionamento();
+                } catch (Exception ex) {
+                    ControleSistema.getInstance().getLogger().log(Level.SEVERE, ex.getMessage(), ex);
                 }
                 return true;
             } catch (SQLException ex) {
