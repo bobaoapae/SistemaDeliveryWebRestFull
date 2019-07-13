@@ -158,15 +158,17 @@ public class SistemaDelivery {
         } catch (Exception e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
-        LocalDateTime localDateTime = estabelecimento.getDataComHoraAtual();
-        try {
-            if (estabelecimento.isTimeBeetwenHorarioFuncionamento(localDateTime.toLocalTime(), localDateTime.getDayOfWeek())) {
-                abrirPedidos();
-            } else {
-                fecharPedidos();
+        if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
+            LocalDateTime localDateTime = estabelecimento.getDataComHoraAtual();
+            try {
+                if (estabelecimento.isTimeBeetwenHorarioFuncionamento(localDateTime.toLocalTime(), localDateTime.getDayOfWeek())) {
+                    abrirPedidos();
+                } else {
+                    fecharPedidos();
+                }
+            } catch (SQLException s) {
+                logger.log(Level.SEVERE, s.getMessage(), s);
             }
-        } catch (SQLException s) {
-            logger.log(Level.SEVERE, s.getMessage(), s);
         }
     }
 
@@ -337,32 +339,34 @@ public class SistemaDelivery {
         if (scheduler != null && !scheduler.isShutdown()) {
             scheduler.shutdown();
         }
-        scheduler = schedulerFactory.getScheduler();
-        scheduler.start();
-        synchronized (horarioFuncionamentos) {
-            for (Map.Entry<DayOfWeek, List<HorarioFuncionamento>> enty : horarioFuncionamentos.entrySet()) {
-                List<HorarioFuncionamento> horariosDoDia = enty.getValue();
-                synchronized (horariosDoDia) {
-                    for (HorarioFuncionamento horario : horariosDoDia) {
-                        if (!horario.isAtivo()) {
-                            continue;
+        if (estabelecimento.isAbrirFecharPedidosAutomatico()) {
+            scheduler = schedulerFactory.getScheduler();
+            scheduler.start();
+            synchronized (horarioFuncionamentos) {
+                for (Map.Entry<DayOfWeek, List<HorarioFuncionamento>> enty : horarioFuncionamentos.entrySet()) {
+                    List<HorarioFuncionamento> horariosDoDia = enty.getValue();
+                    synchronized (horariosDoDia) {
+                        for (HorarioFuncionamento horario : horariosDoDia) {
+                            if (!horario.isAtivo()) {
+                                continue;
+                            }
+                            JobDetail jobAbrir = JobBuilder.newJob(AbrirPedidoJob.class)
+                                    .withIdentity("abrirPedidoJob" + horario.getUuid(), "abrirFecharPedidos")
+                                    .build();
+                            jobAbrir.getJobDataMap().put("sistemaDelivery", this);
+                            JobDetail jobFechar = JobBuilder.newJob(FecharPedidoJob.class)
+                                    .withIdentity("fecharPedidoJob" + horario.getUuid(), "abrirFecharPedidos")
+                                    .build();
+                            jobFechar.getJobDataMap().put("sistemaDelivery", this);
+                            Trigger triggerAbrir = TriggerBuilder.newTrigger()
+                                    .withSchedule(CronScheduleBuilder.cronSchedule("0 " + horario.getHoraAbrir().toLocalTime().getMinute() + " " + horario.getHoraAbrir().toLocalTime().getHour() + " ? * " + horario.getDiaDaSemana().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("en-US")).toUpperCase() + " *"))
+                                    .build();
+                            Trigger triggerFechar = TriggerBuilder.newTrigger()
+                                    .withSchedule(CronScheduleBuilder.cronSchedule("0 " + horario.getHoraFechar().toLocalTime().getMinute() + " " + horario.getHoraFechar().toLocalTime().getHour() + " ? * " + horario.getDiaDaSemana().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("en-US")).toUpperCase() + " *"))
+                                    .build();
+                            scheduler.scheduleJob(jobAbrir, triggerAbrir);
+                            scheduler.scheduleJob(jobFechar, triggerFechar);
                         }
-                        JobDetail jobAbrir = JobBuilder.newJob(AbrirPedidoJob.class)
-                                .withIdentity("abrirPedidoJob" + horario.getUuid(), "abrirFecharPedidos")
-                                .build();
-                        jobAbrir.getJobDataMap().put("sistemaDelivery", this);
-                        JobDetail jobFechar = JobBuilder.newJob(FecharPedidoJob.class)
-                                .withIdentity("fecharPedidoJob" + horario.getUuid(), "abrirFecharPedidos")
-                                .build();
-                        jobFechar.getJobDataMap().put("sistemaDelivery", this);
-                        Trigger triggerAbrir = TriggerBuilder.newTrigger()
-                                .withSchedule(CronScheduleBuilder.cronSchedule("0 " + horario.getHoraAbrir().toLocalTime().getMinute() + " " + horario.getHoraAbrir().toLocalTime().getHour() + " ? * " + horario.getDiaDaSemana().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("en-US")).toUpperCase() + " *"))
-                                .build();
-                        Trigger triggerFechar = TriggerBuilder.newTrigger()
-                                .withSchedule(CronScheduleBuilder.cronSchedule("0 " + horario.getHoraFechar().toLocalTime().getMinute() + " " + horario.getHoraFechar().toLocalTime().getHour() + " ? * " + horario.getDiaDaSemana().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("en-US")).toUpperCase() + " *"))
-                                .build();
-                        scheduler.scheduleJob(jobAbrir, triggerAbrir);
-                        scheduler.scheduleJob(jobFechar, triggerFechar);
                     }
                 }
             }
