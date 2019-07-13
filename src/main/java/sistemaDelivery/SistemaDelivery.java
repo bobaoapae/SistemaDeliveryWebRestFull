@@ -427,6 +427,13 @@ public class SistemaDelivery {
         if (executores != null && !executores.isShutdown()) {
             executores.shutdown();
         }
+        try {
+            if (scheduler != null && !scheduler.isShutdown()) {
+                scheduler.shutdown();
+            }
+        } catch (SchedulerException e) {
+            logger.log(Level.SEVERE, e.getMessage(), e);
+        }
         ControleChatsAsync.getInstance(estabelecimento).finalizar();
         driver.finalizar();
     }
