@@ -27,17 +27,17 @@ public class Propriedades {
     }
 
     public static String pathCacheWebWhats() {
-        String path = getProperty("cache-web-whats") + getEstadoServidor().name().toLowerCase();
+        String path = getProperty("cache-web-whats") + "-" + getEstadoServidor().name().toLowerCase();
         return path + "\\";
     }
 
     public static String pathLogs() {
-        String path = getProperty("logs") + getEstadoServidor().name().toLowerCase();
+        String path = getProperty("logs") + "-" + getEstadoServidor().name().toLowerCase();
         return path + "\\";
     }
 
     public static String pathBinarios() {
-        String path = getProperty("binarios") + getEstadoServidor().name().toLowerCase();
+        String path = getProperty("binarios") + "-" + getEstadoServidor().name().toLowerCase();
         return path + "\\";
     }
 
