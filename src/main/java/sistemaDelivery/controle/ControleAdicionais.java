@@ -134,7 +134,7 @@ public class ControleAdicionais {
     public List<AdicionalProduto> getAdicionaisGrupo(GrupoAdicional grupo) throws SQLException {
         List<AdicionalProduto> adicionais = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Adicionais\" where uuid_grupo_adicional = ? and ativo order by \"dataCriacao\" ");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Adicionais\" where uuid_grupo_adicional = ? order by ordem, \"dataCriacao\"");
         ) {
             preparedStatement.setObject(1, grupo.getUuid());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {

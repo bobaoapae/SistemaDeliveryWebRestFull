@@ -37,18 +37,20 @@ public class ListennerServer implements ServletContextListener {
             FileHandler fh = new FileHandler(Propriedades.pathLogs() + "LogGeral.txt", true);
             logger.addHandler(fh);
             ControleSistema.getInstance().setLogger(logger);
-            for (Estabelecimento estabelecimento : ControleEstabelecimentos.getInstance().getEstabelecimentosIniciarAutomaticamente()) {
-                new Thread() {
-                    public void run() {
-                        try {
-                            System.out.println("Iniciando para - " + estabelecimento.getNomeEstabelecimento());
-                            ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
-                            System.out.println("Iniciado para - " + estabelecimento.getNomeEstabelecimento());
-                        } catch (Exception e) {
-                            ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
+            if (Propriedades.getEstadoServidor() != Propriedades.EstadoServidor.TESTES) {
+                for (Estabelecimento estabelecimento : ControleEstabelecimentos.getInstance().getEstabelecimentosIniciarAutomaticamente()) {
+                    new Thread() {
+                        public void run() {
+                            try {
+                                System.out.println("Iniciando para - " + estabelecimento.getNomeEstabelecimento());
+                                ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
+                                System.out.println("Iniciado para - " + estabelecimento.getNomeEstabelecimento());
+                            } catch (Exception e) {
+                                ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
+                            }
                         }
-                    }
-                }.start();
+                    }.start();
+                }
             }
         } catch (Exception e) {
             ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);

@@ -762,6 +762,47 @@ public class API {
         }
     }
 
+    @POST
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/atualizarOrdemGrupoAdicionais")
+    public Response atualizarOrdemGrupoAdicionais(@QueryParam("uuid") String uuid, @FormParam("adicionaisEmOrdem") String adicionaisEmOrdem) {
+        try {
+            if (uuid == null || uuid.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            GrupoAdicional grupoAdicional = ControleGruposAdicionais.getInstance().getGrupoByUUID(UUID.fromString(uuid));
+            if (grupoAdicional == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if (grupoAdicional.getCategoria() != null) {
+                if (!grupoAdicional.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+            } else if (grupoAdicional.getProduto() != null) {
+                if (!grupoAdicional.getProduto().getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+            }
+            List<String> uuidsString = Arrays.asList(builder.fromJson(adicionaisEmOrdem, String[].class));
+            synchronized (grupoAdicional.getAdicionais()) {
+                for (AdicionalProduto adicionalProduto : grupoAdicional.getAdicionais()) {
+                    adicionalProduto.setOrdem(uuidsString.indexOf(adicionalProduto.getUuid().toString()));
+                    ControleAdicionais.getInstance().salvarAdicional(adicionalProduto);
+                }
+                Collections.sort(grupoAdicional.getAdicionais(), new Comparator<AdicionalProduto>() {
+                    @Override
+                    public int compare(AdicionalProduto o1, AdicionalProduto o2) {
+                        return Integer.compare(o1.getOrdem(), o2.getOrdem());
+                    }
+                });
+            }
+            return Response.status(Response.Status.OK).entity(builder.toJson(ControleGruposAdicionais.getInstance().getGrupoByUUID(grupoAdicional.getUuid()))).build();
+        } catch (Exception e) {
+            Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+        }
+    }
+
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)

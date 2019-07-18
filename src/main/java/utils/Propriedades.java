@@ -27,29 +27,27 @@ public class Propriedades {
     }
 
     public static String pathCacheWebWhats() {
-        boolean producao = Boolean.valueOf(getProperty("producao"));
-        String path = getProperty("cache-web-whats");
-        if (!producao) {
-            path += "-homologacao";
-        }
+        String path = getProperty("cache-web-whats") + getEstadoServidor().name().toLowerCase();
         return path + "\\";
     }
 
     public static String pathLogs() {
-        boolean producao = Boolean.valueOf(getProperty("producao"));
-        String path = getProperty("logs");
-        if (!producao) {
-            path += "-homologacao";
-        }
+        String path = getProperty("logs") + getEstadoServidor().name().toLowerCase();
         return path + "\\";
     }
 
     public static String pathBinarios() {
-        boolean producao = Boolean.valueOf(getProperty("producao"));
-        String path = getProperty("binarios");
-        if (!producao) {
-            path += "-homologacao";
-        }
+        String path = getProperty("binarios") + getEstadoServidor().name().toLowerCase();
         return path + "\\";
+    }
+
+    public static EstadoServidor getEstadoServidor() {
+        return EstadoServidor.valueOf(getProperty("estadoServidor").toUpperCase());
+    }
+
+    public enum EstadoServidor {
+        PRODUCAO,
+        HOMOLOGACAO,
+        TESTES
     }
 }

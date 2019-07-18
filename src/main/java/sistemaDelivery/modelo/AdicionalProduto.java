@@ -12,6 +12,7 @@ public class AdicionalProduto {
     private String nome, descricao;
     private double valor;
     private boolean ativo;
+    private int ordem;
     @Ignorar
     private transient GrupoAdicional grupoAdicional;
 
@@ -75,6 +76,14 @@ public class AdicionalProduto {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public int getOrdem() {
+        return ordem;
+    }
+
+    public void setOrdem(int ordem) {
+        this.ordem = ordem;
     }
 
     @Override
