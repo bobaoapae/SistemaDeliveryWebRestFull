@@ -104,7 +104,7 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                 chat.setHandler(nextHandler, true);
                 return true;
             }
-            String[] idAdicional = msg.getContent().replaceAll(" ", "").split(",");
+            String[] idAdicional = msg.getContent().replace(" ", "").replace(".", ",").split(",");
             int totalEscolhidos = 0;
             for (String idAtual : idAdicional) {
                 if (grupoAtual.getQtdMax() > 0) {
@@ -112,7 +112,7 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                         break;
                     }
                 }
-                int escolha = Integer.parseInt(idAtual) - 1;
+                int escolha = Integer.parseInt(idAtual.replaceAll("[^0-9]", "")) - 1;
                 if (escolha >= 0 && adicionaisDisponiveis.size() > escolha) {
                     adicionaisEscolhidos.add(adicionaisDisponiveis.get(escolha));
                     totalEscolhidos++;

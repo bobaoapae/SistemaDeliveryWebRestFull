@@ -136,7 +136,6 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
             codigosMenu.add(new HandlerInformesProdutoEscolhido(l, chat, new HandlerAdicionaisProduto(l, chat)));
             if (l.getValor() > 0) {
                 builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + " R$" + moneyFormat.format(l.getValor()) + "*");
-
             } else {
                 double valorMinimo = 0;
                 for (GrupoAdicional grupoAdicional : l.getAllGruposAdicionais()) {

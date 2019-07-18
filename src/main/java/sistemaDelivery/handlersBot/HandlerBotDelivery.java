@@ -28,6 +28,14 @@ public abstract class HandlerBotDelivery extends HandlerBot {
         codigosMenu = new ArrayList<>();
     }
 
+    public String gerarTextoOpcoes() {
+        MessageBuilder messageBuilder = new MessageBuilder();
+        for (OpcaoMenu opcaoMenu : codigosMenu) {
+            messageBuilder.textNewLine(opcaoMenu.toString());
+        }
+        return messageBuilder.build();
+    }
+
     protected final void addOpcaoMenu(HandlerBotDelivery handler, String titulo, String... keywords) {
         addOpcaoMenu(handler, titulo, null, keywords);
     }
@@ -64,6 +72,14 @@ public abstract class HandlerBotDelivery extends HandlerBot {
                 msg.text("_" + subTitulo + "_");
             }
             return msg.build();
+        }
+
+        public boolean verificarKeyword(String msg) {
+            return keywords.stream().anyMatch(s -> s.trim().equalsIgnoreCase(msg.trim()));
+        }
+
+        public HandlerBotDelivery getHandlerBotDelivery() {
+            return handlerBotDelivery;
         }
     }
 
