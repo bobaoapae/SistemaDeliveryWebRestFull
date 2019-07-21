@@ -191,6 +191,7 @@ public class ChatBotDelivery extends ChatBot {
             Chat c = chat.getDriver().getFunctions().getChatByNumber("554491050665");
             if (c != null) {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
+                c.setArchive(true);
             }
             c = chat.getDriver().getFunctions().getChatByNumber("55" + Utilitarios.replaceAllNoDigit(estabelecimento.getNumeroAviso()));
             if (c != null) {

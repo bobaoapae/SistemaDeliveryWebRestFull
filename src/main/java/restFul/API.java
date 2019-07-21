@@ -1285,6 +1285,20 @@ public class API {
     public Response alterarEstadoChatBot() {
         token.getEstabelecimento().setOpenChatBot(!token.getEstabelecimento().isOpenChatBot());
         try {
+            String abertoFechado = token.getEstabelecimento().isOpenChatBot() ? "Aberto" : "Fechado";
+            Chat c = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("554491050665");
+            if (c != null) {
+                c.sendMessage("*" + token.getEstabelecimento().getNomeEstabelecimento() + ":* ChatBot " + abertoFechado);
+                c.setArchive(true);
+            }
+            c = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utilitarios.plainText(token.getEstabelecimento().getNumeroAviso()));
+            if (c != null) {
+                c.sendMessage("*" + token.getEstabelecimento().getNomeEstabelecimento() + ":* ChatBot " + abertoFechado);
+            }
+        } catch (Exception e) {
+            Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+        }
+        try {
             if (ControleEstabelecimentos.getInstance().salvarEstabelecimento(token.getEstabelecimento())) {
                 return Response.status(Response.Status.CREATED).entity(builder.toJson(token.getEstabelecimento())).build();
             } else {
