@@ -9,7 +9,6 @@ import restFul.controle.ControleSessions;
 import restFul.controle.ControleSistema;
 import restFul.controle.ControleTokens;
 import restFul.controle.ControleUsuarios;
-import restFul.modelo.LoginInUse;
 import restFul.modelo.TipoUsuario;
 import restFul.modelo.Token;
 import restFul.modelo.Usuario;
@@ -67,39 +66,6 @@ public class Manager {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
         }
     }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path("/create")
-    public Response create(@QueryParam("securePass") @DefaultValue("") String securePass, @QueryParam("login") @DefaultValue("") String login, @QueryParam("senha") @DefaultValue("") String senha, @QueryParam("qtdEstabelecimentos") @DefaultValue("1") int qtdEstabelecimentos) {
-        if (!securePass.equals("mkQZUJbvda8NDUAfqUhjc48PQjB5mvV5psxae6uBhvUG4eQcYCfarb9bWC9S3W4HDyaH3CUgqPgeerqr5dYW8ZdhFgUyTCAEvqq8hr5xDqybeUqKwxHjJ2kWKF5vAkz8")) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity("{message: \"securePass incorreto\"}").build();
-        } else if (login.isEmpty() || senha.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("{message: \"Campos obrigatórios faltando\"}").build();
-        } else {
-            if (qtdEstabelecimentos < 1) {
-                qtdEstabelecimentos = 1;
-            }
-            Usuario usuario = new Usuario();
-            usuario.setMaxEstabelecimentos(qtdEstabelecimentos);
-            usuario.setUsuario(login);
-            usuario.setSenha(senha);
-            usuario.setTipoUsuario(TipoUsuario.ADMIN);
-            try {
-                if (ControleUsuarios.getInstance().salvarUsuario(usuario)) {
-                    return Response.status(Response.Status.CREATED).type(MediaType.APPLICATION_JSON).entity(builder.toJson(usuario)).build();
-                } else {
-                    return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{message: \"Falha ao salvar usuario, verificar log\"}").build();
-                }
-            } catch (LoginInUse ex) {
-                return Response.status(Response.Status.BAD_REQUEST).entity("{message: \"Login já está em uso\"}").build();
-            } catch (SQLException e) {
-                ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{message: \"" + ExceptionUtils.getStackTrace(e) + "\"}").build();
-            }
-        }
-    }
-
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
