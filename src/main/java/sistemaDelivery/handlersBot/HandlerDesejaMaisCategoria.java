@@ -10,13 +10,13 @@ import modelo.Message;
 import modelo.MessageBuilder;
 import sistemaDelivery.controle.ControleCategorias;
 import sistemaDelivery.modelo.Categoria;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
 
 import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.function.Consumer;
 
 /**
  * @author jvbor
@@ -61,36 +61,27 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
                         }
                     }
                 }
-                codigosMenu.add(new HandlerMenuCategoria(c, chat));
-                builder.textNewLine("*" + (codigosMenu.size()) + "* - Pedir " + c.getNomeCategoria());
+                builder.textNewLine(addOpcaoMenu(new HandlerMenuCategoria(c, chat), new Consumer<String>() {
+                    @Override
+                    public void accept(String s) {
+                        Pedido p = getChatBotDelivery().getPedidoAtual();
+                        p.addItemPedido(getChatBotDelivery().getLastPedido());
+                    }
+                }, "Pedir " + c.getNomeCategoria(), "", c.getNomeCategoria()).toString());
             }
         } catch (SQLException e) {
             getChatBotDelivery().getChat().getDriver().onError(e);
         }
-        codigosMenu.add(new HandlerAdeus(chat));
-        builder.textNewLine("*" + (codigosMenu.size()) + "* - Cancelar Pedido ❌");
-        codigosMenu.add(new HandlerVerificaPedidoCorreto(chat));
-        builder.textNewLine("*" + (codigosMenu.size()) + "* - Concluir Pedido ✅");
+        builder.textNewLine(addOpcaoMenu(new HandlerAdeus(chat), null, "Cancelar Pedido ❌", "", "cancelar", "❌").toString());
+        builder.textNewLine(addOpcaoMenu(new HandlerVerificaPedidoCorreto(chat), null, "Concluir Pedido ✅", "", "concluir", "✅").toString());
         chat.getChat().sendMessage(builder.build());
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message m) {
-        try {
-            getChatBotDelivery().setHandlerVoltar(null);
-            int escolha = Integer.parseInt(m.getContent().trim()) - 1;
-            if (escolha >= 0 && codigosMenu.size() > escolha) {
-                Pedido p = ((ChatBotDelivery) chat).getPedidoAtual();
-                p.addItemPedido(((ChatBotDelivery) chat).getLastPedido());
-                chat.setHandler(codigosMenu.get(escolha), true);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception ex) {
-            return false;
-        }
+        getChatBotDelivery().setHandlerVoltar(null);
+        return processarOpcoesMenu(m);
     }
 
     @Override

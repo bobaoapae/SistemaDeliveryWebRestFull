@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.GrupoAdicional;
 import sistemaDelivery.modelo.Produto;
 
@@ -40,7 +39,7 @@ public class HandlerAdicionaisProduto extends HandlerBotDelivery {
                 gruposJaForam.add(grupo);
                 synchronized (grupo.getAdicionais()) {
                     if (grupo.getAdicionais().size() <= grupo.getQtdMin()) {
-                        ((ChatBotDelivery) chat).getLastPedido().getAdicionais().addAll(grupo.getAdicionais());
+                        getChatBotDelivery().getLastPedido().getAdicionais().addAll(grupo.getAdicionais());
                         continue;
                     }
                 }

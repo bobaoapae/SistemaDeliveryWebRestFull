@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 import java.sql.SQLException;
 
@@ -28,7 +27,7 @@ public class HandlerSolicitarFormaPagamento extends HandlerBotDelivery {
         chat.getChat().sendMessage("*2* - 💳 Cartão de Crédito");
         chat.getChat().sendMessage("*3* - 💳💵 Dinheiro e Cartão de Crédito");
         try {
-            if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
+            if (getChatBotDelivery().getCliente().getCreditosDisponiveis() > 0) {
                 chat.getChat().sendMessage("*4* - Créditos de Recarga");
             }
         } catch (SQLException e) {
@@ -40,18 +39,18 @@ public class HandlerSolicitarFormaPagamento extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message msg) {
         if (msg.getContent().trim().equals("1")) {
-            ((ChatBotDelivery) chat).getPedidoAtual().setCartao(false);
+            getChatBotDelivery().getPedidoAtual().setCartao(false);
             chat.setHandler(new HandlerSolicitarTroco(chat), true);
         } else if (msg.getContent().trim().equals("2")) {
-            ((ChatBotDelivery) chat).getPedidoAtual().setCartao(true);
+            getChatBotDelivery().getPedidoAtual().setCartao(true);
             chat.setHandler(new HandlerDesejaAgendar(chat), true);
         } else if (msg.getContent().trim().equals("3")) {
-            ((ChatBotDelivery) chat).getPedidoAtual().setCartao(true);
-            ((ChatBotDelivery) chat).getPedidoAtual().setTroco(-1);
+            getChatBotDelivery().getPedidoAtual().setCartao(true);
+            getChatBotDelivery().getPedidoAtual().setTroco(-1);
             chat.setHandler(new HandlerSolicitarTroco(chat), true);
         } else {
             try {
-                if (msg.getContent().trim().equals("4") && ((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
+                if (msg.getContent().trim().equals("4") && getChatBotDelivery().getCliente().getCreditosDisponiveis() > 0) {
                     chat.setHandler(new HandlerPagarComCreditos(chat), true);
                 } else {
                     return false;

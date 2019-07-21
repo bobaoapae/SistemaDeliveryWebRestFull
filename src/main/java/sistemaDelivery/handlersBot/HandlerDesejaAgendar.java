@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 import java.time.format.DateTimeFormatter;
 
@@ -32,7 +31,7 @@ public class HandlerDesejaAgendar extends HandlerBotDelivery {
             } else {
                 chat.getChat().sendMessage("Não iniciamos o atendimento ainda, porém você pode agendar o horario do seu pedido.", 1000);
             }
-            if (((ChatBotDelivery) chat).getPedidoAtual().isEntrega()) {
+            if (getChatBotDelivery().getPedidoAtual().isEntrega()) {
                 chat.getChat().sendMessage("Você gostaria de agendar algum horario para o seu pedido ou quer que ele seja entregue assim que iniciarmos a produção e o pedido estiver pronto?", 1000);
                 chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*", 500);
                 chat.getChat().sendMessage("*1* - Agendar", 500);
@@ -43,7 +42,7 @@ public class HandlerDesejaAgendar extends HandlerBotDelivery {
                 chat.getChat().sendMessage("*2* - Deixar pronto assim que iniciar a produção", 500);
             }
         } else {
-            if (((ChatBotDelivery) chat).getPedidoAtual().isEntrega()) {
+            if (getChatBotDelivery().getPedidoAtual().isEntrega()) {
                 chat.getChat().sendMessage("Você gostaria de agendar algum horario para o seu pedido ou quer que ele seja entregue assim que estiver pronto?", 1000);
                 chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
                 chat.getChat().sendMessage("*1* - Agendar", 500);

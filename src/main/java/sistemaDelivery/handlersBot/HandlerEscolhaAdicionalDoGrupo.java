@@ -8,7 +8,6 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.modelo.AdicionalProduto;
-import sistemaDelivery.modelo.Categoria;
 import sistemaDelivery.modelo.GrupoAdicional;
 
 import java.util.ArrayList;
@@ -35,16 +34,12 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        Categoria categoria = grupoAtual.getCategoria();
-        if (categoria == null) {
-            categoria = grupoAtual.getProduto().getCategoria();
-        }
         adicionaisDisponiveis.clear();
         adicionaisEscolhidos.clear();
         synchronized (grupoAtual.getAdicionais()) {
-            if (!grupoAtual.getAdicionais().isEmpty() || !grupoAtual.getAdicionais().stream().anyMatch(adicionalProduto -> adicionalProduto.isAtivo())) {
+            if (!grupoAtual.getAdicionais().isEmpty() && grupoAtual.getAdicionais().stream().anyMatch(AdicionalProduto::isAtivo)) {
                 if (grupoAtual.getDescricaoGrupo().isEmpty()) {
-                    if (grupoAtual.getQtdMax() > 2 || grupoAtual.getQtdMax() == 0) {
+                    if (grupoAtual.getQtdMax() > 1 || grupoAtual.getQtdMax() == 0) {
                         chat.getChat().sendMessage("Quais " + grupoAtual.getNomeGrupo() + " você quer?", 2000);
                     } else {
                         chat.getChat().sendMessage("Qual " + grupoAtual.getNomeGrupo() + " você quer?", 2000);

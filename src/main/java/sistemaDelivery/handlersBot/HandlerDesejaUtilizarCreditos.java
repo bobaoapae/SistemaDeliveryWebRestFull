@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 import java.sql.SQLException;
 
@@ -23,7 +22,7 @@ public class HandlerDesejaUtilizarCreditos extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         try {
-            chat.getChat().sendMessage("Você possui R$ " + moneyFormat.format(((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis()) + " de créditos", 500);
+            chat.getChat().sendMessage("Você possui R$ " + moneyFormat.format(getChatBotDelivery().getCliente().getCreditosDisponiveis()) + " de créditos", 500);
         } catch (SQLException e) {
             getChatBotDelivery().getChat().getDriver().onError(e);
         }

@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
+import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.Month;
@@ -314,5 +315,9 @@ public class Utilitarios {
         MessageDigest md = MessageDigest.getInstance("MD5");
         byte[] thedigest = md.digest(bytesOfMessage);
         return thedigest;
+    }
+
+    public static String removerAcentos(String str) {
+        return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
     }
 }

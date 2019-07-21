@@ -8,7 +8,6 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.controle.ControleClientes;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 /**
  * @author jvbor
@@ -22,8 +21,8 @@ public class HandlerFinalizarCadastro extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         try {
-            ((ChatBotDelivery) chat).getCliente().setCadastroRealizado(true);
-            ControleClientes.getInstance().salvarCliente(((ChatBotDelivery) chat).getCliente());
+            getChatBotDelivery().getCliente().setCadastroRealizado(true);
+            ControleClientes.getInstance().salvarCliente(getChatBotDelivery().getCliente());
         } catch (Exception ex) {
             this.reset();
             chat.getChat().getDriver().onError(ex);

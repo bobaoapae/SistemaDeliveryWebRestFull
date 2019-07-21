@@ -8,7 +8,6 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import modelo.MessageBuilder;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Rodizio;
 
 import java.text.DecimalFormat;
@@ -25,7 +24,7 @@ public class HandlerMenuRodizios extends HandlerBotDelivery {
 
     public HandlerMenuRodizios(ChatBot chat) {
         super(chat);
-        this.rodiziosDisponives = ((ChatBotDelivery) chat).getEstabelecimento().getRodizios();
+        this.rodiziosDisponives = getChatBotDelivery().getEstabelecimento().getRodizios();
     }
 
     @Override

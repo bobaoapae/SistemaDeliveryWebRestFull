@@ -8,11 +8,14 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import modelo.MessageBuilder;
-import sistemaDelivery.modelo.*;
+import sistemaDelivery.modelo.AdicionalProduto;
+import sistemaDelivery.modelo.GrupoAdicional;
+import sistemaDelivery.modelo.ItemPedido;
+import sistemaDelivery.modelo.Pedido;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * @author jvbor
@@ -31,7 +34,7 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
         }
-        Pedido p = ((ChatBotDelivery) chat).getPedidoAtual();
+        Pedido p = getChatBotDelivery().getPedidoAtual();
         MessageBuilder builder = new MessageBuilder();
         for (int x = 0; x < p.getProdutos().size(); x++) {
             ItemPedido produto = p.getProdutos().get(x);
@@ -57,58 +60,21 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
         builder.textNewLine("Total: R$" + moneyFormat.format(p.getTotal()) + " 💵");
         chat.getChat().sendMessage(builder.build(), 4000);
         chat.getChat().sendMessage("Está tudo certo? 🤞");
-        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-        builder = new MessageBuilder();
-        builder.textNewLine("*1* - Sim").
-                textNewLine("*2* - Não  (Inicia o Pedido Novamente)");
-        chat.getChat().sendMessage(builder.build());
+        addOpcaoSim(new HandlerFormaRetirada(chat), null);
+        addOpcaoNao(new HandlerBoasVindas(chat), new Consumer<String>() {
+            @Override
+            public void accept(String s) {
+                chat.getChat().sendMessage("Oh ☹️, sinto muito.");
+                chat.getChat().sendMessage("Vamos começar novamente, espero que agora de tudo certo. 🤞😄");
+            }
+        });
+        chat.getChat().sendMessage(gerarTextoOpcoes());
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message msg) {
-        if (msg.getContent().trim().equals("1") || msg.getContent().toLowerCase().trim().equals("sim") || msg.getContent().toLowerCase().trim().equals("s")) {
-            List<ItemPedido> pedidos = new ArrayList<>(((ChatBotDelivery) chat).getPedidoAtual().getProdutos());
-            for (ItemPedido item : pedidos) {
-                Categoria c = item.getProduto().getCategoria();
-                if (!c.isFazEntrega() || !c.getRootCategoria().isFazEntrega()) {
-                    chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
-                    return true;
-                }
-                if (c.getRootCategoria().getQtdMinEntrega() > ((ChatBotDelivery) chat).getPedidoAtual().getProdutos(c).size() && !c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
-                    return true;
-                } else if (c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    List<Categoria> categoriasCompradas = new ArrayList<>();
-                    for (ItemPedido item2 : ((ChatBotDelivery) chat).getPedidoAtual().getProdutos()) {
-                        if (!categoriasCompradas.contains(item2.getProduto().getCategoria().getRootCategoria())) {
-                            categoriasCompradas.add(item2.getProduto().getCategoria().getRootCategoria());
-                        }
-                    }
-                    categoriasCompradas.remove(item.getProduto().getCategoria().getRootCategoria());
-                    boolean temCategoriaPrecisa = false;
-                    for (Categoria catPrecisa : item.getProduto().getCategoria().getRootCategoria().getCategoriasNecessarias()) {
-                        if (categoriasCompradas.contains(catPrecisa)) {
-                            temCategoriaPrecisa = true;
-                            break;
-                        }
-                    }
-                    if (!temCategoriaPrecisa || c.getRootCategoria().getQtdMinEntrega() > ((ChatBotDelivery) chat).getPedidoAtual().getProdutos(c).size()) {
-                        chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
-                        return true;
-                    }
-                }
-            }
-            chat.getChat().sendMessage("Ótimo, agora só falta você me dizer como deseja retirar o seu pedido. 😁", 2000);
-            chat.setHandler(new HandlerFormaRetirada(chat), true);
-        } else if (msg.getContent().trim().equals("2") || msg.getContent().toLowerCase().trim().equals("não") || msg.getContent().toLowerCase().trim().equals("nao") || msg.getContent().toLowerCase().trim().equals("n")) {
-            chat.getChat().sendMessage("Oh ☹️, sinto muito.");
-            chat.getChat().sendMessage("Vamos começar novamente, espero que agora de tudo certo. 🤞😄");
-            chat.setHandler(new HandlerBoasVindas(chat), true);
-        } else {
-            return false;
-        }
-        return true;
+        return processarOpcoesMenu(msg);
     }
 
     @Override

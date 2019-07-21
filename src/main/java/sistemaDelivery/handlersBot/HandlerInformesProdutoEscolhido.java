@@ -8,7 +8,6 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.modelo.Categoria;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.ItemPedido;
 import sistemaDelivery.modelo.Produto;
 
@@ -43,17 +42,17 @@ public class HandlerInformesProdutoEscolhido extends HandlerBotDelivery {
         if (getChatBotDelivery().getEstabelecimento().possuiEntrega() && (!this.produtoEscolhido.getCategoria().isFazEntrega() || !this.produtoEscolhido.getCategoria().getRootCategoria().isFazEntrega())) {
             chat.getChat().sendMessage("*_Obs²: Não é feita a entrega do produto escolhido_*", 3000);
         } else {
-            List<ItemPedido> pedidos = new ArrayList<>(((ChatBotDelivery) chat).getPedidoAtual().getProdutos());
+            List<ItemPedido> pedidos = new ArrayList<>(getChatBotDelivery().getPedidoAtual().getProdutos());
             for (ItemPedido item : pedidos) {
                 Categoria c = item.getProduto().getCategoria();
                 if (!c.isFazEntrega() || !c.getRootCategoria().isFazEntrega()) {
                     flagMsg = true;
                 }
-                if (c.getRootCategoria().getQtdMinEntrega() > ((ChatBotDelivery) chat).getPedidoAtual().getProdutos(c).size() && !c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
+                if (c.getRootCategoria().getQtdMinEntrega() > getChatBotDelivery().getPedidoAtual().getProdutos(c).size() && !c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
                     flagMsg = true;
                 } else {
                     List<Categoria> categoriasCompradas = new ArrayList<>();
-                    for (ItemPedido item2 : ((ChatBotDelivery) chat).getPedidoAtual().getProdutos()) {
+                    for (ItemPedido item2 : getChatBotDelivery().getPedidoAtual().getProdutos()) {
                         if (!categoriasCompradas.contains(item2.getProduto().getCategoria().getRootCategoria())) {
                             categoriasCompradas.add(item2.getProduto().getCategoria().getRootCategoria());
                         }
@@ -66,7 +65,7 @@ public class HandlerInformesProdutoEscolhido extends HandlerBotDelivery {
                             break;
                         }
                     }
-                    if (!temCategoriaPrecisa || c.getRootCategoria().getQtdMinEntrega() > ((ChatBotDelivery) chat).getPedidoAtual().getProdutos(c).size()) {
+                    if (!temCategoriaPrecisa || c.getRootCategoria().getQtdMinEntrega() > getChatBotDelivery().getPedidoAtual().getProdutos(c).size()) {
                         flagMsg = true;
                     }
                 }
@@ -90,7 +89,7 @@ public class HandlerInformesProdutoEscolhido extends HandlerBotDelivery {
         }
         ItemPedido item = new ItemPedido();
         item.setProduto(produtoEscolhido);
-        ((ChatBotDelivery) chat).setLastPedido(item);
+        getChatBotDelivery().setLastPedido(item);
         chat.setHandler(nextHandler, true);
         return true;
     }

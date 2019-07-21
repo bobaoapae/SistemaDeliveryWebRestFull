@@ -8,7 +8,6 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.controle.ControleReservas;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 /**
  * @author jvbor
@@ -22,7 +21,7 @@ public class HandlerFinalizarReserva extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         try {
-            ControleReservas.getInstance().salvarReserva(((ChatBotDelivery) chat).getReservaAtual());
+            ControleReservas.getInstance().salvarReserva(getChatBotDelivery().getReservaAtual());
         } catch (Exception ex) {
             this.reset();
             chat.getChat().getDriver().onError(ex);
