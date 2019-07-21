@@ -3,7 +3,6 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import modelo.MessageBuilder;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.TipoEntrega;
 
 import java.sql.SQLException;
@@ -20,11 +19,11 @@ public class HandlerRetiradaAutomatica extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message message) {
-        ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
+        getChatBotDelivery().getPedidoAtual().setEntrega(false);
         synchronized (getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
             for (TipoEntrega tipoEntrega : getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
                 if (!tipoEntrega.isSolicitarEndereco() && tipoEntrega.getValor() == 0) {
-                    ((ChatBotDelivery) chat).getPedidoAtual().setTipoEntrega(tipoEntrega);
+                    getChatBotDelivery().getPedidoAtual().setTipoEntrega(tipoEntrega);
                     break;
                 }
             }
@@ -57,7 +56,7 @@ public class HandlerRetiradaAutomatica extends HandlerBotDelivery {
 
     private void irParaProximaEtapa() {
         try {
-            if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
+            if (getChatBotDelivery().getCliente().getCreditosDisponiveis() > 0) {
                 chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
             } else {
                 chat.setHandler(new HandlerDesejaAgendar(chat), true);

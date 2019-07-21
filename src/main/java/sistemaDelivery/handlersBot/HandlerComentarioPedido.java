@@ -10,7 +10,6 @@ import modelo.Message;
 import modelo.MessageBuilder;
 import sistemaDelivery.controle.ControleCategorias;
 import sistemaDelivery.modelo.Categoria;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 import java.sql.SQLException;
 import java.time.LocalTime;
@@ -30,16 +29,16 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        if (((ChatBotDelivery) chat).getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido().isEmpty()) {
-            ((ChatBotDelivery) chat).getLastPedido().setComentario("");
+        if (getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido().isEmpty()) {
+            getChatBotDelivery().getLastPedido().setComentario("");
             chat.setHandler(nextHandler, true);
             return true;
         }
         chat.getChat().sendMessage("Você deseja modificar algo em seu pedido?");
         MessageBuilder builder = new MessageBuilder();
         builder.textNewLine(":");
-        if (((ChatBotDelivery) chat).getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido() != null && !((ChatBotDelivery) chat).getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido().isEmpty()) {
-            chat.getChat().sendMessage("Por exemplo: " + ((ChatBotDelivery) chat).getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido() + "... etc");
+        if (getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido() != null && !getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido().isEmpty()) {
+            chat.getChat().sendMessage("Por exemplo: " + getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido() + "... etc");
         }
         chat.getChat().sendMessage("Basta escrever e me enviar, o que você escrever sera repassado para a àrea de produção", 300);
         chat.getChat().sendMessage("*_Obs¹: Caso não queira modificar nada, basta enviar NÃO_*");
@@ -89,9 +88,9 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
     protected boolean runSecondTime(Message msg) {
         getChatBotDelivery().setHandlerVoltar(null);
         if (msg.getContent().toLowerCase().trim().equals("não") || msg.getContent().toLowerCase().trim().equals("nao") || msg.getContent().toLowerCase().trim().equals("n")) {
-            ((ChatBotDelivery) chat).getLastPedido().setComentario("");
+            getChatBotDelivery().getLastPedido().setComentario("");
         } else {
-            ((ChatBotDelivery) chat).getLastPedido().setComentario(msg.getContent().trim());
+            getChatBotDelivery().getLastPedido().setComentario(msg.getContent().trim());
             chat.getChat().sendMessage("Perfeito, já anotei aqui o que você me disse ✌️😉");
         }
         chat.setHandler(nextHandler, true);

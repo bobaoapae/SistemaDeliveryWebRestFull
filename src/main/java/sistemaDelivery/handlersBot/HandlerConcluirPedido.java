@@ -9,7 +9,6 @@ import modelo.ChatBot;
 import modelo.Message;
 import modelo.MessageBuilder;
 import sistemaDelivery.controle.ControlePedidos;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
 
 import java.time.format.DateTimeFormatter;
@@ -25,9 +24,9 @@ public class HandlerConcluirPedido extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        Pedido p = ((ChatBotDelivery) chat).getPedidoAtual();
-        p.setNomeCliente(((ChatBotDelivery) chat).getNome());
-        p.setCelular(((ChatBotDelivery) chat).getCliente().getTelefoneMovel());
+        Pedido p = getChatBotDelivery().getPedidoAtual();
+        p.setNomeCliente(getChatBotDelivery().getNome());
+        p.setCelular(getChatBotDelivery().getCliente().getTelefoneMovel());
         try {
             if (ControlePedidos.getInstance().salvarPedido(p)) {
                 MessageBuilder builder = new MessageBuilder();

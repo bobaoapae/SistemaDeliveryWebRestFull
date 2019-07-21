@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 /**
  * @author jvbor
@@ -27,7 +26,7 @@ public class HandlerSolicitaNumeroContatoReserva extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message m) {
         if (m.getContent().trim().length() >= 8) {
-            ((ChatBotDelivery) chat).getReservaAtual().setTelefoneContato(m.getContent().trim());
+            getChatBotDelivery().getReservaAtual().setTelefoneContato(m.getContent().trim());
             chat.setHandler(new HandlerFinalizarReserva(chat), true);
             return true;
         }

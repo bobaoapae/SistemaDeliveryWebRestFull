@@ -7,14 +7,11 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import modelo.MessageBuilder;
 import sistemaDelivery.controle.ControleCategorias;
 import sistemaDelivery.modelo.Categoria;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 import java.sql.SQLException;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Calendar;
 
 /**
@@ -22,18 +19,13 @@ import java.util.Calendar;
  */
 public class HandlerMenuPrincipal extends HandlerBotDelivery {
 
-    private ArrayList<HandlerBotDelivery> codigosMenu = new ArrayList<>();
-
     public HandlerMenuPrincipal(ChatBot chat) {
         super(chat);
     }
 
     @Override
     protected boolean runFirstTime(Message m) {
-        codigosMenu.clear();
-        MessageBuilder builder = new MessageBuilder();
         chat.getChat().sendMessage("Qual cardapio você gostaria de olhar?", 2000);
-        builder.textNewLine("*_Obs: Envie somente o número da sua escolha_*");
         Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
         LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
@@ -57,43 +49,28 @@ public class HandlerMenuPrincipal extends HandlerBotDelivery {
                         }
                     }
                 }
-                codigosMenu.add(new HandlerMenuCategoria(c, chat));
-                builder.textNewLine("*" + (codigosMenu.size()) + "* - " + c.getNomeCategoria());
+                addOpcaoMenu(new HandlerMenuCategoria(c, chat), null, c.getNomeCategoria(), "", c.getNomeCategoria());
             }
         } catch (SQLException e) {
             getChatBotDelivery().getChat().getDriver().onError(e);
         }
         if (getChatBotDelivery().getEstabelecimento().isReservas()) {
-            codigosMenu.add(new HandlerRealizarReserva(chat));
-            builder.textNewLine("*" + (codigosMenu.size()) + "* - Realizar Reserva");
+            addOpcaoMenu(new HandlerRealizarReserva(chat), null, "Realizar Reserva", "", "reserva");
         }
-        if (!((ChatBotDelivery) chat).getEstabelecimento().getRodizios().isEmpty()) {
-            codigosMenu.add(new HandlerMenuRodizios(chat));
-            builder.textNewLine("*" + (codigosMenu.size()) + "* - Ver Rodizios");
+        if (!getChatBotDelivery().getEstabelecimento().getRodizios().isEmpty()) {
+            addOpcaoMenu(new HandlerMenuRodizios(chat), null, "Ver Rodizios", "", "rodizios", "rodizio");
         }
-        codigosMenu.add(new HandlerAdeus(chat));
-        builder.textNewLine("*" + (codigosMenu.size()) + "* - Cancelar Pedido ❌");
-        if (((ChatBotDelivery) chat).getPedidoAtual() != null && ((ChatBotDelivery) chat).getPedidoAtual().getProdutos().size() > 0) {
-            codigosMenu.add(new HandlerVerificaPedidoCorreto(chat));
-            builder.textNewLine("*" + (codigosMenu.size()) + "* - Concluir Pedido ✅");
+        addOpcaoMenu(new HandlerAdeus(chat), null, "Cancelar Pedido ❌", "", "cancelar");
+        if (getChatBotDelivery().getPedidoAtual() != null && getChatBotDelivery().getPedidoAtual().getProdutos().size() > 0) {
+            addOpcaoMenu(new HandlerVerificaPedidoCorreto(chat), null, "Concluir Pedido ✅", "", "concluir");
         }
-        chat.getChat().sendMessage(builder.build());
+        chat.getChat().sendMessage(gerarTextoOpcoes());
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message m) {
-        try {
-            int escolha = Integer.parseInt(m.getContent().trim()) - 1;
-            if (escolha >= 0 && codigosMenu.size() > escolha) {
-                chat.setHandler(codigosMenu.get(escolha), true);
-            } else {
-                return false;
-            }
-        } catch (Exception ex) {
-            return false;
-        }
-        return true;
+        return processarOpcoesMenu(m);
     }
 
     @Override

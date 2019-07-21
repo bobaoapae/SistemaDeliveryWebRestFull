@@ -8,7 +8,6 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import modelo.UserChat;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 /**
  * @author jvbor
@@ -31,7 +30,7 @@ public class HandlerVerificaNumeroCadastro extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message m) {
         if (m.getContent().trim().equals("1")) {
-            ((ChatBotDelivery) chat).getCliente().setTelefoneMovel(((UserChat) chat.getChat()).getContact().getPhoneNumber());
+            getChatBotDelivery().getCliente().setTelefoneMovel(((UserChat) chat.getChat()).getContact().getPhoneNumber());
             chat.setHandler(new HandlerSolicitarDataNascimento(chat), true);
             return true;
         } else if (m.getContent().trim().equals("2")) {

@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 /**
  * @author jvbor
@@ -37,7 +36,7 @@ public class HandlerSolicitarQuantidadePessoasReserva extends HandlerBotDelivery
             if (qtdPessoas == 0) {
                 return false;
             }
-            ((ChatBotDelivery) chat).getReservaAtual().setQtdPessoas(qtdPessoas);
+            getChatBotDelivery().getReservaAtual().setQtdPessoas(qtdPessoas);
             chat.setHandler(new HandlerVerificaNomeContatoReserva(chat), true);
         } catch (NumberFormatException e) {
             getChatBotDelivery().getChat().getDriver().onError(e);

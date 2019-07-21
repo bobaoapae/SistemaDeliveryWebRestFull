@@ -7,10 +7,10 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
 
 import java.util.Random;
+import java.util.function.Consumer;
 
 /**
  * @author jvbor
@@ -30,24 +30,23 @@ public class HandlerComecarNovoPedido extends HandlerBotDelivery {
             this.reset();
             return true;
         }
-        chat.getChat().sendMessage("Olá, " + ((ChatBotDelivery) chat).getNome() + " 😄");
+        chat.getChat().sendMessage("Olá, " + getChatBotDelivery().getNome() + " 😄");
         chat.getChat().sendMessage("Gostaria de iniciar um novo pedido?");
-        chat.getChat().sendMessage("1 - Sim");
-        chat.getChat().sendMessage("2 - Não");
+        addOpcaoSim(null, new Consumer<String>() {
+            @Override
+            public void accept(String s) {
+                getChatBotDelivery().setPedidoAtual(new Pedido(getChatBotDelivery().getCliente(), getChatBotDelivery().getEstabelecimento()));
+                getChatBotDelivery().enviarMensageInformesIniciais();
+            }
+        });
+        addOpcaoNao(new HandlerAdeus(chat), null);
+        chat.getChat().sendMessage(gerarTextoOpcoes());
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message msg) {
-        if (msg.getContent().trim().equals("1") || msg.getContent().toLowerCase().trim().equals("sim") || msg.getContent().toLowerCase().trim().equals("s")) {
-            ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(((ChatBotDelivery) chat).getCliente(), getChatBotDelivery().getEstabelecimento()));
-            getChatBotDelivery().enviarMensageInformesIniciais();
-        } else if (msg.getContent().trim().equals("2") || msg.getContent().toLowerCase().trim().equals("não") || msg.getContent().toLowerCase().trim().equals("nao") || msg.getContent().toLowerCase().trim().equals("n")) {
-            chat.setHandler(new HandlerAdeus(chat), true);
-        } else {
-            return false;
-        }
-        return true;
+        return processarOpcoesMenu(msg);
     }
 
     @Override

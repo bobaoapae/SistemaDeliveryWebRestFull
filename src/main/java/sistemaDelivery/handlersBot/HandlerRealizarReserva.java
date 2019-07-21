@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Reserva;
 import utils.DateUtils;
 
@@ -38,14 +37,14 @@ public class HandlerRealizarReserva extends HandlerBotDelivery {
         String dataS = m.getContent().trim().replaceAll(" ", "");
         try {
             Calendar data = Calendar.getInstance();
-            data.setTime(((ChatBotDelivery) chat).getDateFormat().parse(dataS));
+            data.setTime(getChatBotDelivery().getDateFormat().parse(dataS));
             data.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
             if (DateUtils.isToday(data.getTime()) || DateUtils.isAfterDay(data.getTime(), Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject()).getTime())) {
                 Reserva r = new Reserva();
-                r.setCliente(((ChatBotDelivery) chat).getCliente());
-                r.setEstabelecimento(((ChatBotDelivery) chat).getEstabelecimento());
+                r.setCliente(getChatBotDelivery().getCliente());
+                r.setEstabelecimento(getChatBotDelivery().getEstabelecimento());
                 r.setDataReserva(new Timestamp(data.getTime().getTime()));
-                ((ChatBotDelivery) chat).setReservaAtual(r);
+                getChatBotDelivery().setReservaAtual(r);
                 chat.setHandler(new HandlerSolicitarHorarioReserva(chat), true);
                 return true;
             } else {

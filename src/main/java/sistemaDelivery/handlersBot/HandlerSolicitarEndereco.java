@@ -10,7 +10,6 @@ import com.google.gson.JsonParser;
 import modelo.ChatBot;
 import modelo.GeoMessage;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Endereco;
 import utils.Utilitarios;
 
@@ -37,7 +36,7 @@ public class HandlerSolicitarEndereco extends HandlerBotDelivery {
         if (!(msg instanceof GeoMessage)) {
             Endereco endereco = new Endereco();
             endereco.setLogradouro(msg.getContent().trim());
-            ((ChatBotDelivery) chat).getPedidoAtual().setEndereco(endereco);
+            getChatBotDelivery().getPedidoAtual().setEndereco(endereco);
         } else if (msg instanceof GeoMessage) {
             try {
                 String jsonAddres = Utilitarios.getText(new URL("https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyAKljZZxcZTXCkL4iwJtHHEWI42Fv1AZnI&latlng=" + ((GeoMessage) msg).getLatitude() + "," + ((GeoMessage) msg).getLongitude()));
@@ -46,7 +45,7 @@ public class HandlerSolicitarEndereco extends HandlerBotDelivery {
                 String ende = element.getAsJsonObject().get("results").getAsJsonArray().get(0).getAsJsonObject().get("formatted_address").getAsString();
                 Endereco endereco = new Endereco();
                 endereco.setLogradouro(ende);
-                ((ChatBotDelivery) chat).getPedidoAtual().setEndereco(endereco);
+                getChatBotDelivery().getPedidoAtual().setEndereco(endereco);
             } catch (Exception ex) {
                 chat.getChat().sendMessage("Desculpe, não consegui achar seu endereço com base na sua localização.");
                 getChatBotDelivery().getChat().getDriver().onError(ex);
