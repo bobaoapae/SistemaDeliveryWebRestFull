@@ -25,7 +25,8 @@ public class HandlerMenuPrincipal extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Qual cardapio você gostaria de olhar?", 2000);
+        chat.getChat().markComposing(2500);
+        chat.getChat().sendMessage("Qual cardapio você gostaria de olhar?");
         Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
         LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
@@ -64,6 +65,7 @@ public class HandlerMenuPrincipal extends HandlerBotDelivery {
         if (getChatBotDelivery().getPedidoAtual() != null && getChatBotDelivery().getPedidoAtual().getProdutos().size() > 0) {
             addOpcaoMenu(new HandlerVerificaPedidoCorreto(chat), null, "Concluir Pedido ✅", "", "concluir");
         }
+        chat.getChat().markComposing(3500);
         chat.getChat().sendMessage(gerarTextoOpcoes());
         return true;
     }

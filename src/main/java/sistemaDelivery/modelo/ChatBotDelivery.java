@@ -142,29 +142,30 @@ public class ChatBotDelivery extends ChatBot {
     }
 
     public void enviarMensageInformesIniciais() {
+        chat.markComposing(3000);
         if (!this.getEstabelecimento().isOpenPedidos()) {
             if (!this.getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
-                chat.sendMessage("_Obs: Não realizamos atendimentos hoje_", 3500);
+                chat.sendMessage("_Obs: Não realizamos atendimentos hoje_");
                 this.setHandler(new HandlerAdeus(this), true);
             } else if (this.getEstabelecimento().nextHorarioAbertoOfDay() == null) {
-                chat.sendMessage("_Obs: Já encerramos os atendimentos por hoje_", 3500);
+                chat.sendMessage("_Obs: Já encerramos os atendimentos por hoje_");
                 this.setHandler(new HandlerAdeus(this), true);
             } else if (this.getEstabelecimento().isAgendamentoDePedidos()) {
-                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você pode deixar seu pedido agendado._", 3000);
+                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você pode deixar seu pedido agendado._");
                 this.setHandler(new HandlerMenuPrincipal(this), true);
             } else if (this.getEstabelecimento().isReservas() && this.getEstabelecimento().isReservasComPedidosFechados()) {
-                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_", 3500);
+                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_");
                 this.setHandler(new HandlerDesejaFazerUmaReserva(this), true);
             } else {
-                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._", 3500);
+                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._");
                 this.setHandler(new HandlerAdeus(this), true);
             }
         } else {
             boolean possuiEntrega = this.getEstabelecimento().possuiEntrega();
             if (possuiEntrega) {
-                chat.sendMessage("Informo que nosso prazo médio para entrega é de " + this.getEstabelecimento().getTempoMedioEntrega() + " à " + (this.getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (this.getEstabelecimento().getTempoMedioRetirada()) + " à " + (this.getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
+                chat.sendMessage("Informo que nosso prazo médio para entrega é de " + this.getEstabelecimento().getTempoMedioEntrega() + " à " + (this.getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (this.getEstabelecimento().getTempoMedioRetirada()) + " à " + (this.getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.");
             } else {
-                chat.sendMessage("Informo que nosso prazo médio para retirada é de " + (this.getEstabelecimento().getTempoMedioRetirada()) + " à " + (this.getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
+                chat.sendMessage("Informo que nosso prazo médio para retirada é de " + (this.getEstabelecimento().getTempoMedioRetirada()) + " à " + (this.getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.");
             }
             this.setHandler(new HandlerMenuPrincipal(this), true);
         }
@@ -192,7 +193,7 @@ public class ChatBotDelivery extends ChatBot {
             if (c != null) {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
             }
-            c = chat.getDriver().getFunctions().getChatByNumber("55" + Utilitarios.replaceAllNoDigit(estabelecimento.getNumeroAviso()));
+            c = chat.getDriver().getFunctions().getChatByNumber("55" + Utilitarios.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
             if (c != null) {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
             }
@@ -220,7 +221,7 @@ public class ChatBotDelivery extends ChatBot {
         if (!estabelecimento.isOpenChatBot()) {
             return;
         }
-        if (m.getContent().trim().equalsIgnoreCase("voltar")) {
+        if (m.getContent().trim().equalsIgnoreCase("voltar") || Utilitarios.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "voltar")) {
             if (handlerVoltar != null) {
                 handlerVoltar.execute(this, m);
                 setHandlerVoltar(null);
@@ -229,9 +230,14 @@ public class ChatBotDelivery extends ChatBot {
             }
             return;
         }
-        if (m.getContent().trim().toLowerCase().equals("cancelar")) {
+        if (m.getContent().trim().toLowerCase().equals("cancelar") || Utilitarios.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "cancelar")) {
             setHandler(new HandlerAdeus(this), true);
             return;
+        }
+        if (Utilitarios.retornarApenasLetras(m.getContent()).equalsIgnoreCase("ajuda") || Utilitarios.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "ajuda")) {
+            if (sendRequestAjuda()) {
+                return;
+            }
         }
         getHandler().handle(m);
     }

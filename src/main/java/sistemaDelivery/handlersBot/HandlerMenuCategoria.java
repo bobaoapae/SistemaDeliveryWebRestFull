@@ -30,9 +30,11 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         MessageBuilder builder = new MessageBuilder();
+        chat.getChat().markComposing(2000);
         chat.getChat().sendMessage("Segue as opções de: " + c.getNomeCategoria() + ".");
         if (!c.isFazEntrega()) {
-            chat.getChat().sendMessage(gerarObs("Não é feita a entrega dos produtos abaixo"), 1500);
+            chat.getChat().markComposing(2000);
+            chat.getChat().sendMessage(gerarObs("Não é feita a entrega dos produtos abaixo"));
         } else {
             boolean temCategoriaPrecisa = false;
             boolean msg = false;
@@ -53,12 +55,13 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
                 msg = true;
             }
             if (msg) {
+                chat.getChat().markComposing(3000);
                 if (c.getRootCategoria().getQtdMinEntrega() > 1 && !c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens"), 1500);
+                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens"));
                 } else if (c.getRootCategoria().getQtdMinEntrega() > 1 && c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens ou pedir junto algum produto de outro cardapio"), 1500);
+                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens ou pedir junto algum produto de outro cardapio"));
                 } else if (c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir junto algum produto de outro cardapio"), 1500);
+                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir junto algum produto de outro cardapio"));
                 }
             }
         }
@@ -67,6 +70,7 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
         builder.textNewLine(addOpcaoMenu(new HandlerMenuPrincipal(chat), null, "Voltar ao Menu Principal ↩", "", "voltar", "menu", "principal").toString());
         builder.textNewLine(addOpcaoMenu(new HandlerAdeus(chat), null, "Cancelar Pedido ❌", "", "cancelar").toString());
         builder.textNewLine(gerarObs("Escolha um item por vez"));
+        chat.getChat().markComposing(5000);
         chat.getChat().sendMessage(builder.build());
         return true;
     }

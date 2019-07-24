@@ -7,6 +7,7 @@ package utils;
 
 import adapters.*;
 import com.google.gson.GsonBuilder;
+import info.debatty.java.stringsimilarity.JaroWinkler;
 import restFul.controle.ControleSistema;
 import sistemaDelivery.modelo.HorarioFuncionamento;
 import sistemaDelivery.modelo.ItemPedido;
@@ -14,24 +15,21 @@ import sistemaDelivery.modelo.Produto;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.swing.text.JTextComponent;
 import javax.xml.bind.DatatypeConverter;
-import java.awt.event.KeyEvent;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.DecimalFormat;
-import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.Month;
@@ -43,12 +41,6 @@ import java.util.logging.Level;
  * @author BOV-INOS
  */
 public class Utilitarios {
-
-    public static Thread runInThread(Runnable r) {
-        Thread t = new Thread(r);
-        t.start();
-        return t;
-    }
 
     public static GsonBuilder getDefaultGsonBuilder(Type type) {
         GsonBuilder builder = new GsonBuilder().disableHtmlEscaping().
@@ -177,21 +169,6 @@ public class Utilitarios {
         return response.toString();
     }
 
-    public static void replaceAllNoDigit(JTextComponent iin) {
-        String in = iin.getText();
-        if (in.isEmpty()) {
-            return;
-        }
-        char[] chars = in.toCharArray();
-        String s = "";
-        for (char i : chars) {
-            if (Character.isDigit(i)) {
-                s += i;
-            }
-        }
-        iin.setText(s);
-    }
-
     public static String getMonth(int mes) {
         return Month.of(mes).getDisplayName(TextStyle.FULL, Locale.forLanguageTag("pt-BR"));
     }
@@ -200,64 +177,12 @@ public class Utilitarios {
         return DayOfWeek.of(diaSemana).getDisplayName(TextStyle.FULL_STANDALONE, Locale.forLanguageTag("pt-BR"));
     }
 
-    public static String replaceAllNoDigit(String iin) {
-        String in = iin;
-        if (in.isEmpty()) {
-            return "";
-        }
-        char[] chars = in.toCharArray();
-        String s = "";
-        for (char i : chars) {
-            if (Character.isDigit(i)) {
-                s += i;
-            }
-        }
-        return s;
-    }
-
-    public static void formatMoneyValue(JTextComponent iin) {
-        String in = iin.getText();
-        in = in.replaceAll("\\.", "");
-        in = in.replaceAll(",", ".");
-        DecimalFormat formatter = new DecimalFormat("###,###,###.00");
-        if (in.isEmpty()) {
-            iin.setText("0,00");
-            return;
-        }
-        iin.setText(formatter.format(Double.parseDouble(in)));
-    }
-
-    public static void validateNumberOnly(KeyEvent evt) {
-        if (!Character.isDigit(evt.getKeyChar())) {
-            evt.consume();
-        }
-    }
-
-    public static void validateNumberFloatOnly(KeyEvent evt) {
-        if (Character.isDigit(evt.getKeyChar())) {
-            return;
-        }
-        if (evt.getKeyChar() != ',') {
-            evt.consume();
-            return;
-        }
-        if (evt.getComponent() instanceof JTextComponent) {
-            JTextComponent comp = ((JTextComponent) evt.getComponent());
-            if (evt.getKeyChar() == ',') {
-                if (comp.getText().indexOf(",") != -1) {
-                    evt.consume();
-                    return;
-                }
-            }
-        }
-    }
-
-    public static String plainText(String input) {
+    public static String retornarApenasNumeros(String input) {
         return input.replaceAll("[^0-9]", "");
     }
 
-    public static String plainTextAlfabeto(String input) {
-        return input.replaceAll("[^a-zA-Z]", "");
+    public static String retornarApenasLetras(String input) {
+        return removerAcentos(input).replaceAll("[^a-zA-Z]", "");
     }
 
     public static String convertToString(Date d, String formato) {
@@ -265,59 +190,66 @@ public class Utilitarios {
         return formatador.format(d);
     }
 
-    public static String convertToString(Date d) {
-        SimpleDateFormat formatador = new SimpleDateFormat("dd/MM/yyyy");
-        return formatador.format(d);
-    }
-
-    public static void validateMaxInput(KeyEvent iin, int max) {
-        if (iin.getComponent() instanceof JTextComponent) {
-            if (((JTextComponent) iin.getComponent()).getText().length() >= max) {
-                iin.consume();
-            }
-        }
-    }
-
-    public static void validateMoneyValue(KeyEvent evt) {
-        if (evt.getComponent() instanceof JTextComponent) {
-            JTextComponent comp = ((JTextComponent) evt.getComponent());
-            if (Character.isDigit(evt.getKeyChar())) {
-                return;
-            }
-            if (evt.getKeyChar() != '.' && evt.getKeyChar() != ',') {
-                evt.consume();
-                return;
-            }
-            if (evt.getKeyChar() == ',') {
-                if (comp.getText().indexOf(",") != -1) {
-                    evt.consume();
-                    return;
-                }
-                int posicaoCursor = comp.getCaretPosition();
-                if (comp.getText().indexOf(".") >= posicaoCursor || comp.getText().indexOf(".") + 1 >= posicaoCursor) {
-                    evt.consume();
-                    return;
-                }
-            }
-            if (evt.getKeyChar() == '.') {
-                int posicaoCursor = comp.getCaretPosition();
-                if (comp.getText().indexOf(",") != -1 && comp.getText().indexOf(",") <= posicaoCursor) {
-                    evt.consume();
-                    return;
-                }
-            }
-        }
-    }
-
-    public static byte[] toMD5(String s) throws UnsupportedEncodingException, NoSuchAlgorithmException {
-        byte[] bytesOfMessage = s.getBytes(StandardCharsets.UTF_8);
-
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        byte[] thedigest = md.digest(bytesOfMessage);
-        return thedigest;
-    }
-
     public static String removerAcentos(String str) {
-        return Normalizer.normalize(str, Normalizer.Form.NFD).replaceAll("[^\\p{ASCII}]", "");
+        return str.replaceAll("[ãâàáä]", "a").replaceAll("[êèéë]", "e").replaceAll("[îìíï]", "i").replaceAll("[õôòóö]", "o").replaceAll("[ûúùü]", "u").replaceAll("[ÃÂÀÁÄ]", "A").replaceAll("[ÊÈÉË]", "E").replaceAll("[ÎÌÍÏ]", "I").replaceAll("[ÕÔÒÓÖ]", "O").replaceAll("[ÛÙÚÜ]", "U").replace('ç', 'c').replace('Ç', 'C').replace('ñ', 'n').replace('Ñ', 'N').replaceAll("!", "").replaceAll("\\[\\´\\`\\?!\\@\\#\\$\\%\\¨\\*", " ").replaceAll("\\(\\)\\=\\{\\}\\[\\]\\~\\^\\]", " ").replaceAll("[\\;\\-\\_\\+\\'\\ª\\º\\:\\;\\/]", " ").replaceAll("§", " ");
     }
+
+    public static boolean verificarSeSaoStringParecidas(String a, String b) {
+        JaroWinkler jw = new JaroWinkler();
+        double igualdade = jw.similarity(retornarApenasLetras(a).toUpperCase(), retornarApenasLetras(b).toUpperCase());
+        return igualdade >= 0.9d;
+    }
+
+    public static boolean verificarFrasePossuiPalavraIgualOuParecida(String frase, String palavra) {
+        String[] palavras = frase.split("\\s");
+        for (String palavraAtual : palavras) {
+            if (retornarApenasLetras(palavraAtual).equalsIgnoreCase(retornarApenasLetras(palavra)) || verificarSeSaoStringParecidas(palavraAtual.trim(), palavra.trim())) {
+                return true;
+            }
+        }
+        if (retornarApenasLetras(frase).equalsIgnoreCase(retornarApenasLetras(palavra)) || verificarSeSaoStringParecidas(frase, palavra)) {
+            return true;
+        }
+        return false;
+    }
+
+    public static String corrigirStringComBaseEmListaDeStringsValidas(List<String> stringsValidas, String corrigir) {
+        JaroWinkler jw = new JaroWinkler();
+        double maiorIgualdade = 0d;
+        String stringValida = "";
+        for (String string : stringsValidas) {
+            String[] palavras = corrigir.trim().split("\\s");
+            double igualdade = 0d;
+            for (String palavraAtual : palavras) {
+                double igualdadeAtual = 0d;
+                String[] palavrasValidas = string.trim().split("\\s");
+                int totalValidas = 0;
+                for (String pa : palavrasValidas) {
+                    double igualdadeTeste = jw.similarity(retornarApenasLetras(pa.toUpperCase()), retornarApenasLetras(palavraAtual.toUpperCase()));
+                    if (igualdadeTeste > 0.7) {
+                        igualdadeAtual += igualdadeTeste;
+                        totalValidas++;
+                    }
+                }
+                if (totalValidas > 0) {
+                    igualdadeAtual /= totalValidas;
+                    igualdade += igualdadeAtual;
+                }
+            }
+            igualdade /= palavras.length;
+            if (igualdade > maiorIgualdade) {
+                maiorIgualdade = igualdade;
+                stringValida = string;
+            }
+        }
+        for (String string : stringsValidas) {
+            double igualdade = jw.similarity(retornarApenasLetras(string.toUpperCase()), retornarApenasLetras(corrigir.toUpperCase()));
+            if (igualdade > 0.7d && igualdade > maiorIgualdade) {
+                maiorIgualdade = igualdade;
+                stringValida = string;
+            }
+        }
+        return stringValida;
+    }
+
 }

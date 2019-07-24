@@ -28,12 +28,8 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
+        chat.getChat().markComposing(1500);
         chat.getChat().sendMessage("Vou mandar um resumo do seu pedido para que você verifique se está tudo certo, okay ☺️?!");
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
         Pedido p = getChatBotDelivery().getPedidoAtual();
         MessageBuilder builder = new MessageBuilder();
         for (int x = 0; x < p.getProdutos().size(); x++) {
@@ -58,7 +54,8 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
         }
         p.calcularValor();
         builder.textNewLine("Total: R$" + moneyFormat.format(p.getTotal()) + " 💵");
-        chat.getChat().sendMessage(builder.build(), 4000);
+        chat.getChat().markComposing(5000);
+        chat.getChat().sendMessage(builder.build());
         chat.getChat().sendMessage("Está tudo certo? 🤞");
         addOpcaoSim(new HandlerFormaRetirada(chat), null);
         addOpcaoNao(new HandlerBoasVindas(chat), new Consumer<String>() {

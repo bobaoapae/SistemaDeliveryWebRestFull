@@ -53,7 +53,8 @@ public class HandlerConcluirPedido extends HandlerBotDelivery {
                                 .textBold(p.getEstabelecimento().getEndereco());
                     }
                 }
-                chat.getChat().sendMessage(builder.build(), 3500);
+                chat.getChat().markComposing(5000);
+                chat.getChat().sendMessage(builder.build());
                 chat.setHandler(new HandlerPedidoConcluido(chat), true);
             } else {
                 this.reset();

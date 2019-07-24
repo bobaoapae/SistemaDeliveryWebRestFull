@@ -26,34 +26,34 @@ public class HandlerDesejaAgendar extends HandlerBotDelivery {
             return true;
         }
         if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
+            chat.getChat().markComposing(3000);
             if (getChatBotDelivery().getEstabelecimento().nextHorarioAbertoOfDay() != null) {
-                chat.getChat().sendMessage("Não iniciamos o atendimento ainda, nosso horário de atentimento é das " + getChatBotDelivery().getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " às " + getChatBotDelivery().getEstabelecimento().nextHorarioAbertoOfDay().getHoraFechar().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você pode agendar o horario do seu pedido.", 1000);
+                chat.getChat().sendMessage("Não iniciamos o atendimento ainda, nosso horário de atentimento é das " + getChatBotDelivery().getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " às " + getChatBotDelivery().getEstabelecimento().nextHorarioAbertoOfDay().getHoraFechar().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você pode agendar o horario do seu pedido.");
             } else {
-                chat.getChat().sendMessage("Não iniciamos o atendimento ainda, porém você pode agendar o horario do seu pedido.", 1000);
+                chat.getChat().sendMessage("Não iniciamos o atendimento ainda, porém você pode agendar o horario do seu pedido.");
             }
             if (getChatBotDelivery().getPedidoAtual().isEntrega()) {
-                chat.getChat().sendMessage("Você gostaria de agendar algum horario para o seu pedido ou quer que ele seja entregue assim que iniciarmos a produção e o pedido estiver pronto?", 1000);
-                chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*", 500);
-                chat.getChat().sendMessage("*1* - Agendar", 500);
-                chat.getChat().sendMessage("*2* - Entregar assim que estiver pronto", 500);
+                chat.getChat().sendMessage("Você gostaria de agendar algum horario para o seu pedido ou quer que ele seja entregue assim que iniciarmos a produção e o pedido estiver pronto?");
+                addOpcaoMenu(new HandlerAgendamentoPedido(chat), null, "Agendar", "", "agendar");
+                addOpcaoMenu(new HandlerConcluirPedido(chat), null, "Entregar assim que estiver pronto", "", "quando", "pronto", "estiver");
             } else {
-                chat.getChat().sendMessage("Você gostaria de agendar algum horario para a retirada do seu pedido ou podemos deixar ele pronto logo após iniciarmos a nossa produção?", 1000);
-                chat.getChat().sendMessage("*1* - Agendar", 500);
-                chat.getChat().sendMessage("*2* - Deixar pronto assim que iniciar a produção", 500);
+                chat.getChat().sendMessage("Você gostaria de agendar algum horario para a retirada do seu pedido ou podemos deixar ele pronto logo após iniciarmos a nossa produção?");
+                addOpcaoMenu(new HandlerAgendamentoPedido(chat), null, "Agendar", "", "agendar");
+                addOpcaoMenu(new HandlerConcluirPedido(chat), null, "Deixar pronto assim que iniciar a produção", "", "quando", "iniciar", "produção");
             }
         } else {
             if (getChatBotDelivery().getPedidoAtual().isEntrega()) {
-                chat.getChat().sendMessage("Você gostaria de agendar algum horario para o seu pedido ou quer que ele seja entregue assim que estiver pronto?", 1000);
-                chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-                chat.getChat().sendMessage("*1* - Agendar", 500);
-                chat.getChat().sendMessage("*2* - Entregar assim que estiver pronto", 500);
+                chat.getChat().sendMessage("Você gostaria de agendar algum horario para o seu pedido ou quer que ele seja entregue assim que estiver pronto?");
+                addOpcaoMenu(new HandlerAgendamentoPedido(chat), null, "Agendar", "", "agendar");
+                addOpcaoMenu(new HandlerConcluirPedido(chat), null, "Entregar assim que estiver pronto", "", "quando", "pronto", "estiver");
             } else {
                 chat.getChat().sendMessage("Você gostaria de agendar algum horario para a retirada do seu pedido?");
-                chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-                chat.getChat().sendMessage("*1* - Sim", 500);
-                chat.getChat().sendMessage("*2* - Não", 500);
+                addOpcaoSim(new HandlerAgendamentoPedido(chat), null);
+                addOpcaoNao(new HandlerConcluirPedido(chat), null);
             }
         }
+        chat.getChat().markComposing(2500);
+        chat.getChat().sendMessage(gerarTextoOpcoes());
         return true;
     }
 

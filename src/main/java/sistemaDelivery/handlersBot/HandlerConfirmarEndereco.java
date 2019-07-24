@@ -26,7 +26,7 @@ public class HandlerConfirmarEndereco extends HandlerBotDelivery {
         MessageBuilder builder = new MessageBuilder();
         builder.textNewLine("Anotei o seguinte endereço aqui: *" + getChatBotDelivery().getPedidoAtual().getEndereco() + "*");
         builder.textNewLine("O endereço informado está correto?");
-        builder.textNewLine(gerarObs("Olhe com atenção, pois caso esteja errado não vou conseguir realizar a entrega para você_* ☹"));
+        builder.textNewLine(gerarObs("*_Olhe com atenção, pois caso esteja errado não vou conseguir realizar a entrega para você_* ☹"));
         builder.textNewLine(addOpcaoSim(new HandlerSolicitarFormaPagamento(chat), new Consumer<String>() {
             @Override
             public void accept(String s) {
@@ -45,6 +45,7 @@ public class HandlerConfirmarEndereco extends HandlerBotDelivery {
                 chat.getChat().sendMessage("Sinto muito, vou anotar seu endereço novamente então");
             }
         }).toString());
+        chat.getChat().markComposing(4000);
         chat.getChat().sendMessage(builder.build());
         return true;
     }

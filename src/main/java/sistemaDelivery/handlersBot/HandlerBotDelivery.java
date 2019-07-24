@@ -143,21 +143,19 @@ public abstract class HandlerBotDelivery extends HandlerBot {
         }
 
         protected boolean verificarKeyword(String msg) {
-            if (!Utilitarios.replaceAllNoDigit(msg).isEmpty() && codigosMenu.indexOf(this) + 1 == Integer.parseInt(Utilitarios.replaceAllNoDigit(msg))) {
+            if (!Utilitarios.retornarApenasNumeros(msg).isEmpty() && codigosMenu.indexOf(this) + 1 == Integer.parseInt(Utilitarios.retornarApenasNumeros(msg))) {
                 return true;
             }
             for (String keyword : keywords) {
-                for (String token : msg.split("\\s")) {
-                    if (Utilitarios.removerAcentos(keyword).toLowerCase().trim().contains(Utilitarios.removerAcentos(token).toLowerCase().trim()) || Utilitarios.removerAcentos(token).toLowerCase().trim().contains(Utilitarios.removerAcentos(keyword).toLowerCase().trim())) {
-                        return true;
-                    }
+                if (Utilitarios.verificarFrasePossuiPalavraIgualOuParecida(msg, keyword)) {
+                    return true;
                 }
             }
             return false;
         }
 
         protected boolean verificarKeywordExata(String msg) {
-            if (!Utilitarios.replaceAllNoDigit(msg).isEmpty() && codigosMenu.indexOf(this) + 1 == Integer.parseInt(Utilitarios.replaceAllNoDigit(msg))) {
+            if (!Utilitarios.retornarApenasNumeros(msg).isEmpty() && codigosMenu.indexOf(this) + 1 == Integer.parseInt(Utilitarios.retornarApenasNumeros(msg))) {
                 return true;
             }
             for (String keyword : keywords) {

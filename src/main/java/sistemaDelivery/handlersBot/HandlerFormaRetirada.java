@@ -59,20 +59,19 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
                 }
             }
         }
-        chat.getChat().sendMessage("Ótimo, agora só falta você me dizer como deseja retirar o seu pedido. 😁", 2000);
-        codigosMenu.clear();
+        chat.getChat().markComposing(1000);
+        chat.getChat().sendMessage("Ótimo, agora só falta você me dizer como deseja retirar o seu pedido. 😁");
         String formasRetiradas = getChatBotDelivery().getEstabelecimento().getTiposEntregasConcatenados();
         boolean possuiEntrega = getChatBotDelivery().getEstabelecimento().possuiEntrega();
         synchronized (getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
-
+            chat.getChat().markComposing(2500);
             if (possuiEntrega) {
                 chat.getChat().sendMessage("Informo que nosso prazo médio para entrega é de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
             } else {
                 chat.getChat().sendMessage("Informo que nosso prazo médio para retirada é de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
             }
-
+            chat.getChat().markComposing(2000);
             chat.getChat().sendMessage("Você quer que seu pedido seja para " + formasRetiradas + "?");
-
             for (TipoEntrega tipoEntrega : getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
                 boolean cobrarTaxa = tipoEntrega.getValor() > 0;
                 if (tipoEntrega.getValor() > 0) {
@@ -111,8 +110,8 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
                         }
                     }
                 }, tipoEntrega.getNome() + (cobrarTaxa ? " R$ " + getChatBotDelivery().getMoneyFormat().format(tipoEntrega.getValor()) : ""), "", tipoEntrega.getNome());
-                chat.getChat().sendMessage(gerarTextoOpcoes());
             }
+            chat.getChat().sendMessage(gerarTextoOpcoes());
         }
         return true;
     }

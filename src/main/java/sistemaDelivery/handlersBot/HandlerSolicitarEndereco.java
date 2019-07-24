@@ -26,8 +26,9 @@ public class HandlerSolicitarEndereco extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Por favor, me envie o endereço para que eu possa entregar seu pedido", 500);
-        chat.getChat().sendMessage("*_Obs: Envie tudo em uma unica mensagem. Ex: Av Tupassi, numero 10, casa verde de esquina...(O PONTO DE REFERÊNCIA É MUITO IMPORTANTE)_*");
+        chat.getChat().sendMessage("Por favor, me envie o endereço para que eu possa entregar seu pedido");
+        chat.getChat().markComposing(3000);
+        chat.getChat().sendMessage(gerarObs("Envie tudo em uma unica mensagem. Ex: Av Tupassi, numero 10, casa verde de esquina...(O PONTO DE REFERÊNCIA É MUITO IMPORTANTE)"));
         return true;
     }
 

@@ -26,6 +26,7 @@ public class HandlerAgendamentoPedido extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
+        chat.getChat().markComposing(1000);
         if (getChatBotDelivery().getPedidoAtual().isEntrega()) {
             chat.getChat().sendMessage("Para que horas você gostaria que a entrega fosse feita?");
         } else {
