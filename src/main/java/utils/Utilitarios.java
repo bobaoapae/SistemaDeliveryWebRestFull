@@ -30,6 +30,7 @@ import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.Month;
@@ -250,6 +251,23 @@ public class Utilitarios {
             }
         }
         return stringValida;
+    }
+
+    public static Date tryParseData(String dataS) {
+        List<SimpleDateFormat> knownPatterns = new ArrayList<>();
+        knownPatterns.add(new SimpleDateFormat("dd/MM/yyyy"));
+        knownPatterns.add(new SimpleDateFormat("dd-MM-yyyy"));
+        knownPatterns.add(new SimpleDateFormat("dd/MM/yy"));
+        knownPatterns.add(new SimpleDateFormat("dd-MM-yy"));
+        knownPatterns.add(new SimpleDateFormat("dd MM yyyy"));
+        knownPatterns.add(new SimpleDateFormat("dd MM yy"));
+        for (SimpleDateFormat pattern : knownPatterns) {
+            try {
+                return pattern.parse(dataS);
+            } catch (ParseException pe) {
+            }
+        }
+        return null;
     }
 
 }
