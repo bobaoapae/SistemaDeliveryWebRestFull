@@ -1291,7 +1291,7 @@ public class API {
                 c.sendMessage("*" + token.getEstabelecimento().getNomeEstabelecimento() + ":* ChatBot " + abertoFechado);
                 c.setArchive(true);
             }
-            c = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utilitarios.plainText(token.getEstabelecimento().getNumeroAviso()));
+            c = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utilitarios.retornarApenasNumeros(token.getEstabelecimento().getNumeroAviso()));
             if (c != null) {
                 c.sendMessage("*" + token.getEstabelecimento().getNomeEstabelecimento() + ":* ChatBot " + abertoFechado);
             }

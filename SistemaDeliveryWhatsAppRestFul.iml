@@ -26,6 +26,8 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.8.5" level="project" />
     <orderEntry type="library" name="commons-dbutils:commons-dbutils:1.7" level="project" />
+    <orderEntry type="library" name="Maven: info.debatty:java-string-similarity:1.2.1" level="project" />
+    <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
     <orderEntry type="library" name="Maven: br.com.zapia:BotWhatsApp:1.0" level="project" />
     <orderEntry type="library" name="Maven: br.com.zapia:WebWhatsAppLib:1.0" level="project" />
     <orderEntry type="library" name="Maven: br.com.zapia:JxBrowserCrack:6.24" level="project" />
