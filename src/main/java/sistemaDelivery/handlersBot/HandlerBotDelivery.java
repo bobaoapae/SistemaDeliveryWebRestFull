@@ -52,8 +52,7 @@ public abstract class HandlerBotDelivery extends HandlerBot {
     }
 
     protected String gerarObs(String observacao) {
-        String obs = "*Obs" + gerarNumeroElevado() + "*: " + observacao;
-        return obs;
+        return "*Obs" + gerarNumeroElevado() + "*: " + observacao;
     }
 
     protected void resetarOpcoes() {

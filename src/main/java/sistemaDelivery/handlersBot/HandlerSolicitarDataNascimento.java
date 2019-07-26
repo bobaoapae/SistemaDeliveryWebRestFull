@@ -9,16 +9,14 @@ import modelo.ChatBot;
 import modelo.Message;
 import utils.Utilitarios;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
  * @author jvbor
  */
 public class HandlerSolicitarDataNascimento extends HandlerBotDelivery {
-
-    SimpleDateFormat formatador = new SimpleDateFormat("dd/MM/yyyy");
 
     public HandlerSolicitarDataNascimento(ChatBot chat) {
         super(chat);
@@ -28,7 +26,7 @@ public class HandlerSolicitarDataNascimento extends HandlerBotDelivery {
     protected boolean runFirstTime(Message m) {
         chat.getChat().sendMessage("Certo, para poder finalizar seu cadastro só preciso de mais uma informação");
         chat.getChat().sendMessage("Me informe sua data de nascimento.");
-        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm/aaaa*. Ex: *" + formatador.format(Calendar.getInstance().getTime()) + "*");
+        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm/aaaa*. Ex: *" + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "*");
         return true;
     }
 
@@ -47,7 +45,7 @@ public class HandlerSolicitarDataNascimento extends HandlerBotDelivery {
     @Override
     protected void onError(Message m) {
         chat.getChat().sendMessage("A data informada é invalida, tente novamente");
-        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm/aaaa*. Ex: *" + formatador.format(Calendar.getInstance().getTime()) + "*");
+        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm/aaaa*. Ex: *" + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "*");
     }
 
     @Override
