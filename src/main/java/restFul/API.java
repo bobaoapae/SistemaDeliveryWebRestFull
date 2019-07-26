@@ -1193,7 +1193,7 @@ public class API {
             cliente.setEstabelecimento(token.getEstabelecimento());
             if (!cliente.getTelefoneMovel().isEmpty() && token.getSistemaDelivery().getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
                 try {
-                    Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utilitarios.replaceAllNoDigit(cliente.getTelefoneMovel()));
+                    Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utilitarios.retornarApenasNumeros(cliente.getTelefoneMovel()));
                     if (chat != null) {
                         cliente.setChatId(chat.getId());
                     }

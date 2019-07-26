@@ -10,20 +10,18 @@ import modelo.Message;
 import modelo.MessageBuilder;
 import sistemaDelivery.controle.ControleCategorias;
 import sistemaDelivery.modelo.Categoria;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
 
 import java.sql.SQLException;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.function.Consumer;
 
 /**
  * @author jvbor
  */
 public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
 
-    private ArrayList<HandlerBotDelivery> codigosMenu = new ArrayList<>();
     private Categoria c;
 
     public HandlerDesejaMaisCategoria(Categoria c, ChatBot chat) {
@@ -39,8 +37,14 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
         } else {
             builder.textNewLine("O que você quer fazer agora?");
         }
-        codigosMenu.add(new HandlerMenuCategoria(c, chat));
-        builder.textNewLine("*" + (codigosMenu.size()) + "* - Pedir mais " + c.getNomeCategoria());
+        Consumer<String> consumer = new Consumer<>() {
+            @Override
+            public void accept(String s) {
+                Pedido p = getChatBotDelivery().getPedidoAtual();
+                p.addItemPedido(getChatBotDelivery().getLastPedido());
+            }
+        };
+        builder.textNewLine(addOpcaoMenu(new HandlerMenuCategoria(c, chat), consumer, "Pedir mais " + c.getNomeCategoria(), "", c.getNomeCategoria()).toString());
         Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
         LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
@@ -61,36 +65,22 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
                         }
                     }
                 }
-                codigosMenu.add(new HandlerMenuCategoria(c, chat));
-                builder.textNewLine("*" + (codigosMenu.size()) + "* - Pedir " + c.getNomeCategoria());
+                builder.textNewLine(addOpcaoMenu(new HandlerMenuCategoria(c, chat), consumer, "Pedir " + c.getNomeCategoria(), "", c.getNomeCategoria()).toString());
             }
         } catch (SQLException e) {
             getChatBotDelivery().getChat().getDriver().onError(e);
         }
-        codigosMenu.add(new HandlerAdeus(chat));
-        builder.textNewLine("*" + (codigosMenu.size()) + "* - Cancelar Pedido ❌");
-        codigosMenu.add(new HandlerVerificaPedidoCorreto(chat));
-        builder.textNewLine("*" + (codigosMenu.size()) + "* - Concluir Pedido ✅");
+        builder.textNewLine(addOpcaoMenu(new HandlerAdeus(chat), null, "Cancelar Pedido ❌", "", "cancelar", "❌").toString());
+        builder.textNewLine(addOpcaoMenu(new HandlerVerificaPedidoCorreto(chat), consumer, "Concluir Pedido ✅", "", "concluir", "✅").toString());
+        chat.getChat().markComposing(1500);
         chat.getChat().sendMessage(builder.build());
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message m) {
-        try {
-            getChatBotDelivery().setHandlerVoltar(null);
-            int escolha = Integer.parseInt(m.getContent().trim()) - 1;
-            if (escolha >= 0 && codigosMenu.size() > escolha) {
-                Pedido p = ((ChatBotDelivery) chat).getPedidoAtual();
-                p.addItemPedido(((ChatBotDelivery) chat).getLastPedido());
-                chat.setHandler(codigosMenu.get(escolha), true);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception ex) {
-            return false;
-        }
+        getChatBotDelivery().setHandlerVoltar(null);
+        return processarOpcoesMenu(m);
     }
 
     @Override

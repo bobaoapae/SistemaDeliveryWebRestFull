@@ -10,7 +10,6 @@ import com.google.gson.JsonParser;
 import modelo.ChatBot;
 import modelo.GeoMessage;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Endereco;
 import utils.Utilitarios;
 
@@ -27,8 +26,9 @@ public class HandlerSolicitarEndereco extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Por favor, me envie o endereço para que eu possa entregar seu pedido", 500);
-        chat.getChat().sendMessage("*_Obs: Envie tudo em uma unica mensagem. Ex: Av Tupassi, numero 10, casa verde de esquina...(O PONTO DE REFERÊNCIA É MUITO IMPORTANTE)_*");
+        chat.getChat().sendMessage("Por favor, me envie o endereço para que eu possa entregar seu pedido");
+        chat.getChat().markComposing(3000);
+        chat.getChat().sendMessage(gerarObs("Envie tudo em uma unica mensagem. Ex: Av Tupassi, numero 10, casa verde de esquina...(O PONTO DE REFERÊNCIA É MUITO IMPORTANTE)"));
         return true;
     }
 
@@ -37,7 +37,7 @@ public class HandlerSolicitarEndereco extends HandlerBotDelivery {
         if (!(msg instanceof GeoMessage)) {
             Endereco endereco = new Endereco();
             endereco.setLogradouro(msg.getContent().trim());
-            ((ChatBotDelivery) chat).getPedidoAtual().setEndereco(endereco);
+            getChatBotDelivery().getPedidoAtual().setEndereco(endereco);
         } else if (msg instanceof GeoMessage) {
             try {
                 String jsonAddres = Utilitarios.getText(new URL("https://maps.googleapis.com/maps/api/geocode/json?key=AIzaSyAKljZZxcZTXCkL4iwJtHHEWI42Fv1AZnI&latlng=" + ((GeoMessage) msg).getLatitude() + "," + ((GeoMessage) msg).getLongitude()));
@@ -46,7 +46,7 @@ public class HandlerSolicitarEndereco extends HandlerBotDelivery {
                 String ende = element.getAsJsonObject().get("results").getAsJsonArray().get(0).getAsJsonObject().get("formatted_address").getAsString();
                 Endereco endereco = new Endereco();
                 endereco.setLogradouro(ende);
-                ((ChatBotDelivery) chat).getPedidoAtual().setEndereco(endereco);
+                getChatBotDelivery().getPedidoAtual().setEndereco(endereco);
             } catch (Exception ex) {
                 chat.getChat().sendMessage("Desculpe, não consegui achar seu endereço com base na sua localização.");
                 getChatBotDelivery().getChat().getDriver().onError(ex);

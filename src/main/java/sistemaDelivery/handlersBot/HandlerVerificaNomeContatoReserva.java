@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 /**
  * @author jvbor
@@ -20,7 +19,7 @@ public class HandlerVerificaNomeContatoReserva extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Agora preciso do nome para contato, já tenho o seguinte nome anotado aqui: " + ((ChatBotDelivery) chat).getNome());
+        chat.getChat().sendMessage("Agora preciso do nome para contato, já tenho o seguinte nome anotado aqui: " + getChatBotDelivery().getNome());
         chat.getChat().sendMessage("O nome está correto?");
         chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
         chat.getChat().sendMessage("1 - Sim");
@@ -31,7 +30,7 @@ public class HandlerVerificaNomeContatoReserva extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message m) {
         if (m.getContent().trim().equals("1")) {
-            ((ChatBotDelivery) chat).getReservaAtual().setNomeContato(((ChatBotDelivery) chat).getNome());
+            getChatBotDelivery().getReservaAtual().setNomeContato(getChatBotDelivery().getNome());
             chat.setHandler(new HandlerVerificaNumeroContatoReserva(chat), true);
             return true;
         } else if (m.getContent().trim().equals("2")) {

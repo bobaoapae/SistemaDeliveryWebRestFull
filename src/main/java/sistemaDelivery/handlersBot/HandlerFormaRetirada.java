@@ -7,18 +7,20 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
+import sistemaDelivery.modelo.Categoria;
 import sistemaDelivery.modelo.ItemPedido;
 import sistemaDelivery.modelo.TipoEntrega;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author jvbor
  */
 public class HandlerFormaRetirada extends HandlerBotDelivery {
 
-    private ArrayList<TipoEntrega> codigosMenu = new ArrayList<>();
 
     public HandlerFormaRetirada(ChatBot chat) {
         super(chat);
@@ -26,76 +28,97 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        codigosMenu.clear();
+        List<ItemPedido> pedidos = new ArrayList<>(getChatBotDelivery().getPedidoAtual().getProdutos());
+        for (ItemPedido item : pedidos) {
+            Categoria c = item.getProduto().getCategoria();
+            if (!c.isFazEntrega() || !c.getRootCategoria().isFazEntrega()) {
+                chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
+                return true;
+            }
+            if (c.getRootCategoria().getQtdMinEntrega() > getChatBotDelivery().getPedidoAtual().getProdutos(c).size() && !c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
+                chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
+                return true;
+            } else if (c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
+                List<Categoria> categoriasCompradas = new ArrayList<>();
+                for (ItemPedido item2 : getChatBotDelivery().getPedidoAtual().getProdutos()) {
+                    if (!categoriasCompradas.contains(item2.getProduto().getCategoria().getRootCategoria())) {
+                        categoriasCompradas.add(item2.getProduto().getCategoria().getRootCategoria());
+                    }
+                }
+                categoriasCompradas.remove(item.getProduto().getCategoria().getRootCategoria());
+                boolean temCategoriaPrecisa = false;
+                for (Categoria catPrecisa : item.getProduto().getCategoria().getRootCategoria().getCategoriasNecessarias()) {
+                    if (categoriasCompradas.contains(catPrecisa)) {
+                        temCategoriaPrecisa = true;
+                        break;
+                    }
+                }
+                if (!temCategoriaPrecisa || c.getRootCategoria().getQtdMinEntrega() > getChatBotDelivery().getPedidoAtual().getProdutos(c).size()) {
+                    chat.setHandler(new HandlerRetiradaAutomatica(chat), true);
+                    return true;
+                }
+            }
+        }
+        chat.getChat().markComposing(1000);
+        chat.getChat().sendMessage("Ótimo, agora só falta você me dizer como deseja retirar o seu pedido. 😁");
         String formasRetiradas = getChatBotDelivery().getEstabelecimento().getTiposEntregasConcatenados();
         boolean possuiEntrega = getChatBotDelivery().getEstabelecimento().possuiEntrega();
         synchronized (getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
-
+            chat.getChat().markComposing(2500);
             if (possuiEntrega) {
                 chat.getChat().sendMessage("Informo que nosso prazo médio para entrega é de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
             } else {
                 chat.getChat().sendMessage("Informo que nosso prazo médio para retirada é de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
             }
-
+            chat.getChat().markComposing(2000);
             chat.getChat().sendMessage("Você quer que seu pedido seja para " + formasRetiradas + "?");
-            chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-
             for (TipoEntrega tipoEntrega : getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
                 boolean cobrarTaxa = tipoEntrega.getValor() > 0;
                 if (tipoEntrega.getValor() > 0) {
-                    for (ItemPedido itemPedido : ((ChatBotDelivery) chat).getPedidoAtual().getProdutos()) {
+                    for (ItemPedido itemPedido : getChatBotDelivery().getPedidoAtual().getProdutos()) {
                         if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
                             cobrarTaxa = false;
                             break;
                         }
                     }
                 }
-                codigosMenu.add(tipoEntrega);
-                if (cobrarTaxa) {
-                    chat.getChat().sendMessage("*" + codigosMenu.size() + "* - " + tipoEntrega.getNome() + " R$ " + ((ChatBotDelivery) chat).getMoneyFormat().format(tipoEntrega.getValor()));
-                } else {
-                    chat.getChat().sendMessage("*" + codigosMenu.size() + "* - " + tipoEntrega.getNome());
-                }
+                addOpcaoMenu(null, new Consumer<String>() {
+                    @Override
+                    public void accept(String s) {
+                        getChatBotDelivery().getPedidoAtual().setTipoEntrega(tipoEntrega);
+                        getChatBotDelivery().getPedidoAtual().calcularValor();
+                        if (tipoEntrega.isSolicitarEndereco()) {
+                            getChatBotDelivery().getPedidoAtual().setEntrega(true);
+                            chat.getChat().sendMessage("Blz");
+                            if (getChatBotDelivery().getCliente().getEndereco() == null || getChatBotDelivery().getCliente().getEndereco().getLogradouro().isEmpty()) {
+                                chat.setHandler(new HandlerSolicitarEndereco(chat), true);
+                            } else {
+                                chat.setHandler(new HandlerUsarUltimoEndereco(chat), true);
+                            }
+                        } else {
+                            getChatBotDelivery().getPedidoAtual().setEntrega(false);
+                            try {
+                                if (getChatBotDelivery().getCliente().getCreditosDisponiveis() > 0) {
+                                    chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
+                                } else {
+                                    chat.setHandler(new HandlerDesejaAgendar(chat), true);
+                                }
+                            } catch (SQLException e) {
+                                chat.getChat().getDriver().onError(e);
+                                chat.setHandler(new HandlerDesejaAgendar(chat), true);
+                            }
+                        }
+                    }
+                }, tipoEntrega.getNome() + (cobrarTaxa ? " R$ " + getChatBotDelivery().getMoneyFormat().format(tipoEntrega.getValor()) : ""), "", tipoEntrega.getNome());
             }
+            chat.getChat().sendMessage(gerarTextoOpcoes());
         }
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message msg) {
-        try {
-            int escolha = Integer.parseInt(msg.getContent().trim()) - 1;
-            if (escolha >= 0 && codigosMenu.size() > escolha) {
-                TipoEntrega tipoEntrega = codigosMenu.get(escolha);
-                ((ChatBotDelivery) chat).getPedidoAtual().setTipoEntrega(tipoEntrega);
-                ((ChatBotDelivery) chat).getPedidoAtual().calcularValor();
-                if (tipoEntrega.isSolicitarEndereco()) {
-                    ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(true);
-                    chat.getChat().sendMessage("Blz");
-                    if (((ChatBotDelivery) chat).getCliente().getEndereco() == null || ((ChatBotDelivery) chat).getCliente().getEndereco().getLogradouro().isEmpty()) {
-                        chat.setHandler(new HandlerSolicitarEndereco(chat), true);
-                    } else {
-                        chat.setHandler(new HandlerUsarUltimoEndereco(chat), true);
-                    }
-                } else {
-                    ((ChatBotDelivery) chat).getPedidoAtual().setEntrega(false);
-                    if (((ChatBotDelivery) chat).getCliente().getCreditosDisponiveis() > 0) {
-                        chat.setHandler(new HandlerDesejaUtilizarCreditos(chat), true);
-                    } else {
-                        chat.setHandler(new HandlerDesejaAgendar(chat), true);
-                    }
-                }
-                return true;
-            } else {
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            getChatBotDelivery().getChat().getDriver().onError(e);
-            return false;
-        } catch (Exception ex) {
-            getChatBotDelivery().getChat().getDriver().onError(ex);
-            return false;
-        }
+        return processarOpcoesMenu(msg);
     }
 
     @Override

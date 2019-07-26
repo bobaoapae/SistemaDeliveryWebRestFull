@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
 
 /**
@@ -22,9 +21,11 @@ public class HandlerAdeus extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         getChatBotDelivery().setHandlerVoltar(null);
-        ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(((ChatBotDelivery) chat).getCliente(), getChatBotDelivery().getEstabelecimento()));
+        getChatBotDelivery().setPedidoAtual(new Pedido(getChatBotDelivery().getCliente(), getChatBotDelivery().getEstabelecimento()));
         chat.setHandler(new HandlerComecarNovoPedido(chat), false);
-        chat.getChat().sendMessage("Até mais, " + ((ChatBotDelivery) chat).getNome() + ". Obrigado pela preferência");
+        chat.getChat().markComposing(2500);
+        chat.getChat().sendMessage("Até mais, " + getChatBotDelivery().getNome() + ". Obrigado pela preferência");
+        chat.getChat().markComposing(2000);
         chat.getChat().sendMessage("Aguardamos seu retorno 🤗🖤");
         return true;
     }

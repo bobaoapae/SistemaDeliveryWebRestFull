@@ -9,7 +9,8 @@ import modelo.ChatBot;
 import modelo.Message;
 import modelo.MessageBuilder;
 import sistemaDelivery.controle.ControleClientes;
-import sistemaDelivery.modelo.ChatBotDelivery;
+
+import java.util.function.Consumer;
 
 /**
  * @author jvbor
@@ -23,34 +24,35 @@ public class HandlerConfirmarEndereco extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         MessageBuilder builder = new MessageBuilder();
-        builder.textNewLine("Anotei o seguinte endereço aqui: *" + ((ChatBotDelivery) chat).getPedidoAtual().getEndereco() + "*");
+        builder.textNewLine("Anotei o seguinte endereço aqui: *" + getChatBotDelivery().getPedidoAtual().getEndereco() + "*");
         builder.textNewLine("O endereço informado está correto?");
-        builder.textNewLine("*_Obs¹: Envie somente o número da sua escolha_*");
-        builder.textNewLine("*_Obs²:Olhe com atenção, pois caso esteja errado não vou conseguir realizar a entrega para você_* ☹️");
-        builder.textNewLine("*1* - Sim");
-        builder.textNewLine("*2* - Não");
+        builder.textNewLine(gerarObs("*_Olhe com atenção, pois caso esteja errado não vou conseguir realizar a entrega para você_* ☹"));
+        builder.textNewLine(addOpcaoSim(new HandlerSolicitarFormaPagamento(chat), new Consumer<String>() {
+            @Override
+            public void accept(String s) {
+                chat.getChat().sendMessage("Blz");
+                getChatBotDelivery().getCliente().setEndereco(getChatBotDelivery().getPedidoAtual().getEndereco());
+                try {
+                    ControleClientes.getInstance().salvarCliente(getChatBotDelivery().getCliente());
+                } catch (Exception ex) {
+                    chat.getChat().getDriver().onError(ex);
+                }
+            }
+        }).toString());
+        builder.textNewLine(addOpcaoNao(new HandlerSolicitarEndereco(chat), new Consumer<String>() {
+            @Override
+            public void accept(String s) {
+                chat.getChat().sendMessage("Sinto muito, vou anotar seu endereço novamente então");
+            }
+        }).toString());
+        chat.getChat().markComposing(4000);
         chat.getChat().sendMessage(builder.build());
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message msg) {
-        if (msg.getContent().trim().equals("1") || msg.getContent().toLowerCase().trim().equals("sim") || msg.getContent().toLowerCase().trim().equals("s")) {
-            chat.getChat().sendMessage("Blz");
-            ((ChatBotDelivery) chat).getCliente().setEndereco(getChatBotDelivery().getPedidoAtual().getEndereco());
-            try {
-                ControleClientes.getInstance().salvarCliente(((ChatBotDelivery) chat).getCliente());
-            } catch (Exception ex) {
-                chat.getChat().getDriver().onError(ex);
-            }
-            chat.setHandler(new HandlerSolicitarFormaPagamento(chat), true);
-        } else if (msg.getContent().trim().equals("2") || msg.getContent().toLowerCase().trim().equals("não") || msg.getContent().toLowerCase().trim().equals("nao") || msg.getContent().toLowerCase().trim().equals("n")) {
-            chat.getChat().sendMessage("Sinto muito, vou anotar seu endereço novamente então");
-            chat.setHandler(new HandlerSolicitarEndereco(chat), true);
-        } else {
-            return false;
-        }
-        return true;
+        return processarOpcoesMenu(msg);
     }
 
     @Override

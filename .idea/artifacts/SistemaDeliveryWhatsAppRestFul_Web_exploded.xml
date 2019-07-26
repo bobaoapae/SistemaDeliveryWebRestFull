@@ -39,6 +39,7 @@
           <element id="library" level="project" name="Maven: org.quartz-scheduler:quartz:2.3.1" />
           <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.7" />
           <element id="library" level="project" name="Maven: org.threadly:threadly:5.38" />
+          <element id="library" level="project" name="Maven: info.debatty:java-string-similarity:1.2.1" />
         </element>
       </element>
     </root>

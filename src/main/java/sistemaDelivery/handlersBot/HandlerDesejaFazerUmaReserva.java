@@ -8,7 +8,6 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import modelo.MessageBuilder;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
 
 /**
@@ -72,7 +71,7 @@ public class HandlerDesejaFazerUmaReserva extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message msg) {
         if (msg.getContent().trim().equals("1") || msg.getContent().toLowerCase().trim().equals("sim") || msg.getContent().toLowerCase().trim().equals("s")) {
-            ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(((ChatBotDelivery) chat).getCliente(), getChatBotDelivery().getEstabelecimento()));
+            getChatBotDelivery().setPedidoAtual(new Pedido(getChatBotDelivery().getCliente(), getChatBotDelivery().getEstabelecimento()));
             chat.setHandler(new HandlerRealizarReserva(chat), true);
         } else if (msg.getContent().trim().equals("2") || msg.getContent().toLowerCase().trim().equals("não") || msg.getContent().toLowerCase().trim().equals("nao") || msg.getContent().toLowerCase().trim().equals("n")) {
             chat.setHandler(new HandlerAdeus(chat), true);

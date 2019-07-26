@@ -8,11 +8,7 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import modelo.MessageBuilder;
-import sistemaDelivery.modelo.ChatBotDelivery;
 import sistemaDelivery.modelo.Pedido;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author jvbor
@@ -25,6 +21,7 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
+        chat.getChat().markComposing(3500);
         int horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual().getHour();
         String msg = "";
         if (horaAtual >= 2 && horaAtual < 12) {
@@ -35,16 +32,14 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
             msg = "Boa Noite";
         }
         MessageBuilder builder = new MessageBuilder();
-        builder.text(msg).text(" ").text(((ChatBotDelivery) chat).getNome()).text(".").newLine();
+        builder.text(msg).text(" ").text(getChatBotDelivery().getNome()).text(".").newLine();
         builder.textNewLine("Eu sou o " + getChatBotDelivery().getEstabelecimento().getNomeBot() + ", atendende virtual da " + getChatBotDelivery().getEstabelecimento().getNomeEstabelecimento() + ", e irei te ajudar a completar seu pedido.").
                 textNewLine("*_Lembre-se de ler as instruções com atenção_*");
-        ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(((ChatBotDelivery) chat).getCliente(), getChatBotDelivery().getEstabelecimento()));
+        getChatBotDelivery().setPedidoAtual(new Pedido(getChatBotDelivery().getCliente(), getChatBotDelivery().getEstabelecimento()));
         chat.getChat().sendMessage(builder.build());
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(HandlerBoasVindas.class.getName()).log(Level.SEVERE, null, ex);
-            Thread.currentThread().interrupt();
+        if (!getChatBotDelivery().getCliente().isCadastroRealizado()) {
+            chat.getChat().markComposing(4000);
+            chat.getChat().sendMessage("Caso você prefira falar com um atendende envie: *AJUDA*");
         }
         getChatBotDelivery().enviarMensageInformesIniciais();
         return true;

@@ -7,7 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.modelo.ChatBotDelivery;
 
 /**
  * @author jvbor
@@ -27,7 +26,7 @@ public class HandlerSolicitaNomeCadastro extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message m) {
         if (m.getContent().trim().length() > 0) {
-            ((ChatBotDelivery) chat).getCliente().setNome(m.getContent().trim());
+            getChatBotDelivery().getCliente().setNome(m.getContent().trim());
             chat.setHandler(new HandlerVerificaNumeroCadastro(chat), true);
             return true;
         }

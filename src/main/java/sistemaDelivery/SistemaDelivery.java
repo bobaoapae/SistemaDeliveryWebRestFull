@@ -235,7 +235,7 @@ public class SistemaDelivery {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Aberto");
                 c.setArchive(true);
             }
-            c = driver.getFunctions().getChatByNumber("55" + Utilitarios.plainText(estabelecimento.getNumeroAviso()));
+            c = driver.getFunctions().getChatByNumber("55" + Utilitarios.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
             if (c != null) {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Aberto");
             }
@@ -312,7 +312,7 @@ public class SistemaDelivery {
                 c.sendMessage(builder.build());
                 c.setArchive(true);
             }
-            c = driver.getFunctions().getChatByNumber("55" + Utilitarios.plainText(estabelecimento.getNumeroAviso()));
+            c = driver.getFunctions().getChatByNumber("55" + Utilitarios.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
             if (c != null) {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Fechado");
                 c.sendMessage(builder.build());

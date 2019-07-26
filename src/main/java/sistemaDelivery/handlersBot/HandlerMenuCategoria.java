@@ -21,7 +21,6 @@ import java.util.List;
 public class HandlerMenuCategoria extends HandlerBotDelivery {
 
     private Categoria c;
-    private ArrayList<HandlerBotDelivery> codigosMenu = new ArrayList<>();
 
     public HandlerMenuCategoria(Categoria c, ChatBot chat) {
         super(chat);
@@ -31,16 +30,16 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         MessageBuilder builder = new MessageBuilder();
+        chat.getChat().markComposing(2000);
         chat.getChat().sendMessage("Segue as opções de: " + c.getNomeCategoria() + ".");
-        chat.getChat().sendMessage("*_Obs¹: Envie somente o número da sua escolha_*");
-        chat.getChat().sendMessage("*_Obs²: Escolha um item por vez_*");
         if (!c.isFazEntrega()) {
-            chat.getChat().sendMessage("*_Obs³: Não é feita a entrega dos produtos abaixo_*", 1500);
+            chat.getChat().markComposing(2000);
+            chat.getChat().sendMessage(gerarObs("Não é feita a entrega dos produtos abaixo"));
         } else {
             boolean temCategoriaPrecisa = false;
             boolean msg = false;
             List<Categoria> categoriasCompradas = new ArrayList<>();
-            for (ItemPedido item2 : ((ChatBotDelivery) chat).getPedidoAtual().getProdutos()) {
+            for (ItemPedido item2 : getChatBotDelivery().getPedidoAtual().getProdutos()) {
                 if (!categoriasCompradas.contains(item2.getProduto().getCategoria().getRootCategoria())) {
                     categoriasCompradas.add(item2.getProduto().getCategoria().getRootCategoria());
                 }
@@ -52,46 +51,33 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
                     break;
                 }
             }
-            if (!temCategoriaPrecisa || c.getRootCategoria().getQtdMinEntrega() > 1 && c.getRootCategoria().getQtdMinEntrega() > ((ChatBotDelivery) chat).getPedidoAtual().getProdutos(c).size()) {
+            if (!temCategoriaPrecisa || c.getRootCategoria().getQtdMinEntrega() > 1 && c.getRootCategoria().getQtdMinEntrega() > getChatBotDelivery().getPedidoAtual().getProdutos(c).size()) {
                 msg = true;
             }
-            if (c.getRootCategoria().getQtdMinEntrega() > 1 && !c.getRootCategoria().isPrecisaPedirOutraCategoria() && msg) {
-                chat.getChat().sendMessage("*_Obs³: A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens_*", 1500);
-            } else if (c.getRootCategoria().getQtdMinEntrega() > 1 && c.getRootCategoria().isPrecisaPedirOutraCategoria() && msg) {
-                chat.getChat().sendMessage("*_Obs³: A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens ou pedir junto algum produto de outro cardapio_*", 1500);
-            } else if (c.getRootCategoria().isPrecisaPedirOutraCategoria() && msg) {
-                chat.getChat().sendMessage("*_Obs³: A entrega só e feita se você pedir junto algum produto de outro cardapio_*", 1500);
+            if (msg) {
+                chat.getChat().markComposing(3000);
+                if (c.getRootCategoria().getQtdMinEntrega() > 1 && !c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
+                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens"));
+                } else if (c.getRootCategoria().getQtdMinEntrega() > 1 && c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
+                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens ou pedir junto algum produto de outro cardapio"));
+                } else if (c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
+                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir junto algum produto de outro cardapio"));
+                }
             }
         }
         gerarMenu(c, builder);
         builder.textNewLine("---------");
-        codigosMenu.add(new HandlerMenuPrincipal(chat));
-        builder.textNewLine("*" + (codigosMenu.size()) + "* - Voltar ao Menu Principal ↩️");
-        codigosMenu.add(new HandlerAdeus(chat));
-        builder.textNewLine("*" + (codigosMenu.size()) + "* - Cancelar Pedido ❌");
-        builder.textNewLine("*_Obs¹: Envie somente o número da sua escolha_*");
-        builder.textNewLine("*_Obs²: Escolha um item por vez_*");
+        builder.textNewLine(addOpcaoMenu(new HandlerMenuPrincipal(chat), null, "Voltar ao Menu Principal ↩", "", "voltar", "menu", "principal").toString());
+        builder.textNewLine(addOpcaoMenu(new HandlerAdeus(chat), null, "Cancelar Pedido ❌", "", "cancelar").toString());
+        builder.textNewLine(gerarObs("Escolha um item por vez"));
+        chat.getChat().markComposing(5000);
         chat.getChat().sendMessage(builder.build());
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message m) {
-        try {
-            int escolha = Integer.parseInt(m.getContent().trim()) - 1;
-            if (escolha >= 0 && codigosMenu.size() > escolha) {
-                chat.setHandler(codigosMenu.get(escolha), true);
-                return true;
-            } else {
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            getChatBotDelivery().getChat().getDriver().onError(e);
-            return false;
-        } catch (Exception ex) {
-            getChatBotDelivery().getChat().getDriver().onError(ex);
-            return false;
-        }
+        return processarOpcoesMenu(m);
     }
 
     private void gerarMenu(Categoria c, MessageBuilder builder) {
@@ -133,9 +119,10 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
                     }
                 }
             }
-            codigosMenu.add(new HandlerInformesProdutoEscolhido(l, chat, new HandlerAdicionaisProduto(l, chat)));
+            String titulo = "";
+            String subTitulo = "";
             if (l.getValor() > 0) {
-                builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + " R$" + moneyFormat.format(l.getValor()) + "*");
+                titulo = "*" + l.getNome() + " R$" + moneyFormat.format(l.getValor()) + "*";
             } else {
                 double valorMinimo = 0;
                 for (GrupoAdicional grupoAdicional : l.getAllGruposAdicionais()) {
@@ -153,15 +140,15 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
                     }
                 }
                 if (valorMinimo > 0) {
-                    builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + "*\n    *Apartir de R$" + moneyFormat.format(valorMinimo) + "*");
+                    titulo = "*" + l.getNome() + "*\n    *Apartir de R$" + moneyFormat.format(valorMinimo) + "*";
                 } else {
-                    builder.textNewLine("*" + (codigosMenu.size()) + " - " + l.getNome() + "*");
+                    titulo = l.getNome();
                 }
             }
             if (!l.getDescricao().trim().isEmpty()) {
-                builder.textNewLine("       _" + l.getDescricao() + "_");
+                subTitulo = l.getDescricao();
             }
-            builder.newLine();
+            builder.textNewLine(addOpcaoMenu(new HandlerInformesProdutoEscolhido(l, chat, new HandlerAdicionaisProduto(l, chat)), null, titulo, subTitulo, l.getNome()).toString());
         }
     }
 
