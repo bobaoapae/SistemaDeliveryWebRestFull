@@ -1,4 +1,4 @@
-package restFul.modelo;
+package restFul.filtros;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -6,6 +6,8 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import restFul.controle.ControleSessions;
 import restFul.controle.ControleSistema;
 import restFul.controle.ControleTokens;
+import restFul.modelo.Token;
+import restFul.modelo.TokenSecurityContext;
 import utils.DateUtils;
 
 import javax.ws.rs.container.ContainerRequestContext;
@@ -25,7 +27,7 @@ import java.util.logging.Level;
 public class AuthenticationToken implements ContainerRequestFilter {
 
 
-    Gson gson = new Gson();
+    private Gson gson = new Gson();
 
     @Override
     public void filter(ContainerRequestContext containerRequestContext) throws IOException {

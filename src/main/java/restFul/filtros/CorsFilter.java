@@ -1,4 +1,4 @@
-package restFul.modelo;
+package restFul.filtros;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;

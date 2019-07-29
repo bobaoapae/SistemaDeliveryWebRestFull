@@ -1,7 +1,7 @@
 package restFul;
 
-import restFul.modelo.AuthenticationToken;
-import restFul.modelo.CorsFilter;
+import restFul.filtros.AuthenticationToken;
+import restFul.filtros.CorsFilter;
 import restFul.modelo.ListennerServer;
 
 import javax.ws.rs.ApplicationPath;
