@@ -83,17 +83,16 @@ public abstract class HandlerBotDelivery extends HandlerBot {
 
     protected final boolean processarOpcoesMenu(Message msg) {
         String textoMsg = msg.getContent().trim();
-        List<OpcaoMenu> opcoesEncontradas = codigosMenu.stream().filter(opcaoMenu -> opcaoMenu.verificarKeyword(textoMsg)).collect(Collectors.toList());
+        List<String> keywordsDisponiveis = new ArrayList<>();
+        codigosMenu.stream().map(opcaoMenu -> opcaoMenu.keywords).collect(Collectors.toList()).forEach(keywordsDisponiveis::addAll);
+        String textoMsgCorridigo = Utilitarios.corrigirStringComBaseEmListaDeStringsValidas(keywordsDisponiveis, textoMsg);
+        List<OpcaoMenu> opcoesEncontradas = codigosMenu.stream().filter(opcaoMenu -> opcaoMenu.verificarKeyword(textoMsgCorridigo)).collect(Collectors.toList());
         if (opcoesEncontradas.size() >= 1) {
             if (opcoesEncontradas.size() == 1) {
-                return opcoesEncontradas.get(0).executar(textoMsg);
+                return opcoesEncontradas.get(0).executar(textoMsgCorridigo);
             } else {
-                List<OpcaoMenu> opcoesExatas = opcoesEncontradas.stream().filter(o -> o.verificarKeywordExata(textoMsg)).collect(Collectors.toList());
-                if (opcoesExatas.size() == 1) {
-                    return opcoesExatas.get(0).executar(textoMsg);
-                }
                 MessageBuilder messageBuilder = new MessageBuilder();
-                messageBuilder.textNewLine("Foi encontrada mais de uma opção para a sua escolha, qual é a correta?");
+                messageBuilder.textNewLine("Foi encontrada mais de uma opção para a sua escolha, qual é o número da opção correta?");
                 for (OpcaoMenu op : opcoesEncontradas) {
                     messageBuilder.textNewLine(op.toString());
                 }
@@ -146,23 +145,7 @@ public abstract class HandlerBotDelivery extends HandlerBot {
                 return true;
             }
             for (String keyword : keywords) {
-                if (Utilitarios.verificarFrasePossuiPalavraIgualOuParecida(msg, keyword)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        protected boolean verificarKeywordExata(String msg) {
-            if (!Utilitarios.retornarApenasNumeros(msg).isEmpty() && codigosMenu.indexOf(this) + 1 == Integer.parseInt(Utilitarios.retornarApenasNumeros(msg))) {
-                return true;
-            }
-            for (String keyword : keywords) {
-                for (String token : msg.split("\\s")) {
-                    if (keyword.trim().equalsIgnoreCase(token.trim()) || token.trim().equalsIgnoreCase(keyword)) {
-                        return true;
-                    }
-                }
+                return keyword.trim().equalsIgnoreCase(msg.trim());
             }
             return false;
         }
