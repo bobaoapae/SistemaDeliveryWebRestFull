@@ -65,9 +65,6 @@ public class ChatBotDelivery extends ChatBot {
 
     @Override
     public HandlerBot getHandler() {
-        if (System.currentTimeMillis() - this.timeCheck >= 60000 * 30) {
-            this.handler = new HandlerChatExpirado(this);
-        }
         return super.getHandler();
     }
 
