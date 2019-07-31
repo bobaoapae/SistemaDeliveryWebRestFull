@@ -86,7 +86,7 @@ public abstract class HandlerBotDelivery extends HandlerBot {
         List<String> keywordsDisponiveis = new ArrayList<>();
         codigosMenu.stream().map(opcaoMenu -> opcaoMenu.keywords).collect(Collectors.toList()).forEach(keywordsDisponiveis::addAll);
         String textoMsgCorridigo = Utilitarios.corrigirStringComBaseEmListaDeStringsValidas(keywordsDisponiveis, textoMsg);
-        List<OpcaoMenu> opcoesEncontradas = codigosMenu.stream().filter(opcaoMenu -> opcaoMenu.verificarKeyword(textoMsgCorridigo)).collect(Collectors.toList());
+        List<OpcaoMenu> opcoesEncontradas = codigosMenu.stream().filter(opcaoMenu -> (!Utilitarios.retornarApenasNumeros(textoMsg).isEmpty() && codigosMenu.indexOf(opcaoMenu) + 1 == Integer.parseInt(Utilitarios.retornarApenasNumeros(textoMsg))) || opcaoMenu.verificarKeyword(textoMsgCorridigo)).collect(Collectors.toList());
         if (opcoesEncontradas.size() >= 1) {
             if (opcoesEncontradas.size() == 1) {
                 return opcoesEncontradas.get(0).executar(textoMsgCorridigo);
@@ -141,9 +141,6 @@ public abstract class HandlerBotDelivery extends HandlerBot {
         }
 
         protected boolean verificarKeyword(String msg) {
-            if (!Utilitarios.retornarApenasNumeros(msg).isEmpty() && codigosMenu.indexOf(this) + 1 == Integer.parseInt(Utilitarios.retornarApenasNumeros(msg))) {
-                return true;
-            }
             for (String keyword : keywords) {
                 return keyword.trim().equalsIgnoreCase(msg.trim());
             }
