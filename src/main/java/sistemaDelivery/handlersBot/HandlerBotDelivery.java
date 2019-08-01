@@ -148,16 +148,13 @@ public abstract class HandlerBotDelivery extends HandlerBot {
         }
 
         protected boolean executar(String msg) {
-            if (verificarKeyword(msg)) {
-                if (executar != null) {
-                    executar.accept(msg);
-                }
-                if (handlerBotDelivery != null) {
-                    chat.setHandler(handlerBotDelivery, true);
-                }
-                return true;
+            if (executar != null) {
+                executar.accept(msg);
             }
-            return false;
+            if (handlerBotDelivery != null) {
+                chat.setHandler(handlerBotDelivery, true);
+            }
+            return true;
         }
 
         public HandlerBotDelivery getHandlerBotDelivery() {
