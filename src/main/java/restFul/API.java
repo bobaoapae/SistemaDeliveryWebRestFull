@@ -11,6 +11,7 @@ import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.*;
 import sistemaDelivery.modelo.*;
 import utils.Utilitarios;
+import utils.Utils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
@@ -1193,7 +1194,7 @@ public class API {
             cliente.setEstabelecimento(token.getEstabelecimento());
             if (!cliente.getTelefoneMovel().isEmpty() && token.getSistemaDelivery().getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
                 try {
-                    Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utilitarios.retornarApenasNumeros(cliente.getTelefoneMovel()));
+                    Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(cliente.getTelefoneMovel()));
                     if (chat != null) {
                         cliente.setChatId(chat.getId());
                     }
@@ -1291,7 +1292,7 @@ public class API {
                 c.sendMessage("*" + token.getEstabelecimento().getNomeEstabelecimento() + ":* ChatBot " + abertoFechado);
                 c.setArchive(true);
             }
-            c = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utilitarios.retornarApenasNumeros(token.getEstabelecimento().getNumeroAviso()));
+            c = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(token.getEstabelecimento().getNumeroAviso()));
             if (c != null) {
                 c.sendMessage("*" + token.getEstabelecimento().getNomeEstabelecimento() + ":* ChatBot " + abertoFechado);
             }

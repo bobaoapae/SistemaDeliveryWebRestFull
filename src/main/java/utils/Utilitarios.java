@@ -7,7 +7,6 @@ package utils;
 
 import adapters.*;
 import com.google.gson.GsonBuilder;
-import info.debatty.java.stringsimilarity.JaroWinkler;
 import restFul.controle.ControleSistema;
 import sistemaDelivery.modelo.HorarioFuncionamento;
 import sistemaDelivery.modelo.ItemPedido;
@@ -30,7 +29,6 @@ import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.Month;
@@ -178,96 +176,9 @@ public class Utilitarios {
         return DayOfWeek.of(diaSemana).getDisplayName(TextStyle.FULL_STANDALONE, Locale.forLanguageTag("pt-BR"));
     }
 
-    public static String retornarApenasNumeros(String input) {
-        return input.replaceAll("[^0-9]", "");
-    }
-
-    public static String retornarApenasLetras(String input) {
-        return removerAcentos(input).replaceAll("[^a-zA-Z]", "");
-    }
-
     public static String convertToString(Date d, String formato) {
         SimpleDateFormat formatador = new SimpleDateFormat(formato);
         return formatador.format(d);
-    }
-
-    public static String removerAcentos(String str) {
-        return str.replaceAll("[ãâàáä]", "a").replaceAll("[êèéë]", "e").replaceAll("[îìíï]", "i").replaceAll("[õôòóö]", "o").replaceAll("[ûúùü]", "u").replaceAll("[ÃÂÀÁÄ]", "A").replaceAll("[ÊÈÉË]", "E").replaceAll("[ÎÌÍÏ]", "I").replaceAll("[ÕÔÒÓÖ]", "O").replaceAll("[ÛÙÚÜ]", "U").replace('ç', 'c').replace('Ç', 'C').replace('ñ', 'n').replace('Ñ', 'N').replaceAll("!", "").replaceAll("\\[\\´\\`\\?!\\@\\#\\$\\%\\¨\\*", " ").replaceAll("\\(\\)\\=\\{\\}\\[\\]\\~\\^\\]", " ").replaceAll("[\\;\\-\\_\\+\\'\\ª\\º\\:\\;\\/]", " ").replaceAll("§", " ");
-    }
-
-    public static boolean verificarSeSaoStringParecidas(String a, String b) {
-        JaroWinkler jw = new JaroWinkler();
-        double igualdade = jw.similarity(retornarApenasLetras(a).toUpperCase(), retornarApenasLetras(b).toUpperCase());
-        return igualdade >= 0.9d;
-    }
-
-    public static boolean verificarFrasePossuiPalavraIgualOuParecida(String frase, String palavra) {
-        String[] palavras = frase.split("\\s");
-        for (String palavraAtual : palavras) {
-            if (retornarApenasLetras(palavraAtual).equalsIgnoreCase(retornarApenasLetras(palavra)) || verificarSeSaoStringParecidas(palavraAtual.trim(), palavra.trim())) {
-                return true;
-            }
-        }
-        if (retornarApenasLetras(frase).equalsIgnoreCase(retornarApenasLetras(palavra)) || verificarSeSaoStringParecidas(frase, palavra)) {
-            return true;
-        }
-        return false;
-    }
-
-    public static String corrigirStringComBaseEmListaDeStringsValidas(List<String> stringsValidas, String corrigir) {
-        JaroWinkler jw = new JaroWinkler();
-        double maiorIgualdade = 0d;
-        String stringValida = "";
-        for (String string : stringsValidas) {
-            String[] palavras = corrigir.trim().split("\\s");
-            double igualdade = 0d;
-            for (String palavraAtual : palavras) {
-                double igualdadeAtual = 0d;
-                String[] palavrasValidas = string.trim().split("\\s");
-                int totalValidas = 0;
-                for (String pa : palavrasValidas) {
-                    double igualdadeTeste = jw.similarity(retornarApenasLetras(pa.toUpperCase()), retornarApenasLetras(palavraAtual.toUpperCase()));
-                    if (igualdadeTeste > 0.7) {
-                        igualdadeAtual += igualdadeTeste;
-                        totalValidas++;
-                    }
-                }
-                if (totalValidas > 0) {
-                    igualdadeAtual /= totalValidas;
-                    igualdade += igualdadeAtual;
-                }
-            }
-            igualdade /= palavras.length;
-            if (igualdade > maiorIgualdade) {
-                maiorIgualdade = igualdade;
-                stringValida = string;
-            }
-        }
-        for (String string : stringsValidas) {
-            double igualdade = jw.similarity(retornarApenasLetras(string.toUpperCase()), retornarApenasLetras(corrigir.toUpperCase()));
-            if (igualdade > 0.7d && igualdade > maiorIgualdade) {
-                maiorIgualdade = igualdade;
-                stringValida = string;
-            }
-        }
-        return stringValida;
-    }
-
-    public static Date tryParseData(String dataS) {
-        List<SimpleDateFormat> knownPatterns = new ArrayList<>();
-        knownPatterns.add(new SimpleDateFormat("dd/MM/yyyy"));
-        knownPatterns.add(new SimpleDateFormat("dd-MM-yyyy"));
-        knownPatterns.add(new SimpleDateFormat("dd/MM/yy"));
-        knownPatterns.add(new SimpleDateFormat("dd-MM-yy"));
-        knownPatterns.add(new SimpleDateFormat("dd MM yyyy"));
-        knownPatterns.add(new SimpleDateFormat("dd MM yy"));
-        for (SimpleDateFormat pattern : knownPatterns) {
-            try {
-                return pattern.parse(dataS);
-            } catch (ParseException pe) {
-            }
-        }
-        return null;
     }
 
 }

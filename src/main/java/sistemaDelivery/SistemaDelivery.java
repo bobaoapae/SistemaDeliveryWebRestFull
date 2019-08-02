@@ -19,6 +19,7 @@ import sistemaDelivery.jobs.FecharPedidoJob;
 import sistemaDelivery.modelo.*;
 import utils.Propriedades;
 import utils.Utilitarios;
+import utils.Utils;
 
 import javax.swing.*;
 import javax.ws.rs.sse.Sse;
@@ -235,7 +236,7 @@ public class SistemaDelivery {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Aberto");
                 c.setArchive(true);
             }
-            c = driver.getFunctions().getChatByNumber("55" + Utilitarios.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
+            c = driver.getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
             if (c != null) {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Aberto");
             }
@@ -312,7 +313,7 @@ public class SistemaDelivery {
                 c.sendMessage(builder.build());
                 c.setArchive(true);
             }
-            c = driver.getFunctions().getChatByNumber("55" + Utilitarios.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
+            c = driver.getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
             if (c != null) {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Fechado");
                 c.sendMessage(builder.build());

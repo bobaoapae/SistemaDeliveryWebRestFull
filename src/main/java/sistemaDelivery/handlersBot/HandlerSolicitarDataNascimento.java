@@ -7,7 +7,7 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import utils.Utilitarios;
+import utils.Utils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -33,7 +33,7 @@ public class HandlerSolicitarDataNascimento extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message m) {
         String dataS = m.getContent().trim().replaceAll(" ", "");
-        Date date = Utilitarios.tryParseData(dataS);
+        Date date = Utils.tryParseData(dataS);
         if (date != null) {
             getChatBotDelivery().getCliente().setDataAniversario(new java.sql.Date(date.getTime()));
             chat.setHandler(new HandlerFinalizarCadastro(chat), true);

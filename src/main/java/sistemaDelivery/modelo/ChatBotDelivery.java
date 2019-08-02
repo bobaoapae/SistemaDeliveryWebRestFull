@@ -13,7 +13,7 @@ import restFul.controle.ControleSessions;
 import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.controle.ControleClientes;
 import sistemaDelivery.handlersBot.*;
-import utils.Utilitarios;
+import utils.Utils;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -191,7 +191,7 @@ public class ChatBotDelivery extends ChatBot {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
                 c.setArchive(true);
             }
-            c = chat.getDriver().getFunctions().getChatByNumber("55" + Utilitarios.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
+            c = chat.getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
             if (c != null) {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
             }
@@ -219,7 +219,7 @@ public class ChatBotDelivery extends ChatBot {
         if (!estabelecimento.isOpenChatBot()) {
             return;
         }
-        if (m.getContent().trim().equalsIgnoreCase("voltar") || Utilitarios.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "voltar")) {
+        if (m.getContent().trim().equalsIgnoreCase("voltar") || Utils.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "voltar")) {
             if (handlerVoltar != null) {
                 handlerVoltar.execute(this, m);
                 setHandlerVoltar(null);
@@ -228,11 +228,11 @@ public class ChatBotDelivery extends ChatBot {
             }
             return;
         }
-        if (m.getContent().trim().toLowerCase().equals("cancelar") || Utilitarios.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "cancelar")) {
+        if (m.getContent().trim().toLowerCase().equals("cancelar") || Utils.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "cancelar")) {
             setHandler(new HandlerAdeus(this), true);
             return;
         }
-        if (Utilitarios.retornarApenasLetras(m.getContent()).equalsIgnoreCase("ajuda") || Utilitarios.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "ajuda")) {
+        if (Utils.retornarApenasLetras(m.getContent()).equalsIgnoreCase("ajuda") || Utils.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "ajuda")) {
             if (sendRequestAjuda()) {
                 return;
             }

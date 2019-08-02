@@ -26,8 +26,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="com.google.code.gson:gson:2.8.5" level="project" />
     <orderEntry type="library" name="commons-dbutils:commons-dbutils:1.7" level="project" />
-    <orderEntry type="library" name="Maven: info.debatty:java-string-similarity:1.2.1" level="project" />
-    <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
     <orderEntry type="library" name="Maven: br.com.zapia:BotWhatsApp:1.0" level="project" />
     <orderEntry type="library" name="Maven: br.com.zapia:WebWhatsAppLib:1.0" level="project" />
     <orderEntry type="library" name="Maven: br.com.zapia:JxBrowserCrack:6.24" level="project" />
@@ -38,6 +36,9 @@
     <orderEntry type="library" name="Maven: com.teamdev.jxbrowser:jxbrowser-mac:6.24" level="project" />
     <orderEntry type="library" name="Maven: org.apache.tika:tika-core:1.21" level="project" />
     <orderEntry type="library" name="Maven: org.threadly:threadly:5.38" level="project" />
+    <orderEntry type="library" name="Maven: br.com.zapia:utilitarios:1.0" level="project" />
+    <orderEntry type="library" name="Maven: info.debatty:java-string-similarity:1.2.1" level="project" />
+    <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.commons:commons-collections4:4.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:4.1.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.poi:poi:4.1.0" level="project" />
@@ -62,7 +63,5 @@
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.7" level="project" />
     <orderEntry type="library" name="Maven: javax.xml.bind:jaxb-api:2.4.0-b180830.0359" level="project" />
     <orderEntry type="library" name="Maven: javax.activation:javax.activation-api:1.2.0" level="project" />
-    <orderEntry type="library" name="Maven: info.debatty:java-string-similarity:1.2.1" level="project" />
-    <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
   </component>
 </module>

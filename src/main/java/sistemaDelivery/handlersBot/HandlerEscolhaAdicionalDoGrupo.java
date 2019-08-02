@@ -9,7 +9,7 @@ import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.modelo.AdicionalProduto;
 import sistemaDelivery.modelo.GrupoAdicional;
-import utils.Utilitarios;
+import utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +112,7 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                         break;
                     }
                 }
-                String soNumeros = Utilitarios.retornarApenasNumeros(adicionalAtual);
+                String soNumeros = Utils.retornarApenasNumeros(adicionalAtual);
                 if (!soNumeros.isEmpty()) {
                     int escolha = Integer.parseInt(soNumeros) - 1;
                     if (escolha >= 0 && adicionaisDisponiveis.size() > escolha) {
@@ -123,9 +123,9 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                         return false;
                     }
                 } else {
-                    String possivelNomeAdicional = Utilitarios.retornarApenasLetras(adicionalAtual);
+                    String possivelNomeAdicional = Utils.retornarApenasLetras(adicionalAtual);
                     boolean found = false;
-                    String possivelNomeAdicionalCorrigido = Utilitarios.corrigirStringComBaseEmListaDeStringsValidas(adicionaisDisponiveis.stream().map(adicionalProduto -> adicionalProduto.getNome()).collect(Collectors.toList()), possivelNomeAdicional);
+                    String possivelNomeAdicionalCorrigido = Utils.corrigirStringComBaseEmListaDeStringsValidas(adicionaisDisponiveis.stream().map(adicionalProduto -> adicionalProduto.getNome()).collect(Collectors.toList()), possivelNomeAdicional);
                     for (AdicionalProduto ad : adicionaisDisponiveis) {
                         if (possivelNomeAdicionalCorrigido.equalsIgnoreCase(ad.getNome())) {
                             adicionaisEscolhidos.add(ad);
