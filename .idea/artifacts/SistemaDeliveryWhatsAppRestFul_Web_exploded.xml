@@ -40,6 +40,8 @@
           <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.7" />
           <element id="library" level="project" name="Maven: org.threadly:threadly:5.38" />
           <element id="library" level="project" name="Maven: info.debatty:java-string-similarity:1.2.1" />
+          <element id="library" level="project" name="Maven: net.jcip:jcip-annotations:1.0" />
+          <element id="library" level="project" name="Maven: br.com.zapia:utilitarios:1.0" />
         </element>
       </element>
     </root>
