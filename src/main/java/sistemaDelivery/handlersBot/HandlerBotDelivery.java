@@ -83,13 +83,19 @@ public abstract class HandlerBotDelivery extends HandlerBot {
 
     protected final boolean processarOpcoesMenu(Message msg) {
         String textoMsg = msg.getContent().trim();
-        List<String> keywordsDisponiveis = new ArrayList<>();
-        codigosMenu.stream().map(opcaoMenu -> opcaoMenu.keywords).collect(Collectors.toList()).forEach(keywordsDisponiveis::addAll);
-        String textoMsgCorridigo = Utilitarios.corrigirStringComBaseEmListaDeStringsValidas(keywordsDisponiveis, textoMsg);
-        List<OpcaoMenu> opcoesEncontradas = codigosMenu.stream().filter(opcaoMenu -> (!Utilitarios.retornarApenasNumeros(textoMsg).isEmpty() && codigosMenu.indexOf(opcaoMenu) + 1 == Integer.parseInt(Utilitarios.retornarApenasNumeros(textoMsg))) || opcaoMenu.verificarKeyword(textoMsgCorridigo)).collect(Collectors.toList());
+        String textoSoNumero = Utilitarios.retornarApenasNumeros(textoMsg);
+        List<OpcaoMenu> opcoesEncontradas;
+        if (textoSoNumero.isEmpty()) {
+            List<String> keywordsDisponiveis = new ArrayList<>();
+            codigosMenu.stream().map(opcaoMenu -> opcaoMenu.keywords).collect(Collectors.toList()).forEach(keywordsDisponiveis::addAll);
+            String textoMsgCorridigo = Utilitarios.corrigirStringComBaseEmListaDeStringsValidas(keywordsDisponiveis, textoMsg);
+            opcoesEncontradas = codigosMenu.stream().filter(opcaoMenu -> opcaoMenu.verificarKeyword(textoMsgCorridigo)).collect(Collectors.toList());
+        } else {
+            opcoesEncontradas = codigosMenu.stream().filter(opcaoMenu -> codigosMenu.indexOf(opcaoMenu) + 1 == Integer.parseInt(textoSoNumero)).collect(Collectors.toList());
+        }
         if (opcoesEncontradas.size() >= 1) {
             if (opcoesEncontradas.size() == 1) {
-                return opcoesEncontradas.get(0).executar(textoMsgCorridigo);
+                return opcoesEncontradas.get(0).executar(textoMsg);
             } else {
                 MessageBuilder messageBuilder = new MessageBuilder();
                 messageBuilder.textNewLine("Foi encontrada mais de uma opção para a sua escolha, qual é o número da opção correta?");
