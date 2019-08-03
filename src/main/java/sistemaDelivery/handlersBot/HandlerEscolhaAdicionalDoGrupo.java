@@ -123,9 +123,8 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                         return false;
                     }
                 } else {
-                    String possivelNomeAdicional = Utils.retornarApenasLetras(adicionalAtual);
                     boolean found = false;
-                    String possivelNomeAdicionalCorrigido = Utils.corrigirStringComBaseEmListaDeStringsValidas(adicionaisDisponiveis.stream().map(adicionalProduto -> adicionalProduto.getNome()).collect(Collectors.toList()), possivelNomeAdicional);
+                    String possivelNomeAdicionalCorrigido = Utils.localizarKeywordParaFrase(adicionaisDisponiveis.stream().map(adicionalProduto -> adicionalProduto.getNome()).collect(Collectors.toList()), adicionalAtual);
                     for (AdicionalProduto ad : adicionaisDisponiveis) {
                         if (possivelNomeAdicionalCorrigido.equalsIgnoreCase(ad.getNome())) {
                             adicionaisEscolhidos.add(ad);

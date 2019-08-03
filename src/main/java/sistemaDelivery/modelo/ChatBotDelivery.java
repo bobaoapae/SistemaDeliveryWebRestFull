@@ -216,6 +216,10 @@ public class ChatBotDelivery extends ChatBot {
             m.getChat().sendMessage("Online");
             return;
         }
+        if (m.getContent().toLowerCase().equals("/rebind")) {
+            m.getChat().getDriver().getFunctions().recriarBindsJavaListenner();
+            return;
+        }
         if (!estabelecimento.isOpenChatBot()) {
             return;
         }
