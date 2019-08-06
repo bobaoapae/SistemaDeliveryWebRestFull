@@ -2180,7 +2180,7 @@ public class API {
     @Produces(MediaType.TEXT_PLAIN)
     public Response finalizarDriver() {
         try {
-            token.getSistemaDelivery().finalizar();
+            new Thread(() -> ControleSessions.getInstance().finalizarSessionForEstabelecimento(token.getEstabelecimento())).start();
             return Response.status(Response.Status.CREATED).build();
         } catch (Exception e) {
             Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
