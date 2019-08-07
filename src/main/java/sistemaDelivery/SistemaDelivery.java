@@ -240,7 +240,6 @@ public class SistemaDelivery {
             if (c != null) {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Aberto");
             }
-            driver.getFunctions().recriarBindsJavaListenner();
             return true;
         } catch (Exception ex) {
             throw ex;
