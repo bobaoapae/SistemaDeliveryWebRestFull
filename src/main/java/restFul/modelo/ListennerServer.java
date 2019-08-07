@@ -10,9 +10,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 import java.io.File;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 @WebListener
 public class ListennerServer implements ServletContextListener {
@@ -35,6 +33,8 @@ public class ListennerServer implements ServletContextListener {
             }
             System.setProperty("jxbrowser.chromium.dir", Propriedades.pathBinarios());
             FileHandler fh = new FileHandler(Propriedades.pathLogs() + "LogGeral.txt", true);
+            fh.setFormatter(new SimpleFormatter());
+            logger.addHandler(new StreamHandler(System.out, new SimpleFormatter()));
             logger.addHandler(fh);
             ControleSistema.getInstance().setLogger(logger);
             if (Propriedades.getEstadoServidor() != Propriedades.EstadoServidor.TESTES) {
