@@ -133,9 +133,7 @@ public class ControlePedidos {
                     connection.commit();
                     try {
                         SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(pedido.getEstabelecimento());
-                        if (sistemaDelivery.getBroadcaster() != null) {
-                            sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("novo-pedido", pedido.getUuid().toString()));
-                        }
+                        sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.NOVO_PEDIDO, pedido.getUuid().toString());
                     } catch (IOException e) {
                         throw e;
                     }

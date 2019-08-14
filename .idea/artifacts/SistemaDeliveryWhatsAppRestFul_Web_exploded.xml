@@ -42,6 +42,9 @@
           <element id="library" level="project" name="Maven: info.debatty:java-string-similarity:1.2.1" />
           <element id="library" level="project" name="Maven: net.jcip:jcip-annotations:1.0" />
           <element id="library" level="project" name="Maven: br.com.zapia:utilitarios:1.0" />
+          <element id="library" level="project" name="Maven: com.google.guava:guava:20.0" />
+          <element id="library" level="project" name="Maven: org.javassist:javassist:3.21.0-GA" />
+          <element id="library" level="project" name="Maven: org.reflections:reflections:0.9.11" />
         </element>
       </element>
     </root>

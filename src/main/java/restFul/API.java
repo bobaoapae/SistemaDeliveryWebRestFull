@@ -39,34 +39,24 @@ import java.util.stream.Collectors;
 @Path("/api")
 public class API {
 
-    JsonParser parser;
+    private JsonParser parser;
     private Gson builder;
     private Token token;
-    private List<Pedido> pedidosSendoCriados;
 
 
     public API(@Context HttpServletRequest session, @Context SecurityContext securityContext) {
         this.token = (Token) securityContext.getUserPrincipal();
         builder = Utilitarios.getDefaultGsonBuilder(null).create();
-        if (session.getSession(true).getAttribute("pedidosSendoCriados") == null) {
-            session.getSession().setAttribute("pedidosSendoCriados", Collections.synchronizedList(new ArrayList<>()));
-        }
-        pedidosSendoCriados = ((List<Pedido>) session.getSession().getAttribute("pedidosSendoCriados"));
         parser = new JsonParser();
     }
 
     @GET
     @Path("/eventos")
     @Produces(MediaType.SERVER_SENT_EVENTS)
-    public void eventoNovoPedido(@Context SseEventSink sink, @Context Sse sse) {
+    public void eventosDelivery(@Context SseEventSink sink, @Context Sse sse) {
         SistemaDelivery sistemaDelivery = token.getSistemaDelivery();
-        if (sistemaDelivery.getBroadcaster() != null) {
-            sistemaDelivery.getBroadcaster().register(sink);
-        } else {
-            sistemaDelivery.setSse(sse);
-            sistemaDelivery.setBroadcaster(sse.newBroadcaster());
-            sistemaDelivery.getBroadcaster().register(sink);
-        }
+        sistemaDelivery.inicializarEventosDelivery(sse);
+        sistemaDelivery.registrarListennerEventoDelivery(sink);
         sink.send(sse.newEvent("ok"));
     }
 
@@ -75,13 +65,8 @@ public class API {
     @Produces(MediaType.SERVER_SENT_EVENTS)
     public void eventosWpp(@Context SseEventSink sink, @Context Sse sse) {
         SistemaDelivery sistemaDelivery = token.getSistemaDelivery();
-        if (sistemaDelivery.getBroadcasterWhats() != null) {
-            sistemaDelivery.getBroadcasterWhats().register(sink);
-        } else {
-            sistemaDelivery.setSseWhats(sse);
-            sistemaDelivery.setBroadcasterWhats(sse.newBroadcaster());
-            sistemaDelivery.getBroadcasterWhats().register(sink);
-        }
+        sistemaDelivery.inicializarEventosWpp(sse);
+        sistemaDelivery.registrarListennerEventoWpp(sink);
         sink.send(sse.newEvent("ok"));
     }
 
@@ -1488,9 +1473,7 @@ public class API {
                     }
                 }
                 SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
-                if (sistemaDelivery.getBroadcaster() != null) {
-                    sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
-                }
+                sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.ATUALIZAR_PEDIDO, pedido.getUuid().toString());
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -1530,9 +1513,7 @@ public class API {
                     }
                 }
                 SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
-                if (sistemaDelivery.getBroadcaster() != null) {
-                    sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
-                }
+                sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.ATUALIZAR_PEDIDO, pedido.getUuid().toString());
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -1564,9 +1545,7 @@ public class API {
             pedido.setEstadoPedido(EstadoPedido.Cancelado);
             if (ControlePedidos.getInstance().salvarPedido(pedido)) {
                 SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
-                if (sistemaDelivery.getBroadcaster() != null) {
-                    sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("atualizar-pedido", pedido.getUuid().toString()));
-                }
+                sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.ATUALIZAR_PEDIDO, pedido.getUuid().toString());
                 return Response.status(Response.Status.CREATED).build();
             } else {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -2096,12 +2075,10 @@ public class API {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
             chat.loadEarlierMsgs(() -> {
-                if (token.getSistemaDelivery().getBroadcasterWhats() != null) {
-                    JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(chat.toJson()));
-                    object.addProperty("noEarlierMsgs", chat.noEarlierMsgs());
-                    object.add("contact", builder.toJsonTree(parser.parse(chat.getContact().toJson())));
-                    token.getSistemaDelivery().getBroadcasterWhats().broadcast(token.getSistemaDelivery().getSseWhats().newEvent("chat-update", builder.toJson(object)));
-                }
+                JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(chat.toJson()));
+                object.addProperty("noEarlierMsgs", chat.noEarlierMsgs());
+                object.add("contact", builder.toJsonTree(parser.parse(chat.getContact().toJson())));
+                token.getSistemaDelivery().enviarEventoWpp(SistemaDelivery.TipoEventoWpp.CHAT_UPDATE, builder.toJson(object));
             });
             return Response.status(Response.Status.OK).build();
         } catch (Exception e) {
@@ -2155,6 +2132,32 @@ public class API {
         } catch (Exception e) {
             Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+        }
+    }
+
+    @POST
+    @Path("/enviarMsgTecnico")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response enviarMsgTecnico(@DefaultValue("") @FormParam("msg") String msg) {
+        if (msg.isEmpty() || msg.isBlank()) {
+            SistemaDelivery sistemaDelivery = token.getSistemaDelivery();
+            sistemaDelivery.enviarMesagemParaTecnico(msg);
+            return Response.status(Response.Status.OK).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).build();
+        }
+    }
+
+    @POST
+    @Path("/enviarMsgSuporte")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response enviarMsgSuporte(@DefaultValue("") @FormParam("msg") String msg) {
+        if (msg.isEmpty() || msg.isBlank()) {
+            SistemaDelivery sistemaDelivery = token.getSistemaDelivery();
+            sistemaDelivery.enviarMensagemParaSuporte(msg);
+            return Response.status(Response.Status.OK).build();
+        } else {
+            return Response.status(Response.Status.BAD_REQUEST).build();
         }
     }
 

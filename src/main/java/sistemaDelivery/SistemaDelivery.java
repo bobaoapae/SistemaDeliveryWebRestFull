@@ -24,6 +24,7 @@ import utils.Utils;
 import javax.swing.*;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
+import javax.ws.rs.sse.SseEventSink;
 import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -33,6 +34,7 @@ import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.*;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -55,8 +57,10 @@ public class SistemaDelivery {
     private Logger logger;
     private StdSchedulerFactory schedulerFactory;
     private Scheduler scheduler;
+    private List<SseEventSink> listennersEventosDelivery;
 
     public SistemaDelivery(Estabelecimento estabelecimento, boolean headless) throws IOException {
+        listennersEventosDelivery = Collections.synchronizedList(new ArrayList<>());
         logger = SistemaDelivery.createOrGetLogger(estabelecimento);
         this.estabelecimento = estabelecimento;
         parser = new JsonParser();
@@ -75,46 +79,37 @@ public class SistemaDelivery {
             }
             driver.getFunctions().addListennerToNewChat(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat));
             driver.getFunctions().addListennerToNewChat(c -> {
-                if (broadcasterWhats != null) {
-                    JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.toJson()));
-                    object.add("contact", builder.toJsonTree(parser.parse(c.getContact().toJson())));
-                    Cliente cliente = null;
-                    try {
-                        cliente = ControleClientes.getInstance().getClienteChatId(c.getId(), this.estabelecimento);
-                    } catch (SQLException e) {
-                        Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
-                    }
-                    if (cliente != null) {
-                        object.add("cliente", builder.toJsonTree(cliente));
-                    }
-                    broadcasterWhats.broadcast(sseWhats.newEvent("new-chat", builder.toJson(object)));
+                JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.toJson()));
+                object.add("contact", builder.toJsonTree(parser.parse(c.getContact().toJson())));
+                Cliente cliente = null;
+                try {
+                    cliente = ControleClientes.getInstance().getClienteChatId(c.getId(), this.estabelecimento);
+                } catch (SQLException e) {
+                    Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
                 }
+                if (cliente != null) {
+                    object.add("cliente", builder.toJsonTree(cliente));
+                }
+                enviarEventoWpp(TipoEventoWpp.NEW_CHAT, builder.toJson(object));
             });
             driver.getFunctions().addListennerToNewMsg(new MessageObserverIncludeMe() {
+
                 @Override
                 public void onNewMsg(Message msg) {
-                    if (broadcasterWhats != null) {
-                        broadcasterWhats.broadcast(sseWhats.newEvent("new-msg", builder.toJson(parser.parse(msg.toJson()))));
-                    }
+                    enviarEventoWpp(TipoEventoWpp.NEW_MSG, builder.toJson(parser.parse(msg.toJson())));
                 }
 
                 @Override
                 public void onNewStatusV3(Message msg) {
-                    if (broadcasterWhats != null) {
-                        broadcasterWhats.broadcast(sseWhats.newEvent("new-msg-v3", builder.toJson(parser.parse(msg.toJson()))));
-                    }
+                    enviarEventoWpp(TipoEventoWpp.NEW_MSG_V3, builder.toJson(parser.parse(msg.toJson())));
                 }
             });
         };
         onLowBaterry = (e) -> {
-            if (broadcaster != null) {
-                broadcaster.broadcast(sse.newEvent("low-battery", e + ""));
-            }
+            enviarEventoWpp(TipoEventoWpp.LOW_BATTERY, e + "");
         };
         onNeedQrCode = (e) -> {
-            if (broadcaster != null) {
-                broadcaster.broadcast(sse.newEvent("need-qrCode", e));
-            }
+            enviarEventoWpp(TipoEventoWpp.NEED_QRCODE, e);
         };
         onErrorInDriver = (e) -> {
             logger.log(Level.SEVERE, e.getMessage(), e);
@@ -381,38 +376,6 @@ public class SistemaDelivery {
         }
     }
 
-    public SseBroadcaster getBroadcasterWhats() {
-        return broadcasterWhats;
-    }
-
-    public void setBroadcasterWhats(SseBroadcaster broadcasterWhats) {
-        this.broadcasterWhats = broadcasterWhats;
-    }
-
-    public Sse getSseWhats() {
-        return sseWhats;
-    }
-
-    public void setSseWhats(Sse sseWhats) {
-        this.sseWhats = sseWhats;
-    }
-
-    public Sse getSse() {
-        return sse;
-    }
-
-    public void setSse(Sse sse) {
-        this.sse = sse;
-    }
-
-    public SseBroadcaster getBroadcaster() {
-        return broadcaster;
-    }
-
-    public void setBroadcaster(SseBroadcaster broadcaster) {
-        this.broadcaster = broadcaster;
-    }
-
     public WebWhatsDriver getDriver() {
         return driver;
     }
@@ -454,6 +417,80 @@ public class SistemaDelivery {
         driver.getFunctions().logout();
     }
 
+    public void enviarMesagemParaTecnico(String msg) {
+        Chat c = driver.getFunctions().getChatByNumber("554491050665");
+        String mensagem = "*" + estabelecimento.getNomeEstabelecimento() + ":* " + msg;
+        if (c != null) {
+            c.sendMessage(mensagem);
+            c.setArchive(true);
+        }
+    }
+
+    public void enviarMensagemParaSuporte(String msg) {
+        String mensagem = "*" + estabelecimento.getNomeEstabelecimento() + ":* " + msg;
+        enviarMesagemParaTecnico(mensagem);
+        Chat c = driver.getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
+        if (c != null) {
+            c.sendMessage(mensagem);
+        }
+    }
+
+    public CompletionStage<?> enviarEventoDelivery(TipoEventoDelivery tipoEventoDelivery, String dado) {
+        if ((tipoEventoDelivery == TipoEventoDelivery.NOVO_PEDIDO || tipoEventoDelivery == TipoEventoDelivery.NOVA_RESERVA) && !possuiListennersDelivery()) {
+            String msg = tipoEventoDelivery == TipoEventoDelivery.NOVO_PEDIDO ? "um novo pedido" : "uma nova reserva";
+            String mensagem = "Recebeu " + msg + ", porém o sistema de impressão e o site estão desconectados.\n\n" +
+                    "Por favor acesse o site ou ligue o sistema de impressão para não perder nenhum pedido.";
+            enviarMensagemParaSuporte(mensagem);
+        }
+        if (broadcaster != null) {
+            return broadcaster.broadcast(sse.newEvent(tipoEventoDelivery.toString().toLowerCase().replace('_', '-'), dado));
+        }
+        return null;
+    }
+
+    public CompletionStage<?> enviarEventoWpp(TipoEventoWpp tipoEventoWpp, String dado) {
+        if (broadcasterWhats != null) {
+            return broadcasterWhats.broadcast(sseWhats.newEvent(tipoEventoWpp.toString().toLowerCase().replace('_', '-'), dado));
+        }
+        return null;
+    }
+
+    public void registrarListennerEventoDelivery(SseEventSink sink) {
+        broadcaster.register(sink);
+        synchronized (listennersEventosDelivery) {
+            listennersEventosDelivery.add(sink);
+        }
+    }
+
+    public void registrarListennerEventoWpp(SseEventSink sink) {
+        broadcasterWhats.register(sink);
+    }
+
+    public void inicializarEventosDelivery(Sse sse) {
+        if (broadcaster == null) {
+            broadcaster = sse.newBroadcaster();
+            broadcaster.onClose(sseEventSink -> {
+                synchronized (listennersEventosDelivery) {
+                    listennersEventosDelivery.remove(sseEventSink);
+                }
+            });
+            this.sse = sse;
+        }
+    }
+
+    public void inicializarEventosWpp(Sse sse) {
+        if (broadcasterWhats == null) {
+            broadcasterWhats = sse.newBroadcaster();
+            this.sseWhats = sse;
+        }
+    }
+
+    public boolean possuiListennersDelivery() {
+        synchronized (listennersEventosDelivery) {
+            return !listennersEventosDelivery.isEmpty();
+        }
+    }
+
     private class TelaWhatsApp extends JFrame {
 
         private JPanel panel;
@@ -476,5 +513,21 @@ public class SistemaDelivery {
         public JPanel getPanel() {
             return panel;
         }
+    }
+
+    public enum TipoEventoDelivery {
+        NOVO_PEDIDO,
+        NOVA_RESERVA,
+        ATUALIZAR_PEDIDO,
+        PEDIDO_AJUDA
+    }
+
+    public enum TipoEventoWpp {
+        CHAT_UPDATE,
+        NEW_CHAT,
+        NEW_MSG,
+        NEW_MSG_V3,
+        LOW_BATTERY,
+        NEED_QRCODE
     }
 }

@@ -21,7 +21,7 @@ public class ControleUsuarios {
 
     private static final Object syncronizeGetInstance = new Object();
     private static ControleUsuarios instance;
-    private Map<UUID, Usuario> usuarios;
+    private final Map<UUID, Usuario> usuarios;
 
     private ControleUsuarios() {
         this.usuarios = Collections.synchronizedMap(new HashMap<>());
@@ -36,24 +36,24 @@ public class ControleUsuarios {
         }
     }
 
+    public void atualizarEstabelecimentosUsuario(Usuario usuario) throws SQLException {
+        usuario.setEstabelecimentos(ControleEstabelecimentos.getInstance().getEstabelecimentosUsuario(usuario));
+    }
+
     public Usuario getUsuarioByUUID(UUID uuid) throws SQLException {
         if (usuarios.containsKey(uuid)) {
             return usuarios.get(uuid);
         }
         synchronized (usuarios) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<Usuario> h = new BeanHandler<Usuario>(Usuario.class);
-                Usuario u = queryRunner.query("select * from \"Usuarios\" where uuid = ?", h, uuid);
-                if (u == null) {
-                    return null;
-                }
-                usuarios.putIfAbsent(uuid, u);
-                u.setEstabelecimentos(ControleEstabelecimentos.getInstance().getEstabelecimentosUsuario(u));
-                return usuarios.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<Usuario> h = new BeanHandler<Usuario>(Usuario.class);
+            Usuario u = queryRunner.query("select * from \"Usuarios\" where uuid = ?", h, uuid);
+            if (u == null) {
+                return null;
             }
+            usuarios.putIfAbsent(uuid, u);
+            u.setEstabelecimentos(ControleEstabelecimentos.getInstance().getEstabelecimentosUsuario(u));
+            return usuarios.get(uuid);
         }
     }
 
@@ -68,8 +68,6 @@ public class ControleUsuarios {
                     return getUsuarioByUUID(uuid);
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return null;
     }
@@ -86,8 +84,6 @@ public class ControleUsuarios {
                     return getUsuarioByUUID(uuid);
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return null;
     }
@@ -135,8 +131,6 @@ public class ControleUsuarios {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 

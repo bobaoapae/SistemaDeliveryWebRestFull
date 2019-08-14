@@ -28,13 +28,31 @@ import java.util.logging.Level;
 @Path("/adm")
 public class Adm {
 
-    JsonParser parser;
+    private JsonParser parser;
     private Gson builder;
 
 
     public Adm() {
         parser = new JsonParser();
         builder = Utilitarios.getDefaultGsonBuilder(null).create();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/ativarUsuario")
+    public Response ativarUsuario(@QueryParam("uuid") String uuid) {
+        try {
+            Usuario usuario = ControleUsuarios.getInstance().getUsuarioByUUID(UUID.fromString(uuid));
+            usuario.setAtivo(true);
+            if (ControleUsuarios.getInstance().salvarUsuario(usuario)) {
+                return Response.status(Response.Status.CREATED).type(MediaType.APPLICATION_JSON).entity(builder.toJson(usuario)).build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{message: \"Falha ao salvar usuario, verificar log\"}").build();
+            }
+        } catch (Exception e) {
+            ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{message: \"" + ExceptionUtils.getStackTrace(e) + "\"}").build();
+        }
     }
 
     @GET
@@ -75,7 +93,7 @@ public class Adm {
             usuario.setTipoUsuario(TipoUsuario.ADMIN);
             try {
                 if (ControleUsuarios.getInstance().salvarUsuario(usuario)) {
-                    return Response.status(Response.Status.CREATED).type(MediaType.APPLICATION_JSON).entity(builder.toJson(usuario)).build();
+                    return Response.status(Response.Status.CREATED).type(MediaType.APPLICATION_JSON).entity(builder.toJson(ControleUsuarios.getInstance().getUsuarioByUUID(usuario.getUuid()))).build();
                 } else {
                     return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("{message: \"Falha ao salvar usuario, verificar log\"}").build();
                 }
@@ -92,19 +110,19 @@ public class Adm {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/reiniciarSistema")
     public Response reiniciarSistema(@QueryParam("uuid") @DefaultValue("") String uuid) {
-        try {
-            ControleSessions.getInstance().finalizarSessionForEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(uuid)));
-            Thread.sleep(2000);
-            ControleSessions.getInstance().getSessionForEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(uuid)));
-            return Response.status(Response.Status.OK).build();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
-        } catch (Exception e) {
-            ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
-        }
+        new Thread(() -> {
+            try {
+                ControleSessions.getInstance().finalizarSessionForEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(uuid)));
+                Thread.sleep(2000);
+                ControleSessions.getInstance().getSessionForEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(UUID.fromString(uuid)));
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
+            } catch (Exception e) {
+                ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
+            }
+        }).start();
+        return Response.status(Response.Status.OK).build();
     }
 
     @GET

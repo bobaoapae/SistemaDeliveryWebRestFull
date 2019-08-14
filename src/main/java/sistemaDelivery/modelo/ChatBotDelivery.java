@@ -179,9 +179,7 @@ public class ChatBotDelivery extends ChatBot {
         setPaused(true);
         try {
             SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
-            if (sistemaDelivery != null && sistemaDelivery.getBroadcaster() != null) {
-                sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("pedido-ajuda", getCliente().getNome()));
-            }
+            sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.PEDIDO_AJUDA, getCliente().getNome());
         } catch (IOException e) {
             e.printStackTrace();
         }

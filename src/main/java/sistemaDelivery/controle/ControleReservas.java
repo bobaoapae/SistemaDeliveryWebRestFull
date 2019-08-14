@@ -95,9 +95,7 @@ public class ControleReservas {
                     connection.commit();
                     try {
                         SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(reserva.getEstabelecimento());
-                        if (sistemaDelivery.getBroadcaster() != null) {
-                            sistemaDelivery.getBroadcaster().broadcast(sistemaDelivery.getSse().newEvent("nova-reserva", reserva.getUuid().toString()));
-                        }
+                        sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.NOVA_RESERVA, reserva.getUuid().toString());
                     } catch (IOException e) {
                         throw e;
                     }

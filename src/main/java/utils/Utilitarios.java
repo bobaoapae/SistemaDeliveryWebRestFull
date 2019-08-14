@@ -7,10 +7,8 @@ package utils;
 
 import adapters.*;
 import com.google.gson.GsonBuilder;
+import org.reflections.Reflections;
 import restFul.controle.ControleSistema;
-import sistemaDelivery.modelo.HorarioFuncionamento;
-import sistemaDelivery.modelo.ItemPedido;
-import sistemaDelivery.modelo.Produto;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -41,6 +39,15 @@ import java.util.logging.Level;
  */
 public class Utilitarios {
 
+    private static Reflections reflections;
+
+    public static Reflections getReflections() {
+        if (reflections == null) {
+            reflections = new Reflections("resful", "sistemaDelivery");
+        }
+        return reflections;
+    }
+
     public static GsonBuilder getDefaultGsonBuilder(Type type) {
         GsonBuilder builder = new GsonBuilder().disableHtmlEscaping().
                 registerTypeAdapter(java.sql.Date.class, new DateAdapterSerialize()).
@@ -50,9 +57,9 @@ public class Utilitarios {
                 registerTypeAdapter(Time.class, new TimeAdapter()).
                 registerTypeAdapter(Time.class, new TimeAdapterDeserialize());
         HashMap<Type, Object> adapters = new HashMap<>();
-        adapters.put(ItemPedido.class, new UseGetterAdapterSerialize<>());
-        adapters.put(Produto.class, new UseGetterAdapterSerialize<>());
-        adapters.put(HorarioFuncionamento.class, new UseGetterAdapterSerialize<>());
+        for (Class classe : getReflections().getTypesAnnotatedWith(ExposeGetter.class)) {
+            adapters.put(classe, new UseGetterAdapterSerialize<>());
+        }
         for (Map.Entry<Type, Object> entry : adapters.entrySet()) {
             if (entry.getKey().equals(type)) {
                 continue;

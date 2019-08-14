@@ -186,4 +186,22 @@ public class Manager {
         }
     }
 
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/atualizarEstabelecimentos")
+    public Response atualizarEstabelecimentos(@QueryParam("login") String login, @QueryParam("senha") String senha) {
+        try {
+            Usuario usuario = ControleUsuarios.getInstance().getUsuario(login, senha, true);
+            if (usuario != null) {
+                ControleUsuarios.getInstance().atualizarEstabelecimentosUsuario(usuario);
+                return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).entity(builder.toJson(usuario)).build();
+            } else {
+                return Response.status(Response.Status.UNAUTHORIZED).build();
+            }
+        } catch (SQLException e) {
+            ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+        }
+    }
+
 }

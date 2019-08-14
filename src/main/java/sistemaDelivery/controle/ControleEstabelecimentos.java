@@ -5,6 +5,7 @@ import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
 import restFul.controle.ControleSessions;
+import restFul.modelo.TipoUsuario;
 import restFul.modelo.Usuario;
 import sistemaDelivery.modelo.Estabelecimento;
 import sistemaDelivery.modelo.TipoEntrega;
@@ -244,9 +245,11 @@ public class ControleEstabelecimentos {
     public List<Estabelecimento> getEstabelecimentosUsuario(Usuario u) throws SQLException {
         List<Estabelecimento> estabelecimentos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid_estabelecimento from \"Estabelecimentos_Usuario\" as a inner join \"Estabelecimentos\" as b on a.uuid_estabelecimento=b.uuid where uuid_usuario = ? and ativo order by b.\"dataCriacao\"");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid_estabelecimento from \"Estabelecimentos_Usuario\" as a " +
+                     "inner join \"Estabelecimentos\" as b on a.uuid_estabelecimento=b.uuid where uuid_usuario = ? and ativo or ? order by b.\"dataCriacao\"");
         ) {
             preparedStatement.setObject(1, u.getUuid());
+            preparedStatement.setBoolean(2, u.getTipoUsuario() == TipoUsuario.SUPER_ADMIN);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     estabelecimentos.add(getEstabelecimentoByUUID(UUID.fromString(resultSet.getString("uuid_estabelecimento"))));
