@@ -1,5 +1,7 @@
-
-!/.idea/
-!/.scannerwork/
-!/META-INF/
-!/SistemaDeliveryWhatsAppRestFul.iml
+/target/
+/META-INF/
+/.scannerwork/
+/.idea/
+/.scannerwork/
+/SistemaDeliveryWhatsAppRestFul.iml
+/out/*
