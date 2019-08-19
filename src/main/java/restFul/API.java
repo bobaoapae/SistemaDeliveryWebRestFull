@@ -1155,6 +1155,22 @@ public class API {
     }
 
     @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    @Path("/exportarClientes")
+    public Response exportarClientes() {
+        try {
+            String exportacao = "Nome Cliente; WhatsApp;\r\n";
+            for (Cliente cliente : ControleClientes.getInstance().getClientes(token.getEstabelecimento())) {
+                exportacao += cliente.getNome() + ";" + cliente.getTelefoneMovel() + "\r\n";
+            }
+            return Response.status(Response.Status.OK).entity(Base64.getEncoder().encodeToString(exportacao.getBytes(Charset.forName("UTF-8")))).build();
+        } catch (Exception e) {
+            Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+        }
+    }
+
+    @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/clientes")
     public Response getClientes(@QueryParam("uuid") String uuid) {
