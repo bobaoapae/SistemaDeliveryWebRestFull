@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
 import java.time.format.TextStyle;
 import java.util.*;
 
@@ -95,11 +96,7 @@ public class ControleEstabelecimentos {
                 preparedStatement.setBoolean(8, estabelecimento.isReservasComPedidosFechados());
                 preparedStatement.setBoolean(9, estabelecimento.isAbrirFecharPedidosAutomatico());
                 preparedStatement.setBoolean(10, estabelecimento.isAgendamentoDePedidos());
-                if (estabelecimento.isReservas()) {
-                    preparedStatement.setTime(11, estabelecimento.getHoraInicioReservas());
-                } else {
-                    preparedStatement.setTime(11, null);
-                }
+                preparedStatement.setObject(11, estabelecimento.getHoraInicioReservas());
                 preparedStatement.setString(12, estabelecimento.getWebHookNovaReserva());
                 preparedStatement.setString(13, estabelecimento.getWebHookNovoPedido());
                 preparedStatement.setString(14, estabelecimento.getLogo());
@@ -158,12 +155,8 @@ public class ControleEstabelecimentos {
                     preparedStatement.setBoolean(9, estabelecimento.isReservasComPedidosFechados());
                     preparedStatement.setBoolean(10, estabelecimento.isAbrirFecharPedidosAutomatico());
                     preparedStatement.setBoolean(11, estabelecimento.isAgendamentoDePedidos());
-                    preparedStatement.setTimestamp(12, new java.sql.Timestamp(estabelecimento.getHoraAberturaPedidos() == null ? new Date().getTime() : estabelecimento.getHoraAberturaPedidos().getTime()));
-                    if (estabelecimento.isReservas()) {
-                        preparedStatement.setTime(13, estabelecimento.getHoraInicioReservas());
-                    } else {
-                        preparedStatement.setTime(13, null);
-                    }
+                    preparedStatement.setObject(12, estabelecimento.getHoraAberturaPedidos() == null ? OffsetDateTime.now() : estabelecimento.getHoraAberturaPedidos());
+                    preparedStatement.setObject(13, estabelecimento.getHoraInicioReservas());
                     preparedStatement.setString(14, estabelecimento.getWebHookNovaReserva());
                     preparedStatement.setString(15, estabelecimento.getWebHookNovoPedido());
                     preparedStatement.setString(16, estabelecimento.getLogo());

@@ -11,12 +11,14 @@ import utils.PedidoHandlerRowProcessor;
 import utils.Utilitarios;
 
 import java.io.IOException;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.*;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -101,7 +103,7 @@ public class ControlePedidos {
                     preparedStatement.setDouble(10, pedido.getPgCreditos());
                     preparedStatement.setDouble(11, pedido.getSubTotal());
                     preparedStatement.setDouble(12, pedido.getTotal());
-                    preparedStatement.setTime(13, pedido.getHoraAgendamento());
+                    preparedStatement.setObject(13, pedido.getHoraAgendamento());
                     preparedStatement.setString(14, pedido.getEstadoPedido().toString());
                     preparedStatement.setDouble(15, pedido.getTroco());
                     preparedStatement.setDouble(16, pedido.getTotalRemovido());
@@ -119,7 +121,7 @@ public class ControlePedidos {
                     preparedStatement.setLong(21, pedido.getCod());
                     preparedStatement.setDouble(22, pedido.getTaxaEntrega());
                     preparedStatement.setObject(23, pedido.getTipoEntrega().getUuid());
-                    preparedStatement.setTimestamp(24, pedido.getDataPedido());
+                    preparedStatement.setObject(24, pedido.getDataPedido());
                     preparedStatement.executeUpdate();
                     for (ItemPedido itemPedido : pedido.getProdutos()) {
                         itemPedido.calcularValor();
@@ -162,7 +164,7 @@ public class ControlePedidos {
                     preparedStatement.setDouble(7, pedido.getPgCreditos());
                     preparedStatement.setDouble(8, pedido.getSubTotal());
                     preparedStatement.setDouble(9, pedido.getTotal());
-                    preparedStatement.setTime(10, pedido.getHoraAgendamento());
+                    preparedStatement.setObject(10, pedido.getHoraAgendamento());
                     preparedStatement.setString(11, pedido.getEstadoPedido().toString());
                     preparedStatement.setDouble(12, pedido.getTroco());
                     preparedStatement.setDouble(13, pedido.getTotalRemovido());
@@ -223,7 +225,7 @@ public class ControlePedidos {
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"dataPedido\" >= ? order by \"dataPedido\" asc");
         ) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
-            preparedStatement.setTimestamp(2, new Timestamp(estabelecimento.getHoraAberturaPedidos().getTime()));
+            preparedStatement.setObject(2, estabelecimento.getHoraAberturaPedidos());
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
@@ -271,18 +273,14 @@ public class ControlePedidos {
         return pedidos;
     }
 
-    public List<Pedido> getPedidosBetween(Estabelecimento estabelecimento, Date data1, Date data2) throws SQLException {
+    public List<Pedido> getPedidosBetween(Estabelecimento estabelecimento, LocalDate data1, LocalDate data2) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection connection = Conexao.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!='Cancelado' and \"dataPedido\" between ? and ?")
         ) {
-            Calendar calendar = Calendar.getInstance();
-            Calendar calendar2 = Calendar.getInstance();
-            calendar.setTime(data1);
-            calendar2.setTime(data2);
             preparedStatement.setObject(1, estabelecimento.getUuid());
-            preparedStatement.setTimestamp(2, new Timestamp(data1.getTime()));
-            preparedStatement.setTimestamp(3, new Timestamp(data2.getTime()));
+            preparedStatement.setObject(2, data1);
+            preparedStatement.setObject(3, data2);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
@@ -328,19 +326,16 @@ public class ControlePedidos {
         return map;
     }
 
-    public HashMap<Integer, Integer> getEntregasPorHorario(Estabelecimento estabelecimento, Date data1) throws SQLException {
+    public HashMap<Integer, Integer> getEntregasPorHorario(Estabelecimento estabelecimento, LocalDate data1) throws SQLException {
         HashMap<Integer, Integer> map = new HashMap<>();
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(data1.getTime());
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
         for (int x = 0; x < 24; x++) {
             map.put(x, 0);
         }
         try (Connection connection = Conexao.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("select extract(hour from \"dataPedido\") as hora,count(uuid) as total from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!='Cancelado' and \"dataPedido\" between ? and ? group by extract(hour from \"dataPedido\")")) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
-            preparedStatement.setTimestamp(2, new Timestamp(data1.getTime()));
-            preparedStatement.setTimestamp(3, new Timestamp(calendar.getTime().getTime()));
+            preparedStatement.setObject(2, data1);
+            preparedStatement.setObject(3, data1.plusDays(1));
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 map.put(resultSet.getInt("hora"), resultSet.getInt("total"));
@@ -351,20 +346,16 @@ public class ControlePedidos {
         return map;
     }
 
-    public HashMap<String, Integer> getEntregasPorDiaSemana(Estabelecimento estabelecimento, Date data1, Date data2) throws SQLException {
+    public HashMap<String, Integer> getEntregasPorDiaSemana(Estabelecimento estabelecimento, LocalDate data1, LocalDate data2) throws SQLException {
         HashMap<String, Integer> map = new HashMap<>();
-        Calendar calendar = Calendar.getInstance();
-        Calendar calendar2 = Calendar.getInstance();
-        calendar.setTime(data1);
-        calendar2.setTime(data2);
         for (int x = 1; x <= 7; x++) {
             map.put(Utilitarios.getDayOfWeekName(x), 0);
         }
         try (Connection connection = Conexao.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("select extract(isodow from \"dataPedido\") as diaSemana,count(uuid) as total from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!='Cancelado' and \"dataPedido\" between ? and ? group by extract(isodow from \"dataPedido\")")) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
-            preparedStatement.setTimestamp(2, new Timestamp(data1.getTime()));
-            preparedStatement.setTimestamp(3, new Timestamp(data2.getTime()));
+            preparedStatement.setObject(2, data1);
+            preparedStatement.setObject(3, data2);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 map.put(Utilitarios.getDayOfWeekName(resultSet.getInt("diaSemana")), resultSet.getInt("total"));
@@ -375,7 +366,7 @@ public class ControlePedidos {
         return map;
     }
 
-    public HashMap<String, LinkedHashMap<String, Double>> getReceitaPeriodo(Estabelecimento estabelecimento, Date data1, Date data2) throws SQLException {
+    public HashMap<String, LinkedHashMap<String, Double>> getReceitaPeriodo(Estabelecimento estabelecimento, LocalDate data1, LocalDate data2) throws SQLException {
         HashMap<String, LinkedHashMap<String, Double>> lista = new HashMap<>();
         LinkedHashMap<String, Double> map = new LinkedHashMap<>();
         LinkedHashMap<String, Double> map2 = new LinkedHashMap<>();
@@ -383,17 +374,13 @@ public class ControlePedidos {
         lista.put("entrega", map);
         lista.put("retirada", map2);
         lista.put("total", map3);
-        Calendar calendar = Calendar.getInstance();
-        Calendar calendar2 = Calendar.getInstance();
-        calendar.setTime(data1);
-        calendar2.setTime(data2);
-        LocalDate primeiroMesCopia = LocalDate.of(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
-        LocalDate ultimoMes = LocalDate.of(calendar2.get(Calendar.YEAR), calendar2.get(Calendar.MONTH) + 1, calendar2.get(Calendar.DAY_OF_MONTH));
+        LocalDate primeiroMesCopia = data1;
+        LocalDate ultimoMes = data2;
         if (primeiroMesCopia.isAfter(ultimoMes)) {
             throw new DateTimeException("Primeiro mês deve ser anterior ao ultimo Mês");
         }
         while (primeiroMesCopia.isBefore(ultimoMes)) {
-            if (calendar.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR)) {
+            if (data1.getYear() == data2.getYear()) {
                 map.put(primeiroMesCopia.format(DateTimeFormatter.ofPattern("MMMM", Locale.forLanguageTag("pt-BR"))), 0.0);
                 map2.put(primeiroMesCopia.format(DateTimeFormatter.ofPattern("MMMM", Locale.forLanguageTag("pt-BR"))), 0.0);
                 map3.put(primeiroMesCopia.format(DateTimeFormatter.ofPattern("MMMM", Locale.forLanguageTag("pt-BR"))), 0.0);
@@ -407,11 +394,11 @@ public class ControlePedidos {
         try (Connection connection = Conexao.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("select extract(year from \"dataPedido\") as ano,extract(month from \"dataPedido\") as mes,entrega,sum(total) as total from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!='Cancelado' and \"dataPedido\" between ? and ?  group by extract(year from \"dataPedido\"),extract(month from \"dataPedido\"),entrega")) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
-            preparedStatement.setTimestamp(2, new Timestamp(data1.getTime()));
-            preparedStatement.setTimestamp(3, new Timestamp(data2.getTime()));
+            preparedStatement.setObject(2, data1);
+            preparedStatement.setObject(3, data2);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                if (calendar.get(Calendar.YEAR) == calendar2.get(Calendar.YEAR)) {
+                if (data1.getYear() == data2.getYear()) {
                     if (resultSet.getBoolean("entrega")) {
                         map.put(Utilitarios.getMonth(resultSet.getInt("mes")), resultSet.getDouble("total"));
                     } else {

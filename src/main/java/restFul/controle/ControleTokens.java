@@ -62,7 +62,7 @@ public class ControleTokens {
                 preparedStatement.setString(1, token.getToken());
                 preparedStatement.setObject(2, token.getEstabelecimento().getUuid());
                 preparedStatement.setObject(3, token.getUsuario().getUuid());
-                preparedStatement.setDate(4, new java.sql.Date(token.getValidade().getTime()));
+                preparedStatement.setObject(4, token.getValidade());
                 preparedStatement.executeUpdate();
                 connection.commit();
                 return true;

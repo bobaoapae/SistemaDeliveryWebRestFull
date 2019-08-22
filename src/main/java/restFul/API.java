@@ -24,8 +24,6 @@ import javax.ws.rs.sse.SseEventSink;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.sql.Time;
-import java.text.SimpleDateFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -1626,7 +1624,7 @@ public class API {
                     p.setEntrega(false);
                 }
                 if (new Random().nextInt() % 2 == 0) {
-                    p.setHoraAgendamento(Time.valueOf(LocalTime.now()));
+                    p.setHoraAgendamento(LocalTime.now().plusHours(2));
                 }
                 p.setCartao(new Random().nextInt() % 2 == 0);
                 for (Produto produto : produtosDisponiveis) {
@@ -1671,14 +1669,12 @@ public class API {
     @GET
     @Path("/entregasPorHorario")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response entregasPorHorario(@QueryParam("dataInicio") String data1) {
+    public Response entregasPorHorario(@QueryParam("dataInicio") String data) {
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            Date dataInicio = dateFormat.parse(data1);
-            HashMap<Integer, Integer> entregas = ControlePedidos.getInstance().getEntregasPorHorario(token.getEstabelecimento(), dataInicio);
+            HashMap<Integer, Integer> entregas = ControlePedidos.getInstance().getEntregasPorHorario(token.getEstabelecimento(), LocalDate.parse(data, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             JsonObject object = new JsonObject();
             object.add("entregas", builder.toJsonTree(entregas));
-            object.addProperty("data", data1);
+            object.addProperty("data", data);
             return Response.status(Response.Status.OK).entity(builder.toJson(object)).build();
         } catch (Exception e) {
             Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
@@ -1691,10 +1687,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response entregasPorDiaDaSemana(@QueryParam("dataInicio") String data1, @QueryParam("dataFim") String data2) {
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            Date dataInicio = dateFormat.parse(data1);
-            Date dataFim = dateFormat.parse(data2);
-            HashMap<String, Integer> entregas = ControlePedidos.getInstance().getEntregasPorDiaSemana(token.getEstabelecimento(), dataInicio, dataFim);
+            HashMap<String, Integer> entregas = ControlePedidos.getInstance().getEntregasPorDiaSemana(token.getEstabelecimento(), LocalDate.parse(data1, DateTimeFormatter.ofPattern("dd/MM/yyyy")), LocalDate.parse(data2, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             JsonObject object = new JsonObject();
             object.add("entregas", builder.toJsonTree(entregas));
             object.addProperty("datas", data1 + " - " + data2);
@@ -1710,10 +1703,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response receitaPorPeriodo(@QueryParam("dataInicio") String data1, @QueryParam("dataFim") String data2) {
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            Date dataInicio = dateFormat.parse(data1);
-            Date dataFim = dateFormat.parse(data2);
-            HashMap<String, LinkedHashMap<String, Double>> lista = ControlePedidos.getInstance().getReceitaPeriodo(token.getEstabelecimento(), dataInicio, dataFim);
+            HashMap<String, LinkedHashMap<String, Double>> lista = ControlePedidos.getInstance().getReceitaPeriodo(token.getEstabelecimento(), LocalDate.parse(data1, DateTimeFormatter.ofPattern("dd/MM/yyyy")), LocalDate.parse(data2, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             JsonObject object = new JsonObject();
             JsonArray array = new JsonArray();
             JsonArray array2 = new JsonArray();
@@ -1764,10 +1754,7 @@ public class API {
     public Response vendasPorProduto(@QueryParam("dataInicio") String data1, @QueryParam("dataFim") String data2) {
         try {
             HashMap<String, Integer> top5VendidosMes = new HashMap<>();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-            Date dataInicio = dateFormat.parse(data1);
-            Date dataFim = dateFormat.parse(data2);
-            List<Pedido> pedidosMes = ControlePedidos.getInstance().getPedidosBetween(token.getEstabelecimento(), dataInicio, dataFim);
+            List<Pedido> pedidosMes = ControlePedidos.getInstance().getPedidosBetween(token.getEstabelecimento(), LocalDate.parse(data1, DateTimeFormatter.ofPattern("dd/MM/yyyy")), LocalDate.parse(data2, DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             for (Pedido pedido : pedidosMes) {
                 synchronized (pedido.getProdutos()) {
                     for (ItemPedido itemPedido : pedido.getProdutos()) {

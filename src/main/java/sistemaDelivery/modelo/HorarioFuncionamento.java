@@ -3,8 +3,8 @@ package sistemaDelivery.modelo;
 import adapters.ExposeGetter;
 import utils.Ignorar;
 
-import java.sql.Time;
 import java.time.DayOfWeek;
+import java.time.LocalTime;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.Objects;
@@ -16,7 +16,7 @@ public class HorarioFuncionamento {
     @Ignorar
     private UUID uuid, uuid_estabelecimento;
     private DayOfWeek diaDaSemana;
-    private Time horaAbrir, horaFechar;
+    private LocalTime horaAbrir, horaFechar;
     private boolean ativo;
     @Ignorar
     private transient Estabelecimento estabelecimento;
@@ -57,19 +57,19 @@ public class HorarioFuncionamento {
         this.diaDaSemana = diaDaSemana;
     }
 
-    public Time getHoraAbrir() {
+    public LocalTime getHoraAbrir() {
         return horaAbrir;
     }
 
-    public void setHoraAbrir(Time horaAbrir) {
+    public void setHoraAbrir(LocalTime horaAbrir) {
         this.horaAbrir = horaAbrir;
     }
 
-    public Time getHoraFechar() {
+    public LocalTime getHoraFechar() {
         return horaFechar;
     }
 
-    public void setHoraFechar(Time horaFechar) {
+    public void setHoraFechar(LocalTime horaFechar) {
         this.horaFechar = horaFechar;
     }
 

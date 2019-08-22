@@ -7,7 +7,7 @@ package sistemaDelivery.modelo;
 
 import utils.Ignorar;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -19,7 +19,7 @@ public class RecargaCliente {
     boolean ativo;
     @Ignorar
     private UUID uuid, uuid_cliente, uuid_estabelecimento;
-    private Date dataRecarga;
+    private LocalDateTime dataRecarga;
     @Ignorar
     private transient Estabelecimento estabelecimento;
     @Ignorar
@@ -31,7 +31,7 @@ public class RecargaCliente {
         this.valor = valor;
         this.estabelecimento = estabelecimento;
         this.cliente = cliente;
-        dataRecarga = new Date();
+        dataRecarga = estabelecimento.getDataComHoraAtual();
         this.tipoRecarga = tipoRecarga;
     }
 
@@ -46,11 +46,11 @@ public class RecargaCliente {
         this.ativo = ativo;
     }
 
-    public Date getDataRecarga() {
+    public LocalDateTime getDataRecarga() {
         return dataRecarga;
     }
 
-    public void setDataRecarga(Date dataRecarga) {
+    public void setDataRecarga(LocalDateTime dataRecarga) {
         this.dataRecarga = dataRecarga;
     }
 

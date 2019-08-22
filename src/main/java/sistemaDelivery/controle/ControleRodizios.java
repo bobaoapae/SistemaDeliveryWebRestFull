@@ -74,7 +74,7 @@ public class ControleRodizios {
                     preparedStatement.setString(3, rodizio.getNome());
                     preparedStatement.setString(4, rodizio.getDescricao());
                     preparedStatement.setDouble(5, rodizio.getValor());
-                    preparedStatement.setTime(6, rodizio.getHoraInicio());
+                    preparedStatement.setObject(6, rodizio.getHoraInicio());
                     for (int x = 0; x < 7; x++) {
                         preparedStatement.setBoolean(x + 7, rodizio.getDiasSemana()[x]);
                     }
@@ -98,7 +98,7 @@ public class ControleRodizios {
                     preparedStatement.setString(1, rodizio.getNome());
                     preparedStatement.setString(2, rodizio.getDescricao());
                     preparedStatement.setDouble(3, rodizio.getValor());
-                    preparedStatement.setTime(4, rodizio.getHoraInicio());
+                    preparedStatement.setObject(4, rodizio.getHoraInicio());
                     for (int x = 0; x < 7; x++) {
                         preparedStatement.setBoolean(x + 5, rodizio.getDiasSemana()[x]);
                     }

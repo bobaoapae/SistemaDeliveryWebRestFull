@@ -4,7 +4,7 @@ import sistemaDelivery.SistemaDelivery;
 import sistemaDelivery.modelo.Estabelecimento;
 
 import java.security.Principal;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -12,7 +12,7 @@ public class Token implements Principal {
 
     private UUID uuid_estabelecimento, uuid_usuario;
     private String token;
-    private Date validade;
+    private LocalDateTime validade;
     private Estabelecimento estabelecimento;
     private Usuario usuario;
     private SistemaDelivery sistemaDelivery;
@@ -65,11 +65,11 @@ public class Token implements Principal {
         this.token = token;
     }
 
-    public Date getValidade() {
+    public LocalDateTime getValidade() {
         return validade;
     }
 
-    public void setValidade(Date validade) {
+    public void setValidade(LocalDateTime validade) {
         this.validade = validade;
     }
 

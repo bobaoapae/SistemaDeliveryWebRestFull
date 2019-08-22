@@ -2,7 +2,7 @@ package sistemaDelivery.modelo;
 
 import utils.Ignorar;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -11,7 +11,7 @@ public class Reserva {
     @Ignorar
     private UUID uuid, uuid_estabelecimento, uuid_cliente;
     private String telefoneContato, nomeContato, comentario;
-    private Timestamp dataReserva;
+    private LocalDateTime dataReserva;
     private int qtdPessoas;
     private long cod;
     private boolean impresso;
@@ -89,11 +89,11 @@ public class Reserva {
         this.impresso = impresso;
     }
 
-    public Timestamp getDataReserva() {
+    public LocalDateTime getDataReserva() {
         return dataReserva;
     }
 
-    public void setDataReserva(Timestamp dataReserva) {
+    public void setDataReserva(LocalDateTime dataReserva) {
         this.dataReserva = dataReserva;
     }
 

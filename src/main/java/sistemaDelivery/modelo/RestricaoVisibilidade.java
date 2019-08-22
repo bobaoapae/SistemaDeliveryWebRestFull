@@ -2,7 +2,7 @@ package sistemaDelivery.modelo;
 
 import utils.Ignorar;
 
-import java.sql.Time;
+import java.time.LocalTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -10,7 +10,7 @@ public class RestricaoVisibilidade {
 
     @Ignorar
     private UUID uuid, uuid_categoria, uuid_produto;
-    private Time horarioDe, horarioAte;
+    private LocalTime horarioDe, horarioAte;
     private boolean restricaoHorario, restricaoDia;
     private boolean[] diasSemana;
     @Ignorar
@@ -80,19 +80,19 @@ public class RestricaoVisibilidade {
         this.diasSemana = diasSemana;
     }
 
-    public Time getHorarioDe() {
+    public LocalTime getHorarioDe() {
         return horarioDe;
     }
 
-    public void setHorarioDe(Time horarioDe) {
+    public void setHorarioDe(LocalTime horarioDe) {
         this.horarioDe = horarioDe;
     }
 
-    public Time getHorarioAte() {
+    public LocalTime getHorarioAte() {
         return horarioAte;
     }
 
-    public void setHorarioAte(Time horarioAte) {
+    public void setHorarioAte(LocalTime horarioAte) {
         this.horarioAte = horarioAte;
     }
 

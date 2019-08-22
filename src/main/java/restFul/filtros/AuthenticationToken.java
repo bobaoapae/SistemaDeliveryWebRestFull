@@ -8,7 +8,6 @@ import restFul.controle.ControleSistema;
 import restFul.controle.ControleTokens;
 import restFul.modelo.Token;
 import restFul.modelo.TokenSecurityContext;
-import utils.DateUtils;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -19,7 +18,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.logging.Level;
 
 @Provider
@@ -50,7 +49,7 @@ public class AuthenticationToken implements ContainerRequestFilter {
                     return;
                 }
                 if (k != null) {
-                    if (DateUtils.isAfterDay(k.getValidade(), new Date())) {
+                    if (k.getValidade().isAfter(LocalDateTime.now())) {
                         TokenSecurityContext securityContext = new TokenSecurityContext(k);
                         containerRequestContext.setSecurityContext(securityContext);
                         k.setSistemaDelivery(ControleSessions.getInstance().getSessionForEstabelecimento(k.getEstabelecimento()));

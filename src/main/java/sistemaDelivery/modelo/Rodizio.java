@@ -7,7 +7,7 @@ package sistemaDelivery.modelo;
 
 import utils.Ignorar;
 
-import java.sql.Time;
+import java.time.LocalTime;
 import java.util.UUID;
 
 /**
@@ -17,7 +17,7 @@ public class Rodizio extends Produto {
 
     @Ignorar
     private UUID uuid_estabelecimento;
-    private Time horaInicio;
+    private LocalTime horaInicio;
     private boolean diasSemana[];
     @Ignorar
     private transient Estabelecimento estabelecimento;
@@ -107,11 +107,11 @@ public class Rodizio extends Produto {
         this.diasSemana[6] = flag;
     }
 
-    public Time getHoraInicio() {
+    public LocalTime getHoraInicio() {
         return horaInicio;
     }
 
-    public void setHoraInicio(Time horaInicio) {
+    public void setHoraInicio(LocalTime horaInicio) {
         this.horaInicio = horaInicio;
     }
 

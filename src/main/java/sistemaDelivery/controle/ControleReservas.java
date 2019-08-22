@@ -85,7 +85,7 @@ public class ControleReservas {
                     } else {
                         preparedStatement.setObject(3, null);
                     }
-                    preparedStatement.setTimestamp(4, reserva.getDataReserva());
+                    preparedStatement.setObject(4, reserva.getDataReserva());
                     preparedStatement.setString(5, reserva.getTelefoneContato());
                     preparedStatement.setString(6, reserva.getNomeContato());
                     preparedStatement.setString(7, reserva.getComentario());
@@ -112,7 +112,7 @@ public class ControleReservas {
                         "       \"telefoneContato\"=?, \"nomeContato\"=?, comentario=?, impresso=?, \n" +
                         "       \"qtdPessoas\"=?\n" +
                         " WHERE uuid = ? and uuid_estabelecimento = ?;")) {
-                    preparedStatement.setTimestamp(1, reserva.getDataReserva());
+                    preparedStatement.setObject(1, reserva.getDataReserva());
                     preparedStatement.setString(2, reserva.getTelefoneContato());
                     preparedStatement.setString(3, reserva.getNomeContato());
                     preparedStatement.setString(4, reserva.getComentario());

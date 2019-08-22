@@ -44,10 +44,10 @@ public class HandlerConcluirPedido extends HandlerBotDelivery {
                     }
                 } else {
                     if (p.isEntrega()) {
-                        builder.textNewLine("A partir das " + p.getHoraAgendamento().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " ele sera entregue no endereço informado.")
+                        builder.textNewLine("A partir das " + p.getHoraAgendamento().format(DateTimeFormatter.ofPattern("HH:mm")) + " ele sera entregue no endereço informado.")
                                 .text("E não se preocupe, você recebera um aviso assim que seu pedido estiver saindo para a entrega.");
                     } else {
-                        builder.text("A partir das " + p.getHoraAgendamento().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + " você recebera um aviso para buscar seu pedido.")
+                        builder.text("A partir das " + p.getHoraAgendamento().format(DateTimeFormatter.ofPattern("HH:mm")) + " você recebera um aviso para buscar seu pedido.")
                                 .newLine()
                                 .text("Nosso endereço é o seguinte: ")
                                 .textBold(p.getEstabelecimento().getEndereco());

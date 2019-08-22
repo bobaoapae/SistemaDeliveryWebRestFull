@@ -85,8 +85,8 @@ public class ControleRestricaoVisibilidade {
                 }
                 preparedStatement.setBoolean(4, restricaoVisibilidade.isRestricaoHorario());
                 preparedStatement.setBoolean(5, restricaoVisibilidade.isRestricaoDia());
-                preparedStatement.setTime(6, restricaoVisibilidade.getHorarioDe());
-                preparedStatement.setTime(7, restricaoVisibilidade.getHorarioAte());
+                preparedStatement.setObject(6, restricaoVisibilidade.getHorarioDe());
+                preparedStatement.setObject(7, restricaoVisibilidade.getHorarioAte());
                 for (int x = 0; x < 7; x++) {
                     preparedStatement.setBoolean(x + 8, restricaoVisibilidade.getDiasSemana()[x]);
                 }

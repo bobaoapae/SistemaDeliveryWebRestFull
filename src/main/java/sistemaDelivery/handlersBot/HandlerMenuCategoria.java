@@ -114,7 +114,7 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
                     }
                 }
                 if (l.getRestricaoVisibilidade().isRestricaoHorario()) {
-                    if (!(horaAtual.isAfter(l.getRestricaoVisibilidade().getHorarioDe().toLocalTime()) && horaAtual.isBefore(l.getRestricaoVisibilidade().getHorarioAte().toLocalTime()))) {
+                    if (!(horaAtual.isAfter(l.getRestricaoVisibilidade().getHorarioDe()) && horaAtual.isBefore(l.getRestricaoVisibilidade().getHorarioAte()))) {
                         continue;
                     }
                 }

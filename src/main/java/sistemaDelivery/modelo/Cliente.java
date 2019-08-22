@@ -10,8 +10,8 @@ import sistemaDelivery.controle.ControleRecargas;
 import utils.Ignorar;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -24,9 +24,9 @@ public class Cliente {
     @Ignorar
     private UUID uuid, uuid_estabelecimento;
     private String nome, chatId, telefoneMovel, telefoneFixo;
-    private java.sql.Date dataAniversario;
-    private java.sql.Date dataCadastro;
-    private Timestamp dataUltimaCompra;
+    private LocalDate dataAniversario;
+    private LocalDate dataCadastro;
+    private LocalDateTime dataUltimaCompra;
     private boolean cadastroRealizado;
     private Endereco endereco;
     @Ignorar
@@ -39,7 +39,7 @@ public class Cliente {
     }
 
     public Cliente() {
-        this.dataCadastro = new java.sql.Date(new Date().getTime());
+        this.dataCadastro = LocalDate.now();
     }
 
     public UUID getUuid_estabelecimento() {
@@ -80,11 +80,6 @@ public class Cliente {
 
     public List<RecargaCliente> getRegargas() throws SQLException {
         return ControleRecargas.getInstance().getRecargasCliente(this);
-    }
-
-
-    public List<SeloFidelidade> getSelosFidelidade(Estabelecimento e) {
-        return null;
     }
 
     public double getCreditosDisponiveis() throws SQLException {
@@ -130,11 +125,11 @@ public class Cliente {
         this.cadastroRealizado = cadastroRealizado;
     }
 
-    public java.sql.Date getDataAniversario() {
+    public LocalDate getDataAniversario() {
         return dataAniversario;
     }
 
-    public void setDataAniversario(java.sql.Date dataAniversario) {
+    public void setDataAniversario(LocalDate dataAniversario) {
         this.dataAniversario = dataAniversario;
     }
 
@@ -161,19 +156,19 @@ public class Cliente {
     }
 
 
-    public java.sql.Date getDataCadastro() {
+    public LocalDate getDataCadastro() {
         return dataCadastro;
     }
 
-    public void setDataCadastro(java.sql.Date dataCadastro) {
+    public void setDataCadastro(LocalDate dataCadastro) {
         this.dataCadastro = dataCadastro;
     }
 
-    public Timestamp getDataUltimaCompra() {
+    public LocalDateTime getDataUltimaCompra() {
         return dataUltimaCompra;
     }
 
-    public void setDataUltimaCompra(Timestamp dataUltimaCompra) {
+    public void setDataUltimaCompra(LocalDateTime dataUltimaCompra) {
         this.dataUltimaCompra = dataUltimaCompra;
     }
 

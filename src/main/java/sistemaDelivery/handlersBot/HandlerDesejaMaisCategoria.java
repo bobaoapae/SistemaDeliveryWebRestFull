@@ -60,7 +60,7 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
                         }
                     }
                     if (c.getRestricaoVisibilidade().isRestricaoHorario()) {
-                        if (!(horaAtual.isAfter(c.getRestricaoVisibilidade().getHorarioDe().toLocalTime()) && horaAtual.isBefore(c.getRestricaoVisibilidade().getHorarioAte().toLocalTime()))) {
+                        if (!(horaAtual.isAfter(c.getRestricaoVisibilidade().getHorarioDe()) && horaAtual.isBefore(c.getRestricaoVisibilidade().getHorarioAte()))) {
                             continue;
                         }
                     }

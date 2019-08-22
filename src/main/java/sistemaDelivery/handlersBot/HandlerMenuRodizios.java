@@ -84,7 +84,7 @@ public class HandlerMenuRodizios extends HandlerBotDelivery {
                 builder.textNewLine(r.getDescricao());
                 builder.textNewLine("Tudo isso por apenas, R$" + new DecimalFormat("###,###,###.00").format(r.getValor()));
                 builder.textNewLine("Dias da Semana: " + diasSemana);
-                builder.textNewLine("Horario: " + r.getHoraInicio().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")));
+                builder.textNewLine("Horario: " + r.getHoraInicio().format(DateTimeFormatter.ofPattern("HH:mm")));
                 builder.textNewLine("");
                 builder.textNewLine("");
                 chat.getChat().sendMessage(builder.build());

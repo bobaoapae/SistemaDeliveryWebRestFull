@@ -62,7 +62,7 @@ public class ControleHorariosFuncionamento {
 
 
     public boolean salvarHorarioFuncionamento(HorarioFuncionamento horarioFuncionamento) throws SQLException, SchedulerException, IOException {
-        if (horarioFuncionamento.getHoraAbrir().after(horarioFuncionamento.getHoraFechar())) {
+        if (horarioFuncionamento.getHoraAbrir().isAfter(horarioFuncionamento.getHoraFechar())) {
             return false;
         }
         try (Connection connection = Conexao.getConnection();) {
@@ -76,8 +76,8 @@ public class ControleHorariosFuncionamento {
                     preparedStatement.setObject(1, horarioFuncionamento.getUuid());
                     preparedStatement.setObject(2, horarioFuncionamento.getEstabelecimento().getUuid());
                     preparedStatement.setString(3, horarioFuncionamento.getDiaDaSemana().toString());
-                    preparedStatement.setTime(4, horarioFuncionamento.getHoraAbrir());
-                    preparedStatement.setTime(5, horarioFuncionamento.getHoraFechar());
+                    preparedStatement.setObject(4, horarioFuncionamento.getHoraAbrir());
+                    preparedStatement.setObject(5, horarioFuncionamento.getHoraFechar());
                     preparedStatement.executeUpdate();
                     connection.commit();
                     horarioFuncionamento.getEstabelecimento().addHorarioFuncionamento(getHorarioFuncionamentoByUUID(horarioFuncionamento.getUuid()));
@@ -92,8 +92,8 @@ public class ControleHorariosFuncionamento {
             } else {
                 try (PreparedStatement preparedStatement = connection.prepareStatement("update \"Horarios_Funcionamento\" set \"diaDaSemana\" = ?,\"horaAbrir\" = ?,\"horaFechar\" = ?,ativo = ? where uuid = ? and uuid_estabelecimento = ?")) {
                     preparedStatement.setString(1, horarioFuncionamento.getDiaDaSemana().toString());
-                    preparedStatement.setTime(2, horarioFuncionamento.getHoraAbrir());
-                    preparedStatement.setTime(3, horarioFuncionamento.getHoraFechar());
+                    preparedStatement.setObject(2, horarioFuncionamento.getHoraAbrir());
+                    preparedStatement.setObject(3, horarioFuncionamento.getHoraFechar());
                     preparedStatement.setBoolean(4, horarioFuncionamento.isAtivo());
                     preparedStatement.setObject(5, horarioFuncionamento.getUuid());
                     preparedStatement.setObject(6, horarioFuncionamento.getEstabelecimento().getUuid());

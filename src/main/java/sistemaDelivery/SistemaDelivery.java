@@ -361,11 +361,11 @@ public class SistemaDelivery {
                             jobFechar.getJobDataMap().put("sistemaDelivery", this);
                             Trigger triggerAbrir = TriggerBuilder.newTrigger()
                                     .withIdentity("abrirPedidoTrigger" + horario.getUuid(), "abrirFecharPedidos")
-                                    .withSchedule(CronScheduleBuilder.cronSchedule("0 " + horario.getHoraAbrir().toLocalTime().getMinute() + " " + horario.getHoraAbrir().toLocalTime().getHour() + " ? * " + horario.getDiaDaSemana().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("en-US")).toUpperCase() + " *").inTimeZone(estabelecimento.getTimeZoneObject()))
+                                    .withSchedule(CronScheduleBuilder.cronSchedule("0 " + horario.getHoraAbrir().getMinute() + " " + horario.getHoraAbrir().getHour() + " ? * " + horario.getDiaDaSemana().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("en-US")).toUpperCase() + " *").inTimeZone(estabelecimento.getTimeZoneObject()))
                                     .build();
                             Trigger triggerFechar = TriggerBuilder.newTrigger()
                                     .withIdentity("fecharPedidoTrigger" + horario.getUuid(), "abrirFecharPedidos")
-                                    .withSchedule(CronScheduleBuilder.cronSchedule("0 " + horario.getHoraFechar().toLocalTime().getMinute() + " " + horario.getHoraFechar().toLocalTime().getHour() + " ? * " + horario.getDiaDaSemana().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("en-US")).toUpperCase() + " *").inTimeZone(estabelecimento.getTimeZoneObject()))
+                                    .withSchedule(CronScheduleBuilder.cronSchedule("0 " + horario.getHoraFechar().getMinute() + " " + horario.getHoraFechar().getHour() + " ? * " + horario.getDiaDaSemana().getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("en-US")).toUpperCase() + " *").inTimeZone(estabelecimento.getTimeZoneObject()))
                                     .build();
                             scheduler.scheduleJob(jobAbrir, triggerAbrir);
                             scheduler.scheduleJob(jobFechar, triggerFechar);

@@ -83,11 +83,7 @@ public class ControleClientes {
                     preparedStatement.setString(3, cliente.getNome());
                     preparedStatement.setString(4, cliente.getTelefoneMovel());
                     preparedStatement.setString(5, cliente.getTelefoneFixo());
-                    if (cliente.getDataAniversario() != null) {
-                        preparedStatement.setDate(6, cliente.getDataAniversario());
-                    } else {
-                        preparedStatement.setDate(6, null);
-                    }
+                    preparedStatement.setObject(6, cliente.getDataAniversario());
                     if (cliente.getEndereco() != null) {
                         preparedStatement.setString(7, cliente.getEndereco().getLogradouro());
                         preparedStatement.setString(8, cliente.getEndereco().getBairro());
@@ -116,11 +112,7 @@ public class ControleClientes {
                     preparedStatement.setString(2, cliente.getNome());
                     preparedStatement.setString(3, cliente.getTelefoneMovel());
                     preparedStatement.setString(4, cliente.getTelefoneFixo());
-                    if (cliente.getDataAniversario() != null) {
-                        preparedStatement.setDate(5, cliente.getDataAniversario());
-                    } else {
-                        preparedStatement.setDate(5, null);
-                    }
+                    preparedStatement.setObject(5, cliente.getDataAniversario());
                     if (cliente.getEndereco() != null) {
                         preparedStatement.setString(6, cliente.getEndereco().getLogradouro());
                         preparedStatement.setString(7, cliente.getEndereco().getBairro());

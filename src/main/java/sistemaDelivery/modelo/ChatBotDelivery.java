@@ -151,10 +151,10 @@ public class ChatBotDelivery extends ChatBot {
                 chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você pode deixar seu pedido agendado._");
                 this.setHandler(new HandlerMenuPrincipal(this), true);
             } else if (this.getEstabelecimento().isReservas() && this.getEstabelecimento().isReservasComPedidosFechados()) {
-                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_");
+                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_");
                 this.setHandler(new HandlerDesejaFazerUmaReserva(this), true);
             } else {
-                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "._");
+                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + "._");
                 this.setHandler(new HandlerAdeus(this), true);
             }
         } else {

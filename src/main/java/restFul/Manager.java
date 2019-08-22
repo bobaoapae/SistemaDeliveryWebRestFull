@@ -1,8 +1,6 @@
 package restFul;
 
-import adapters.*;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import restFul.controle.ControleSessions;
@@ -24,11 +22,8 @@ import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -38,17 +33,8 @@ public class Manager {
     private Gson builder;
 
     public Manager() {
-        builder = new GsonBuilder().disableHtmlEscaping().
-                registerTypeAdapter(LocalTime.class, new DateAdapterSerialize()).
-                registerTypeAdapter(LocalTime.class, new DateAdapterDeserialize()).
-                registerTypeAdapter(LocalDate.class, new TimestampAdapterSerialize()).
-                registerTypeAdapter(LocalDate.class, new TimestampAdapterDeserialize()).
-                registerTypeAdapter(Time.class, new TimeAdapter()).
-                registerTypeAdapter(Time.class, new TimeAdapterDeserialize()).
-                setDateFormat("dd/MM/yyyy HH:mm:ss").
-                create();
+        builder = Utilitarios.getDefaultGsonBuilder(null).create();
     }
-
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
@@ -82,9 +68,7 @@ public class Manager {
                     Token token = new Token();
                     token.setUsuario(usuario);
                     token.setEstabelecimento(esta);
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.add(Calendar.DAY_OF_YEAR, 7);
-                    token.setValidade(calendar.getTime());
+                    token.setValidade(LocalDateTime.now().plusWeeks(1));
                     try {
                         token.setToken(Utilitarios.generate(128));
                     } catch (NoSuchAlgorithmException e1) {

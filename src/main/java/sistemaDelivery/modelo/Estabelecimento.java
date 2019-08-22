@@ -2,7 +2,6 @@ package sistemaDelivery.modelo;
 
 import utils.Ignorar;
 
-import java.sql.Time;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -18,8 +17,8 @@ public class Estabelecimento {
     private boolean openPedidos, openChatBot, reservas, reservasComPedidosFechados, abrirFecharPedidosAutomatico;
     private boolean agendamentoDePedidos, ativo, iniciarAutomaticamente;
     @Ignorar
-    private Date horaAberturaPedidos;
-    private Time horaInicioReservas;
+    private LocalDateTime horaAberturaPedidos;
+    private LocalTime horaInicioReservas;
     private double valorSelo;
     @Ignorar
     private transient List<Categoria> categorias;
@@ -237,7 +236,7 @@ public class Estabelecimento {
 
     public void setOpenPedidos(boolean openPedidos) {
         if (openPedidos && !this.openPedidos) {
-            this.horaAberturaPedidos = Calendar.getInstance(getTimeZoneObject()).getTime();
+            this.horaAberturaPedidos = LocalDateTime.now(getTimeZoneObject().toZoneId());
         }
         this.openPedidos = openPedidos;
     }
@@ -282,11 +281,11 @@ public class Estabelecimento {
         this.agendamentoDePedidos = agendamentoDePedidos;
     }
 
-    public Time getHoraInicioReservas() {
+    public LocalTime getHoraInicioReservas() {
         return horaInicioReservas;
     }
 
-    public void setHoraInicioReservas(Time horaInicioReservas) {
+    public void setHoraInicioReservas(LocalTime horaInicioReservas) {
         this.horaInicioReservas = horaInicioReservas;
     }
 
@@ -314,11 +313,11 @@ public class Estabelecimento {
         this.validadeSeloFidelidade = validadeSeloFidelidade;
     }
 
-    public Date getHoraAberturaPedidos() {
+    public LocalDateTime getHoraAberturaPedidos() {
         return horaAberturaPedidos;
     }
 
-    public void setHoraAberturaPedidos(Date horaAberturaPedidos) {
+    public void setHoraAberturaPedidos(LocalDateTime horaAberturaPedidos) {
         this.horaAberturaPedidos = horaAberturaPedidos;
     }
 
@@ -332,7 +331,7 @@ public class Estabelecimento {
                     if (!horarioFuncionamento.isAtivo()) {
                         continue;
                     }
-                    if (horaInformada.isAfter(horarioFuncionamento.getHoraAbrir().toLocalTime()) && horaInformada.isBefore(horarioFuncionamento.getHoraFechar().toLocalTime())) {
+                    if (horaInformada.isAfter(horarioFuncionamento.getHoraAbrir()) && horaInformada.isBefore(horarioFuncionamento.getHoraFechar())) {
                         return true;
                     }
                 }
@@ -355,7 +354,7 @@ public class Estabelecimento {
                     if (!horarioFuncionamento.isAtivo()) {
                         continue;
                     }
-                    if (getDataComHoraAtual().toLocalTime().isAfter(horarioFuncionamento.getHoraAbrir().toLocalTime()) && getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraFechar().toLocalTime())) {
+                    if (getDataComHoraAtual().toLocalTime().isAfter(horarioFuncionamento.getHoraAbrir()) && getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraFechar())) {
                         return horarioFuncionamento;
                     }
                 }
@@ -374,7 +373,7 @@ public class Estabelecimento {
                     if (!horarioFuncionamento.isAtivo()) {
                         continue;
                     }
-                    if (getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraAbrir().toLocalTime())) {
+                    if (getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraAbrir())) {
                         return horarioFuncionamento;
                     }
                 }
@@ -393,9 +392,9 @@ public class Estabelecimento {
                     if (!horarioFuncionamento.isAtivo()) {
                         continue;
                     }
-                    if ((getDataComHoraAtual().toLocalTime().isAfter(horarioFuncionamento.getHoraAbrir().toLocalTime()) || getDataComHoraAtual().toLocalTime().withSecond(0).withNano(0).equals(horarioFuncionamento.getHoraAbrir().toLocalTime())) && (getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraFechar().toLocalTime()) || getDataComHoraAtual().toLocalTime().withSecond(0).withNano(0).equals(horarioFuncionamento.getHoraFechar().toLocalTime()))) {
+                    if ((getDataComHoraAtual().toLocalTime().isAfter(horarioFuncionamento.getHoraAbrir()) || getDataComHoraAtual().toLocalTime().withSecond(0).withNano(0).equals(horarioFuncionamento.getHoraAbrir())) && (getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraFechar()) || getDataComHoraAtual().toLocalTime().withSecond(0).withNano(0).equals(horarioFuncionamento.getHoraFechar()))) {
                         return horarioFuncionamento;
-                    } else if (getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraAbrir().toLocalTime())) {
+                    } else if (getDataComHoraAtual().toLocalTime().isBefore(horarioFuncionamento.getHoraAbrir())) {
                         return horarioFuncionamento;
                     }
                 }

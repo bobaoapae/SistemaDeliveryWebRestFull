@@ -8,12 +8,10 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.modelo.Reserva;
-import utils.DateUtils;
 
-import java.sql.Timestamp;
-import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
+import java.time.format.DateTimeParseException;
 
 /**
  * @author jvbor
@@ -36,21 +34,20 @@ public class HandlerRealizarReserva extends HandlerBotDelivery {
     protected boolean runSecondTime(Message m) {
         String dataS = m.getContent().trim().replaceAll(" ", "");
         try {
-            Calendar data = Calendar.getInstance();
-            data.setTime(getChatBotDelivery().getDateFormat().parse(dataS));
-            data.set(Calendar.YEAR, Calendar.getInstance().get(Calendar.YEAR));
-            if (DateUtils.isToday(data.getTime()) || DateUtils.isAfterDay(data.getTime(), Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject()).getTime())) {
+            LocalDateTime localDateTime = LocalDateTime.parse(dataS, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            LocalDateTime localDateTimeAtual = getChatBotDelivery().getEstabelecimento().getDataComHoraAtual();
+            if (localDateTime.toLocalDate().equals(localDateTimeAtual.toLocalDate()) || localDateTime.toLocalDate().isAfter(localDateTimeAtual.toLocalDate())) {
                 Reserva r = new Reserva();
                 r.setCliente(getChatBotDelivery().getCliente());
                 r.setEstabelecimento(getChatBotDelivery().getEstabelecimento());
-                r.setDataReserva(new Timestamp(data.getTime().getTime()));
+                r.setDataReserva(localDateTime);
                 getChatBotDelivery().setReservaAtual(r);
                 chat.setHandler(new HandlerSolicitarHorarioReserva(chat), true);
                 return true;
             } else {
                 return false;
             }
-        } catch (ParseException ex) {
+        } catch (DateTimeParseException ex) {
             return false;
         } catch (Exception e) {
             getChatBotDelivery().getChat().getDriver().onError(e);

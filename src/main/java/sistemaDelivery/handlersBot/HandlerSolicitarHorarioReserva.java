@@ -7,11 +7,11 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import utils.DateUtils;
 
-import java.sql.Timestamp;
-import java.text.ParseException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 
 /**
@@ -34,23 +34,21 @@ public class HandlerSolicitarHorarioReserva extends HandlerBotDelivery {
     protected boolean runSecondTime(Message m) {
         String dataS = m.getContent().trim().replaceAll(" ", "");
         try {
-            Calendar horaAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
-            Calendar dataInformada = Calendar.getInstance();
-            Calendar dataChat = Calendar.getInstance();
-            dataChat.setTimeInMillis(getChatBotDelivery().getReservaAtual().getDataReserva().getTime());
-            dataInformada.setTime(getChatBotDelivery().getTimeFormat().parse(dataS));
-            dataChat.set(Calendar.HOUR_OF_DAY, dataInformada.get(Calendar.HOUR_OF_DAY));
-            dataChat.set(Calendar.MINUTE, dataInformada.get(Calendar.MINUTE));
-            dataChat.set(Calendar.SECOND, 0);
-            dataChat.set(Calendar.MILLISECOND, 0);
-            if (((dataInformada.get(Calendar.HOUR_OF_DAY) == getChatBotDelivery().getEstabelecimento().getHoraInicioReservas().toLocalTime().getHour() && dataInformada.get(Calendar.MINUTE) >= getChatBotDelivery().getEstabelecimento().getHoraInicioReservas().toLocalTime().getMinute()) || dataInformada.get(Calendar.HOUR_OF_DAY) > getChatBotDelivery().getEstabelecimento().getHoraInicioReservas().toLocalTime().getHour()) && ((dataChat.get(Calendar.HOUR_OF_DAY) == horaAtual.get(Calendar.HOUR_OF_DAY) && dataChat.get(Calendar.MINUTE) > horaAtual.get(Calendar.MINUTE)) || dataChat.get(Calendar.HOUR_OF_DAY) > horaAtual.get(Calendar.HOUR_OF_DAY) || DateUtils.isAfterDay(getChatBotDelivery().getReservaAtual().getDataReserva(), Calendar.getInstance().getTime()))) {
-                getChatBotDelivery().getReservaAtual().setDataReserva(new Timestamp(dataChat.getTime().getTime()));
+            LocalDateTime localDateTimeAtual = getChatBotDelivery().getEstabelecimento().getDataComHoraAtual();
+            LocalTime horaInformada = LocalTime.parse(dataS, DateTimeFormatter.ofPattern("HH:mm"));
+            LocalDateTime localDateTimeReserva = getChatBotDelivery().getReservaAtual().getDataReserva().
+                    withSecond(0).
+                    withNano(0).
+                    withHour(horaInformada.getHour()).
+                    withMinute(horaInformada.getMinute());
+            if (localDateTimeReserva.toLocalTime().isBefore(getChatBotDelivery().getEstabelecimento().getHoraInicioReservas()) || localDateTimeReserva.getDayOfYear() > localDateTimeAtual.getDayOfYear()) {
+                getChatBotDelivery().getReservaAtual().setDataReserva(localDateTimeReserva);
                 chat.setHandler(new HandlerSolicitarQuantidadePessoasReserva(chat), true);
                 return true;
             } else {
                 return false;
             }
-        } catch (ParseException ex) {
+        } catch (DateTimeParseException ex) {
             return false;
         } catch (Exception e) {
             getChatBotDelivery().getChat().getDriver().onError(e);
@@ -62,7 +60,7 @@ public class HandlerSolicitarHorarioReserva extends HandlerBotDelivery {
     protected void onError(Message m) {
         chat.getChat().sendMessage("A hora informada é invalida, tente novamente");
         chat.getChat().sendMessage("*Obs¹*: Envie a hora no seguinte formato *hh:mm*. Ex: *18:50*");
-        chat.getChat().sendMessage("*Obs²*: Os horarios de reservas disponíveis são apenas para após as *" + getChatBotDelivery().getEstabelecimento().getHoraInicioReservas().toLocalTime().format(DateTimeFormatter.ofPattern("HH:mm")) + "*");
+        chat.getChat().sendMessage("*Obs²*: Os horarios de reservas disponíveis são apenas para após as *" + getChatBotDelivery().getEstabelecimento().getHoraInicioReservas().format(DateTimeFormatter.ofPattern("HH:mm")) + "*");
         chat.getChat().sendMessage("*Obs³*: Você não pode solicitar um horario de reserva para um horario anterior à: *" + getChatBotDelivery().getTimeFormat().format(Calendar.getInstance().getTime()) + "*");
     }
 

@@ -25,11 +25,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Time;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.Month;
+import java.time.*;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.logging.Level;
@@ -50,12 +47,14 @@ public class Utilitarios {
 
     public static GsonBuilder getDefaultGsonBuilder(Type type) {
         GsonBuilder builder = new GsonBuilder().disableHtmlEscaping().
-                registerTypeAdapter(java.sql.Date.class, new DateAdapterSerialize()).
-                registerTypeAdapter(java.sql.Date.class, new DateAdapterDeserialize()).
-                registerTypeAdapter(Timestamp.class, new TimestampAdapterSerialize()).
-                registerTypeAdapter(Timestamp.class, new TimestampAdapterDeserialize()).
-                registerTypeAdapter(Time.class, new TimeAdapter()).
-                registerTypeAdapter(Time.class, new TimeAdapterDeserialize());
+                registerTypeAdapter(LocalTime.class, new LocalTimeAdapterSerialize()).
+                registerTypeAdapter(LocalTime.class, new LocalTimeAdapterDeserialize()).
+                registerTypeAdapter(LocalDate.class, new LocalDateAdapterSerialize()).
+                registerTypeAdapter(LocalDate.class, new LocalDateAdapterDeserialize()).
+                registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapterSerialize()).
+                registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapterDeserialize()).
+                registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeAdapterSerialize()).
+                registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeAdapterDeserialize());
         HashMap<Type, Object> adapters = new HashMap<>();
         for (Class classe : getReflections().getTypesAnnotatedWith(ExposeGetter.class)) {
             adapters.put(classe, new UseGetterAdapterSerialize<>());
@@ -106,7 +105,13 @@ public class Utilitarios {
                         metodoSet.invoke(x, new Object[]{null});
                         continue;
                     }
-                    if (listaField1.getType().isPrimitive() || listaField1.getType().isEnum() || listaField1.getType().isArray() || listaField1.getType().equals(String.class) || listaField1.getType().equals(Date.class) || listaField1.getType().equals(Time.class) || listaField1.getType().equals(java.sql.Date.class) || listaField1.getType().equals(Timestamp.class)) {
+                    if (listaField1.getType().isPrimitive() ||
+                            listaField1.getType().isEnum() ||
+                            listaField1.getType().isArray() ||
+                            listaField1.getType().equals(String.class) ||
+                            listaField1.getType().equals(LocalTime.class) ||
+                            listaField1.getType().equals(LocalDateTime.class) ||
+                            listaField1.getType().equals(LocalDate.class)) {
                         metodoSet.invoke(x, metodoGet.invoke(y));
                     } else {
                         if (metodoGet.invoke(x) == null) {

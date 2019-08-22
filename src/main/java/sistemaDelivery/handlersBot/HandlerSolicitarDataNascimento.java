@@ -11,7 +11,6 @@ import utils.Utils;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 /**
  * @author jvbor
@@ -33,9 +32,9 @@ public class HandlerSolicitarDataNascimento extends HandlerBotDelivery {
     @Override
     protected boolean runSecondTime(Message m) {
         String dataS = m.getContent().trim().replaceAll(" ", "");
-        Date date = Utils.tryParseData(dataS);
+        LocalDate date = Utils.tryParseData(dataS);
         if (date != null) {
-            getChatBotDelivery().getCliente().setDataAniversario(new java.sql.Date(date.getTime()));
+            getChatBotDelivery().getCliente().setDataAniversario(date);
             chat.setHandler(new HandlerFinalizarCadastro(chat), true);
             return true;
         }
