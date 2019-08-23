@@ -34,8 +34,9 @@ public class HandlerRealizarReserva extends HandlerBotDelivery {
     protected boolean runSecondTime(Message m) {
         String dataS = m.getContent().trim().replaceAll(" ", "");
         try {
-            LocalDateTime localDateTime = LocalDateTime.parse(dataS, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            LocalDateTime localDateTime = LocalDateTime.parse(dataS, DateTimeFormatter.ofPattern("dd/MM"));
             LocalDateTime localDateTimeAtual = getChatBotDelivery().getEstabelecimento().getDataComHoraAtual();
+            localDateTime = localDateTime.withYear(localDateTimeAtual.getYear());
             if (localDateTime.toLocalDate().equals(localDateTimeAtual.toLocalDate()) || localDateTime.toLocalDate().isAfter(localDateTimeAtual.toLocalDate())) {
                 Reserva r = new Reserva();
                 r.setCliente(getChatBotDelivery().getCliente());
