@@ -39,21 +39,17 @@ public class ControleProdutos {
             return produtos.get(uuid);
         }
         synchronized (produtos) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<Produto> h = new BeanHandler<Produto>(Produto.class);
-                Produto produto = queryRunner.query("select * from \"Produtos\" where uuid = ?", h, uuid);
-                if (produto == null) {
-                    return null;
-                }
-                produtos.putIfAbsent(uuid, produto);
-                produto.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(produto.getUuid_categoria()));
-                produto.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstance().getRestricaoProduto(produto));
-                produto.setGruposAdicionais(ControleGruposAdicionais.getInstance().getGruposProduto(produto));
-                return produtos.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<Produto> h = new BeanHandler<Produto>(Produto.class);
+            Produto produto = queryRunner.query("select * from \"Produtos\" where uuid = ?", h, uuid);
+            if (produto == null) {
+                return null;
             }
+            produtos.putIfAbsent(uuid, produto);
+            produto.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(produto.getUuid_categoria()));
+            produto.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstance().getRestricaoProduto(produto));
+            produto.setGruposAdicionais(ControleGruposAdicionais.getInstance().getGruposProduto(produto));
+            return produtos.get(uuid);
         }
     }
 
@@ -127,8 +123,6 @@ public class ControleProdutos {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -158,8 +152,6 @@ public class ControleProdutos {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -175,8 +167,6 @@ public class ControleProdutos {
                     produtos.add(getProdutoByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return produtos;
     }
@@ -192,8 +182,6 @@ public class ControleProdutos {
                     produtos.add(getProdutoByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return produtos;
     }

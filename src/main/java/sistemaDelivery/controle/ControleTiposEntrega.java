@@ -38,19 +38,15 @@ public class ControleTiposEntrega {
             return tiposEntrega.get(uuid);
         }
         synchronized (tiposEntrega) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<TipoEntrega> h = new BeanHandler<TipoEntrega>(TipoEntrega.class);
-                TipoEntrega tipoEntrega = queryRunner.query("select * from \"TiposEntregas\" where uuid = ?", h, uuid);
-                if (tipoEntrega == null) {
-                    return null;
-                }
-                tiposEntrega.putIfAbsent(uuid, tipoEntrega);
-                tipoEntrega.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(tipoEntrega.getUuid_estabelecimento()));
-                return tiposEntrega.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<TipoEntrega> h = new BeanHandler<TipoEntrega>(TipoEntrega.class);
+            TipoEntrega tipoEntrega = queryRunner.query("select * from \"TiposEntregas\" where uuid = ?", h, uuid);
+            if (tipoEntrega == null) {
+                return null;
             }
+            tiposEntrega.putIfAbsent(uuid, tipoEntrega);
+            tipoEntrega.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(tipoEntrega.getUuid_estabelecimento()));
+            return tiposEntrega.get(uuid);
         }
     }
 
@@ -69,8 +65,6 @@ public class ControleTiposEntrega {
                 preparedStatement.setBoolean(5, tipoEntrega.isSolicitarEndereco());
                 preparedStatement.executeUpdate();
                 return true;
-            } catch (SQLException ex) {
-                throw ex;
             }
         } else {
             try (PreparedStatement preparedStatement = connection.prepareStatement("update \"TiposEntregas\" set " +
@@ -87,8 +81,6 @@ public class ControleTiposEntrega {
                     Utilitarios.atualizarObjeto(tiposEntrega.get(tipoEntrega.getUuid()), tipoEntrega);
                 }
                 return true;
-            } catch (SQLException ex) {
-                throw ex;
             }
         }
     }
@@ -143,8 +135,6 @@ public class ControleTiposEntrega {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -159,8 +149,6 @@ public class ControleTiposEntrega {
                     tipoEntregas.add(getTipoEntregaByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return tipoEntregas;
     }
@@ -191,8 +179,6 @@ public class ControleTiposEntrega {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 

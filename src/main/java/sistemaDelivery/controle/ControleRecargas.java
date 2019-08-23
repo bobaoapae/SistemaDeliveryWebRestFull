@@ -37,20 +37,16 @@ public class ControleRecargas {
             return recargas.get(uuid);
         }
         synchronized (recargas) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<RecargaCliente> h = new BeanHandler<RecargaCliente>(RecargaCliente.class);
-                RecargaCliente recargaCliente = queryRunner.query("select * from \"Recargas_Clientes\" where uuid = ?", h, uuid);
-                if (recargaCliente == null) {
-                    return null;
-                }
-                recargas.putIfAbsent(uuid, recargaCliente);
-                recargaCliente.setCliente(ControleClientes.getInstance().getClienteByUUID(recargaCliente.getUuid_cliente()));
-                recargaCliente.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(recargaCliente.getUuid_estabelecimento()));
-                return recargas.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<RecargaCliente> h = new BeanHandler<RecargaCliente>(RecargaCliente.class);
+            RecargaCliente recargaCliente = queryRunner.query("select * from \"Recargas_Clientes\" where uuid = ?", h, uuid);
+            if (recargaCliente == null) {
+                return null;
             }
+            recargas.putIfAbsent(uuid, recargaCliente);
+            recargaCliente.setCliente(ControleClientes.getInstance().getClienteByUUID(recargaCliente.getUuid_cliente()));
+            recargaCliente.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(recargaCliente.getUuid_estabelecimento()));
+            return recargas.get(uuid);
         }
     }
 
@@ -73,8 +69,6 @@ public class ControleRecargas {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -88,8 +82,6 @@ public class ControleRecargas {
                     recargaClientes.add(getRecargaByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return recargaClientes;
     }

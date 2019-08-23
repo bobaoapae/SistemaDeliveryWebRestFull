@@ -61,40 +61,34 @@ public class ControleRestricaoVisibilidade {
                 restricao.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(restricao.getUuid_categoria()));
                 restricao.setProduto(ControleProdutos.getInstance().getProdutoByUUID(restricao.getUuid_produto()));
                 return restricoes.get(uuid);
-            } catch (SQLException e) {
-                throw e;
             }
         }
     }
 
     public boolean salvarRestricao(Connection connection, RestricaoVisibilidade restricaoVisibilidade) throws SQLException {
-        try {
-            connection.setAutoCommit(false);
-            try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Restricoes_Visibilidade\" (uuid, uuid_categoria, uuid_produto, \"restricaoHorario\", \"restricaoDia\", \"horarioDe\", \"horarioAte\", domingo, segunda, terca, quarta, quinta, sexta, sabado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
-                restricaoVisibilidade.setUuid(UUID.randomUUID());
-                preparedStatement.setObject(1, restricaoVisibilidade.getUuid());
-                if (restricaoVisibilidade.getCategoria() != null) {
-                    preparedStatement.setObject(2, restricaoVisibilidade.getCategoria().getUuid());
-                } else {
-                    preparedStatement.setObject(2, null);
-                }
-                if (restricaoVisibilidade.getProduto() != null) {
-                    preparedStatement.setObject(3, restricaoVisibilidade.getProduto().getUuid());
-                } else {
-                    preparedStatement.setObject(3, null);
-                }
-                preparedStatement.setBoolean(4, restricaoVisibilidade.isRestricaoHorario());
-                preparedStatement.setBoolean(5, restricaoVisibilidade.isRestricaoDia());
-                preparedStatement.setObject(6, restricaoVisibilidade.getHorarioDe());
-                preparedStatement.setObject(7, restricaoVisibilidade.getHorarioAte());
-                for (int x = 0; x < 7; x++) {
-                    preparedStatement.setBoolean(x + 8, restricaoVisibilidade.getDiasSemana()[x]);
-                }
-                preparedStatement.executeUpdate();
-                return true;
+        connection.setAutoCommit(false);
+        try (PreparedStatement preparedStatement = connection.prepareStatement("insert into \"Restricoes_Visibilidade\" (uuid, uuid_categoria, uuid_produto, \"restricaoHorario\", \"restricaoDia\", \"horarioDe\", \"horarioAte\", domingo, segunda, terca, quarta, quinta, sexta, sabado) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)")) {
+            restricaoVisibilidade.setUuid(UUID.randomUUID());
+            preparedStatement.setObject(1, restricaoVisibilidade.getUuid());
+            if (restricaoVisibilidade.getCategoria() != null) {
+                preparedStatement.setObject(2, restricaoVisibilidade.getCategoria().getUuid());
+            } else {
+                preparedStatement.setObject(2, null);
             }
-        } catch (SQLException e) {
-            throw e;
+            if (restricaoVisibilidade.getProduto() != null) {
+                preparedStatement.setObject(3, restricaoVisibilidade.getProduto().getUuid());
+            } else {
+                preparedStatement.setObject(3, null);
+            }
+            preparedStatement.setBoolean(4, restricaoVisibilidade.isRestricaoHorario());
+            preparedStatement.setBoolean(5, restricaoVisibilidade.isRestricaoDia());
+            preparedStatement.setObject(6, restricaoVisibilidade.getHorarioDe());
+            preparedStatement.setObject(7, restricaoVisibilidade.getHorarioAte());
+            for (int x = 0; x < 7; x++) {
+                preparedStatement.setBoolean(x + 8, restricaoVisibilidade.getDiasSemana()[x]);
+            }
+            preparedStatement.executeUpdate();
+            return true;
         }
     }
 
@@ -125,8 +119,6 @@ public class ControleRestricaoVisibilidade {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -140,8 +132,6 @@ public class ControleRestricaoVisibilidade {
                     return getRestricaoByUUID(UUID.fromString(resultSet.getString("uuid")));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return null;
     }
@@ -156,8 +146,6 @@ public class ControleRestricaoVisibilidade {
                     return getRestricaoByUUID(UUID.fromString(resultSet.getString("uuid")));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return null;
     }

@@ -39,19 +39,15 @@ public class ControleClientes {
             return clientes.get(uuid);
         }
         synchronized (clientes) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<Cliente> h = new BeanHandler<Cliente>(Cliente.class, new ClienteHandlerRowProcessor());
-                Cliente cliente = queryRunner.query("select * from \"Clientes\" where uuid = ?", h, uuid);
-                if (cliente == null) {
-                    return null;
-                }
-                clientes.putIfAbsent(uuid, cliente);
-                cliente.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(cliente.getUuid_estabelecimento()));
-                return clientes.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<Cliente> h = new BeanHandler<Cliente>(Cliente.class, new ClienteHandlerRowProcessor());
+            Cliente cliente = queryRunner.query("select * from \"Clientes\" where uuid = ?", h, uuid);
+            if (cliente == null) {
+                return null;
             }
+            clientes.putIfAbsent(uuid, cliente);
+            cliente.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(cliente.getUuid_estabelecimento()));
+            return clientes.get(uuid);
         }
     }
 
@@ -64,8 +60,6 @@ public class ControleClientes {
                     return getClienteByUUID(UUID.fromString(resultSet.getString("uuid")));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return null;
     }
@@ -138,8 +132,6 @@ public class ControleClientes {
                     throw ex;
                 }
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -155,8 +147,6 @@ public class ControleClientes {
                     clientes.add(getClienteByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return clientes;
     }
@@ -172,8 +162,6 @@ public class ControleClientes {
                     clientes.add(getClienteByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return clientes;
     }

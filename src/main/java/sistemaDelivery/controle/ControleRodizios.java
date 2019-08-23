@@ -57,8 +57,6 @@ public class ControleRodizios {
                 rodizios.putIfAbsent(uuid, rodizio);
                 rodizio.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(rodizio.getUuid_estabelecimento()));
                 return rodizios.get(uuid);
-            } catch (SQLException e) {
-                throw e;
             }
         }
     }
@@ -117,8 +115,6 @@ public class ControleRodizios {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -148,8 +144,6 @@ public class ControleRodizios {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -164,8 +158,6 @@ public class ControleRodizios {
                     rodizios.add(getRodizioByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return rodizios;
     }

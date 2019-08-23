@@ -39,19 +39,15 @@ public class ControleAdicionais {
             return adicionais.get(uuid);
         }
         synchronized (adicionais) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<AdicionalProduto> h = new BeanHandler<AdicionalProduto>(AdicionalProduto.class);
-                AdicionalProduto adicional = queryRunner.query("select * from \"Adicionais\" where uuid = ?", h, uuid);
-                if (adicional == null) {
-                    return null;
-                }
-                adicionais.putIfAbsent(uuid, adicional);
-                adicional.setGrupoAdicional(ControleGruposAdicionais.getInstance().getGrupoByUUID(adicional.getUuid_grupo_adicional()));
-                return adicionais.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<AdicionalProduto> h = new BeanHandler<AdicionalProduto>(AdicionalProduto.class);
+            AdicionalProduto adicional = queryRunner.query("select * from \"Adicionais\" where uuid = ?", h, uuid);
+            if (adicional == null) {
+                return null;
             }
+            adicionais.putIfAbsent(uuid, adicional);
+            adicional.setGrupoAdicional(ControleGruposAdicionais.getInstance().getGrupoByUUID(adicional.getUuid_grupo_adicional()));
+            return adicionais.get(uuid);
         }
     }
 
@@ -99,8 +95,6 @@ public class ControleAdicionais {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -125,8 +119,6 @@ public class ControleAdicionais {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -142,8 +134,6 @@ public class ControleAdicionais {
                     adicionais.add(getAdicionalByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return adicionais;
     }
@@ -159,8 +149,6 @@ public class ControleAdicionais {
                     adicionais.add(getAdicionalByUUID(UUID.fromString(resultSet.getString("uuid_adicional"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return adicionais;
     }

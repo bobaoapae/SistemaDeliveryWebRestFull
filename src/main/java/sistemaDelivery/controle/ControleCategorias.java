@@ -38,29 +38,25 @@ public class ControleCategorias {
             return categorias.get(uuid);
         }
         synchronized (categorias) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<Categoria> h = new BeanHandler<Categoria>(Categoria.class);
-                Categoria cat = queryRunner.query("select * from \"Categorias\" where uuid = ?", h, uuid);
-                if (cat == null) {
-                    return null;
-                }
-                categorias.putIfAbsent(uuid, cat);
-                cat.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(cat.getUuid_estabelecimento()));
-                cat.setProdutos(ControleProdutos.getInstance().getProdutosCategoria(cat));
-                if (cat.isPrecisaPedirOutraCategoria()) {
-                    cat.setCategoriasNecessarias(getCategoriasNecessariasEntrega(cat));
-                }
-                cat.setCategoriasFilhas(getCategoriasFilhas(cat));
-                cat.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstance().getRestricaoCategoria(cat));
-                cat.setGruposAdicionais(ControleGruposAdicionais.getInstance().getGruposCategoria(cat));
-                if (cat.getUuid_categoria_pai() != null) {
-                    cat.setCategoriaPai(this.getCategoriaByUUID(cat.getUuid_categoria_pai()));
-                }
-                return categorias.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<Categoria> h = new BeanHandler<Categoria>(Categoria.class);
+            Categoria cat = queryRunner.query("select * from \"Categorias\" where uuid = ?", h, uuid);
+            if (cat == null) {
+                return null;
             }
+            categorias.putIfAbsent(uuid, cat);
+            cat.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(cat.getUuid_estabelecimento()));
+            cat.setProdutos(ControleProdutos.getInstance().getProdutosCategoria(cat));
+            if (cat.isPrecisaPedirOutraCategoria()) {
+                cat.setCategoriasNecessarias(getCategoriasNecessariasEntrega(cat));
+            }
+            cat.setCategoriasFilhas(getCategoriasFilhas(cat));
+            cat.setRestricaoVisibilidade(ControleRestricaoVisibilidade.getInstance().getRestricaoCategoria(cat));
+            cat.setGruposAdicionais(ControleGruposAdicionais.getInstance().getGruposCategoria(cat));
+            if (cat.getUuid_categoria_pai() != null) {
+                cat.setCategoriaPai(this.getCategoriaByUUID(cat.getUuid_categoria_pai()));
+            }
+            return categorias.get(uuid);
         }
     }
 
@@ -102,8 +98,6 @@ public class ControleCategorias {
                                 preparedStatement1.setObject(1, cat.getUuid());
                                 preparedStatement1.setObject(2, categoria.getUuid());
                                 preparedStatement1.executeUpdate();
-                            } catch (SQLException ex) {
-                                throw ex;
                             }
                         }
                     }
@@ -148,8 +142,6 @@ public class ControleCategorias {
                     try (PreparedStatement preparedStatement1 = connection.prepareStatement("delete from \"Categorias_Necessarias_Entrega\" where uuid_categoria = ?")) {
                         preparedStatement1.setObject(1, cat.getUuid());
                         preparedStatement1.executeUpdate();
-                    } catch (SQLException ex) {
-                        throw ex;
                     }
                     if (cat.getCategoriasNecessarias() != null) {
                         for (Categoria categoria : cat.getCategoriasNecessarias()) {
@@ -157,8 +149,6 @@ public class ControleCategorias {
                                 preparedStatement1.setObject(1, cat.getUuid());
                                 preparedStatement1.setObject(2, categoria.getUuid());
                                 preparedStatement1.executeUpdate();
-                            } catch (SQLException ex) {
-                                throw ex;
                             }
                         }
                     }
@@ -185,8 +175,6 @@ public class ControleCategorias {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -222,8 +210,6 @@ public class ControleCategorias {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -238,8 +224,6 @@ public class ControleCategorias {
                     categorias.add(getCategoriaByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return categorias;
     }
@@ -255,8 +239,6 @@ public class ControleCategorias {
                     categorias.add(getCategoriaByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return categorias;
     }
@@ -272,8 +254,6 @@ public class ControleCategorias {
                     categorias.add(getCategoriaByUUID(UUID.fromString(resultSet.getString("uuid_categoria_necessaria"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return categorias;
     }

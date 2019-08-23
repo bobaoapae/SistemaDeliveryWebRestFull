@@ -22,19 +22,15 @@ public class ControleSistema {
     }
 
     public String getSecurePass() throws SQLException {
-        try {
-            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-            String securePass = queryRunner.query("select * from \"SecurePass\"", resultSet -> {
-                if (resultSet.next()) {
-                    return resultSet.getString(1);
-                } else {
-                    return "";
-                }
-            });
-            return securePass;
-        } catch (SQLException e) {
-            throw e;
-        }
+        QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+        String securePass = queryRunner.query("select * from \"SecurePass\"", resultSet -> {
+            if (resultSet.next()) {
+                return resultSet.getString(1);
+            } else {
+                return "";
+            }
+        });
+        return securePass;
     }
 
     public Logger getLogger() {

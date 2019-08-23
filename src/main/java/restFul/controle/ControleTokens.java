@@ -38,20 +38,16 @@ public class ControleTokens {
             return tokens.get(token);
         }
         synchronized (tokens) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<Token> h = new BeanHandler<Token>(Token.class);
-                Token u = queryRunner.query("select * from \"Tokens\" where token = ?", h, token);
-                if (u == null) {
-                    return null;
-                }
-                tokens.putIfAbsent(token, u);
-                u.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(u.getUuid_estabelecimento()));
-                u.setUsuario(ControleUsuarios.getInstance().getUsuarioByUUID(u.getUuid_usuario()));
-                return tokens.get(token);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<Token> h = new BeanHandler<Token>(Token.class);
+            Token u = queryRunner.query("select * from \"Tokens\" where token = ?", h, token);
+            if (u == null) {
+                return null;
             }
+            tokens.putIfAbsent(token, u);
+            u.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(u.getUuid_estabelecimento()));
+            u.setUsuario(ControleUsuarios.getInstance().getUsuarioByUUID(u.getUuid_usuario()));
+            return tokens.get(token);
         }
     }
 
@@ -72,8 +68,6 @@ public class ControleTokens {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -98,8 +92,6 @@ public class ControleTokens {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 

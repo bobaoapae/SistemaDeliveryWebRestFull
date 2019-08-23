@@ -39,21 +39,17 @@ public class ControleGruposAdicionais {
             return grupos.get(uuid);
         }
         synchronized (grupos) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<GrupoAdicional> h = new BeanHandler<GrupoAdicional>(GrupoAdicional.class);
-                GrupoAdicional grupo = queryRunner.query("select * from \"Grupos_Adicionais\" where uuid = ?", h, uuid);
-                if (grupo == null) {
-                    return null;
-                }
-                grupos.putIfAbsent(uuid, grupo);
-                grupo.setAdicionais(ControleAdicionais.getInstance().getAdicionaisGrupo(grupo));
-                grupo.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(grupo.getUuid_categoria()));
-                grupo.setProduto(ControleProdutos.getInstance().getProdutoByUUID(grupo.getUuid_produto()));
-                return grupos.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<GrupoAdicional> h = new BeanHandler<GrupoAdicional>(GrupoAdicional.class);
+            GrupoAdicional grupo = queryRunner.query("select * from \"Grupos_Adicionais\" where uuid = ?", h, uuid);
+            if (grupo == null) {
+                return null;
             }
+            grupos.putIfAbsent(uuid, grupo);
+            grupo.setAdicionais(ControleAdicionais.getInstance().getAdicionaisGrupo(grupo));
+            grupo.setCategoria(ControleCategorias.getInstance().getCategoriaByUUID(grupo.getUuid_categoria()));
+            grupo.setProduto(ControleProdutos.getInstance().getProdutoByUUID(grupo.getUuid_produto()));
+            return grupos.get(uuid);
         }
     }
 
@@ -112,8 +108,6 @@ public class ControleGruposAdicionais {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -144,8 +138,6 @@ public class ControleGruposAdicionais {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -160,8 +152,6 @@ public class ControleGruposAdicionais {
                     grupos.add(getGrupoByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return grupos;
     }
@@ -177,8 +167,6 @@ public class ControleGruposAdicionais {
                     grupos.add(getGrupoByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return grupos;
     }

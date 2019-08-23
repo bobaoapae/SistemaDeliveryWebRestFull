@@ -39,21 +39,17 @@ public class ControleItensPedidos {
             return itensPedidos.get(uuid);
         }
         synchronized (itensPedidos) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<ItemPedido> h = new BeanHandler<ItemPedido>(ItemPedido.class);
-                ItemPedido item = queryRunner.query("select * from \"Items_Pedidos\" where uuid = ?", h, uuid);
-                if (item == null) {
-                    return null;
-                }
-                itensPedidos.putIfAbsent(uuid, item);
-                item.setProduto(ControleProdutos.getInstance().getProdutoByUUID(item.getUuid_produto()));
-                item.setAdicionais(ControleAdicionais.getInstance().getAdicionaisItemPedido(item));
-                item.setPedido(ControlePedidos.getInstance().getPedidoByUUID(item.getUuid_pedido()));
-                return itensPedidos.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<ItemPedido> h = new BeanHandler<ItemPedido>(ItemPedido.class);
+            ItemPedido item = queryRunner.query("select * from \"Items_Pedidos\" where uuid = ?", h, uuid);
+            if (item == null) {
+                return null;
             }
+            itensPedidos.putIfAbsent(uuid, item);
+            item.setProduto(ControleProdutos.getInstance().getProdutoByUUID(item.getUuid_produto()));
+            item.setAdicionais(ControleAdicionais.getInstance().getAdicionaisItemPedido(item));
+            item.setPedido(ControlePedidos.getInstance().getPedidoByUUID(item.getUuid_pedido()));
+            return itensPedidos.get(uuid);
         }
     }
 
@@ -79,13 +75,9 @@ public class ControleItensPedidos {
                         preparedStatement2.setObject(1, itemPedido.getUuid());
                         preparedStatement2.setObject(2, adicionalProduto.getUuid());
                         preparedStatement2.executeUpdate();
-                    } catch (SQLException ex) {
-                        throw ex;
                     }
                 }
                 return true;
-            } catch (SQLException ex) {
-                throw ex;
             }
         }
         return false;
@@ -117,8 +109,6 @@ public class ControleItensPedidos {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -141,8 +131,6 @@ public class ControleItensPedidos {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -157,8 +145,6 @@ public class ControleItensPedidos {
                     itemPedidos.add(getItemByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return itemPedidos;
     }

@@ -44,19 +44,15 @@ public class ControleHorariosFuncionamento {
             return horariosFuncionamento.get(uuid);
         }
         synchronized (horariosFuncionamento) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<HorarioFuncionamento> h = new BeanHandler<HorarioFuncionamento>(HorarioFuncionamento.class);
-                HorarioFuncionamento horarioFuncionamento = queryRunner.query("select * from \"Horarios_Funcionamento\" where uuid = ?", h, uuid);
-                if (horarioFuncionamento == null) {
-                    return null;
-                }
-                horariosFuncionamento.putIfAbsent(uuid, horarioFuncionamento);
-                horarioFuncionamento.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(horarioFuncionamento.getUuid_estabelecimento()));
-                return horariosFuncionamento.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<HorarioFuncionamento> h = new BeanHandler<HorarioFuncionamento>(HorarioFuncionamento.class);
+            HorarioFuncionamento horarioFuncionamento = queryRunner.query("select * from \"Horarios_Funcionamento\" where uuid = ?", h, uuid);
+            if (horarioFuncionamento == null) {
+                return null;
             }
+            horariosFuncionamento.putIfAbsent(uuid, horarioFuncionamento);
+            horarioFuncionamento.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(horarioFuncionamento.getUuid_estabelecimento()));
+            return horariosFuncionamento.get(uuid);
         }
     }
 
@@ -114,8 +110,6 @@ public class ControleHorariosFuncionamento {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException | SchedulerException | IOException e) {
-            throw e;
         }
     }
 
@@ -134,8 +128,6 @@ public class ControleHorariosFuncionamento {
                     horarios.get(horarioFuncionamento.getDiaDaSemana()).add(horarioFuncionamento);
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return horarios;
     }
@@ -170,8 +162,6 @@ public class ControleHorariosFuncionamento {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 

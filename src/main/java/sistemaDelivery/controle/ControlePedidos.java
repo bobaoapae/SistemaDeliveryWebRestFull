@@ -48,23 +48,19 @@ public class ControlePedidos {
             return pedidos.get(uuid);
         }
         synchronized (pedidos) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<Pedido> h = new BeanHandler<Pedido>(Pedido.class, new PedidoHandlerRowProcessor());
-                Pedido pedido = queryRunner.query("select * from \"Pedidos\" where uuid = ?", h, uuid);
-                if (pedido == null) {
-                    return null;
-                }
-                pedidos.putIfAbsent(uuid, pedido);
-                pedido.setCliente(ControleClientes.getInstance().getClienteByUUID(pedido.getUuid_cliente()));
-                pedido.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(pedido.getUuid_estabelecimento()));
-                pedido.setProdutos(ControleItensPedidos.getInstance().getItensPedidos(pedido));
-                pedido.setTipoEntrega(ControleTiposEntrega.getInstance().getTipoEntregaByUUID(pedido.getUuid_tipoEntrega()));
-                pedido.setHorarioFuncionamentoPedido(ControleHorariosFuncionamento.getInstance().getHorarioFuncionamentoByUUID(pedido.getUuid_horarioFuncionamentoPedido()));
-                return pedidos.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<Pedido> h = new BeanHandler<Pedido>(Pedido.class, new PedidoHandlerRowProcessor());
+            Pedido pedido = queryRunner.query("select * from \"Pedidos\" where uuid = ?", h, uuid);
+            if (pedido == null) {
+                return null;
             }
+            pedidos.putIfAbsent(uuid, pedido);
+            pedido.setCliente(ControleClientes.getInstance().getClienteByUUID(pedido.getUuid_cliente()));
+            pedido.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(pedido.getUuid_estabelecimento()));
+            pedido.setProdutos(ControleItensPedidos.getInstance().getItensPedidos(pedido));
+            pedido.setTipoEntrega(ControleTiposEntrega.getInstance().getTipoEntregaByUUID(pedido.getUuid_tipoEntrega()));
+            pedido.setHorarioFuncionamentoPedido(ControleHorariosFuncionamento.getInstance().getHorarioFuncionamentoByUUID(pedido.getUuid_horarioFuncionamentoPedido()));
+            return pedidos.get(uuid);
         }
     }
 
@@ -139,12 +135,8 @@ public class ControlePedidos {
                         }
                     }
                     connection.commit();
-                    try {
-                        SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(pedido.getEstabelecimento());
-                        sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.NOVO_PEDIDO, pedido.getUuid().toString());
-                    } catch (IOException e) {
-                        throw e;
-                    }
+                    SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(pedido.getEstabelecimento());
+                    sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.NOVO_PEDIDO, pedido.getUuid().toString());
                     return true;
                 } catch (SQLException | IOException ex) {
                     connection.rollback();
@@ -203,8 +195,6 @@ public class ControlePedidos {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException | IOException ex) {
-            throw ex;
         }
     }
 
@@ -243,8 +233,6 @@ public class ControlePedidos {
                     pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return pedidos;
     }
@@ -260,8 +248,6 @@ public class ControlePedidos {
                     pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return pedidos;
     }
@@ -279,8 +265,6 @@ public class ControlePedidos {
                     pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return pedidos;
     }
@@ -297,8 +281,6 @@ public class ControlePedidos {
             while (resultSet.next()) {
                 pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
         return pedidos;
     }
@@ -308,14 +290,11 @@ public class ControlePedidos {
         try (Connection connection = Conexao.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"estadoPedido\"!='Cancelado' and EXTRACT(YEAR FROM \"dataPedido\") = EXTRACT(YEAR FROM current_timestamp) and EXTRACT(MONTH FROM \"dataPedido\") = EXTRACT(MONTH FROM current_timestamp)")
         ) {
-            Calendar calendar = Calendar.getInstance();
             preparedStatement.setObject(1, estabelecimento.getUuid());
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
         return pedidos;
     }
@@ -339,8 +318,6 @@ public class ControlePedidos {
             while (resultSet.next()) {
                 map.put(resultSet.getString(1), resultSet.getInt(2));
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
         return map;
     }
@@ -359,8 +336,6 @@ public class ControlePedidos {
             while (resultSet.next()) {
                 map.put(resultSet.getInt("hora"), resultSet.getInt("total"));
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
         return map;
     }
@@ -379,8 +354,6 @@ public class ControlePedidos {
             while (resultSet.next()) {
                 map.put(Utilitarios.getDayOfWeekName(resultSet.getInt("diaSemana")), resultSet.getInt("total"));
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
         return map;
     }
@@ -431,8 +404,6 @@ public class ControlePedidos {
                     }
                 }
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
         for (Map.Entry<String, Double> entry : map.entrySet()) {
             map3.put(entry.getKey(), entry.getValue() + map2.get(entry.getKey()));
@@ -453,8 +424,6 @@ public class ControlePedidos {
             while (resultSet.next()) {
                 pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
         return pedidos;
     }
@@ -470,8 +439,6 @@ public class ControlePedidos {
                     pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return pedidos;
     }

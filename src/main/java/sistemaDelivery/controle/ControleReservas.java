@@ -42,20 +42,16 @@ public class ControleReservas {
             return reservas.get(uuid);
         }
         synchronized (reservas) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<Reserva> h = new BeanHandler<Reserva>(Reserva.class);
-                Reserva reserva = queryRunner.query("select * from \"Reservas\" where uuid = ?", h, uuid);
-                if (reserva == null) {
-                    return null;
-                }
-                reservas.putIfAbsent(uuid, reserva);
-                reserva.setCliente(ControleClientes.getInstance().getClienteByUUID(reserva.getUuid_cliente()));
-                reserva.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(reserva.getUuid_estabelecimento()));
-                return reservas.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<Reserva> h = new BeanHandler<Reserva>(Reserva.class);
+            Reserva reserva = queryRunner.query("select * from \"Reservas\" where uuid = ?", h, uuid);
+            if (reserva == null) {
+                return null;
             }
+            reservas.putIfAbsent(uuid, reserva);
+            reserva.setCliente(ControleClientes.getInstance().getClienteByUUID(reserva.getUuid_cliente()));
+            reserva.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(reserva.getUuid_estabelecimento()));
+            return reservas.get(uuid);
         }
     }
 
@@ -93,12 +89,8 @@ public class ControleReservas {
                     preparedStatement.setLong(9, reserva.getCod());
                     preparedStatement.executeUpdate();
                     connection.commit();
-                    try {
-                        SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(reserva.getEstabelecimento());
-                        sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.NOVA_RESERVA, reserva.getUuid().toString());
-                    } catch (IOException e) {
-                        throw e;
-                    }
+                    SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(reserva.getEstabelecimento());
+                    sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.NOVA_RESERVA, reserva.getUuid().toString());
                     return true;
                 } catch (SQLException | IOException ex) {
                     connection.rollback();
@@ -133,8 +125,6 @@ public class ControleReservas {
                     connection.setAutoCommit(true);
                 }
             }
-        } catch (SQLException | IOException ex) {
-            throw ex;
         }
     }
 
@@ -160,8 +150,6 @@ public class ControleReservas {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -176,8 +164,6 @@ public class ControleReservas {
                     reservas.add(getReservaByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return reservas;
     }
@@ -192,8 +178,6 @@ public class ControleReservas {
                     reservas.add(getReservaByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return reservas;
     }
@@ -224,8 +208,6 @@ public class ControleReservas {
                     reservas.add(getReservaByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return reservas;
     }
