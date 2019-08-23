@@ -18,7 +18,7 @@ import java.util.*;
 public class Pedido {
 
     @Ignorar
-    private UUID uuid, uuid_estabelecimento, uuid_cliente, uuid_tipoEntrega;
+    private UUID uuid, uuid_estabelecimento, uuid_cliente, uuid_tipoEntrega, uuid_horarioFuncionamentoPedido;
     private String nomeCliente;
     private boolean entrega, cartao, impresso;
     private double troco, desconto, pgCreditos, subTotal, taxaEntrega, total, valorPago, totalRemovido;
@@ -38,10 +38,13 @@ public class Pedido {
     private Endereco endereco;
     @Ignorar
     private TipoEntrega tipoEntrega;
+    @Ignorar
+    private HorarioFuncionamento horarioFuncionamentoPedido;
 
     public Pedido(Cliente cliente, Estabelecimento estabelecimento) {
         produtos = Collections.synchronizedList(new ArrayList<>());
         dataPedido = estabelecimento.getDataComHoraAtual();
+        horarioFuncionamentoPedido = estabelecimento.nextOrCurrentHorarioAbertoOfDay();
         estadoPedido = EstadoPedido.Novo;
         celular = "";
         fixo = "";
@@ -378,6 +381,22 @@ public class Pedido {
             }
             return lista;
         }
+    }
+
+    public HorarioFuncionamento getHorarioFuncionamentoPedido() {
+        return horarioFuncionamentoPedido;
+    }
+
+    public void setHorarioFuncionamentoPedido(HorarioFuncionamento horarioFuncionamentoPedido) {
+        this.horarioFuncionamentoPedido = horarioFuncionamentoPedido;
+    }
+
+    public UUID getUuid_horarioFuncionamentoPedido() {
+        return uuid_horarioFuncionamentoPedido;
+    }
+
+    public void setUuid_horarioFuncionamentoPedido(UUID uuid_horarioFuncionamentoPedido) {
+        this.uuid_horarioFuncionamentoPedido = uuid_horarioFuncionamentoPedido;
     }
 
     @Override

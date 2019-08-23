@@ -60,6 +60,7 @@ public class ControlePedidos {
                 pedido.setEstabelecimento(ControleEstabelecimentos.getInstance().getEstabelecimentoByUUID(pedido.getUuid_estabelecimento()));
                 pedido.setProdutos(ControleItensPedidos.getInstance().getItensPedidos(pedido));
                 pedido.setTipoEntrega(ControleTiposEntrega.getInstance().getTipoEntregaByUUID(pedido.getUuid_tipoEntrega()));
+                pedido.setHorarioFuncionamentoPedido(ControleHorariosFuncionamento.getInstance().getHorarioFuncionamentoByUUID(pedido.getUuid_horarioFuncionamentoPedido()));
                 return pedidos.get(uuid);
             } catch (SQLException e) {
                 throw e;
@@ -84,11 +85,11 @@ public class ControlePedidos {
                         "            uuid, uuid_cliente, uuid_estabelecimento, \"comentarioPedido\", \n" +
                         "            entrega, cartao, impresso, \"valorPago\", desconto, \"pgCreditos\", \n" +
                         "            \"subTotal\", total, \"horaAgendamento\", \"estadoPedido\", \n" +
-                        "            troco, \"totalRemovido\", logradouro, bairro, referencia, numero,cod,\"taxaEntrega\",\"uuid_tipoEntrega\",\"dataPedido\")\n" +
+                        "            troco, \"totalRemovido\", logradouro, bairro, referencia, numero,cod,\"taxaEntrega\",\"uuid_tipoEntrega\",\"dataPedido\", \"uuid_horarioFuncionamentoPedido\")\n" +
                         "    VALUES (?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, ?, ?, \n" +
                         "            ?, ?, ?, ?, ?, \n" +
-                        "            ?, ?, ?, ?, ?, ?,?,?,?);\n")) {
+                        "            ?, ?, ?, ?, ?, ?,?,?,?,?);\n")) {
                     pedido.setUuid(UUID.randomUUID());
                     pedido.calcularValor();
                     preparedStatement.setObject(1, pedido.getUuid());
@@ -122,6 +123,11 @@ public class ControlePedidos {
                     preparedStatement.setDouble(22, pedido.getTaxaEntrega());
                     preparedStatement.setObject(23, pedido.getTipoEntrega().getUuid());
                     preparedStatement.setObject(24, pedido.getDataPedido());
+                    if (pedido.getHorarioFuncionamentoPedido() != null) {
+                        preparedStatement.setObject(25, pedido.getHorarioFuncionamentoPedido().getUuid());
+                    } else {
+                        preparedStatement.setObject(25, null);
+                    }
                     preparedStatement.executeUpdate();
                     for (ItemPedido itemPedido : pedido.getProdutos()) {
                         itemPedido.calcularValor();
@@ -222,10 +228,16 @@ public class ControlePedidos {
     public List<Pedido> getPedidosDoDia(Estabelecimento estabelecimento) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"dataPedido\" >= ? order by \"dataPedido\" asc");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and (\"dataPedido\" >= ? or \"uuid_horarioFuncionamentoPedido\" = ?) order by \"dataPedido\" asc");
         ) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
             preparedStatement.setObject(2, estabelecimento.getHoraAberturaPedidos());
+            HorarioFuncionamento horarioFuncionamento = estabelecimento.nextOrCurrentHorarioAbertoOfDay();
+            if (horarioFuncionamento != null) {
+                preparedStatement.setObject(3, estabelecimento.nextOrCurrentHorarioAbertoOfDay().getUuid());
+            } else {
+                preparedStatement.setObject(3, null);
+            }
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     pedidos.add(getPedidoByUUID(UUID.fromString(resultSet.getString("uuid"))));
@@ -314,8 +326,15 @@ public class ControlePedidos {
         map.put("Novo", 0);
         map.put("Cancelado", 0);
         try (Connection connection = Conexao.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("select \"estadoPedido\",count(\"estadoPedido\") from \"Pedidos\" as a inner join \"Estabelecimentos\" as b on a.uuid_estabelecimento=b.uuid  where uuid_estabelecimento = ? and \"dataPedido\" >=\"horaAberturaPedidos\" group by \"estadoPedido\" ")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("select \"estadoPedido\",count(\"estadoPedido\") from \"Pedidos\" where uuid_estabelecimento = ? and (\"dataPedido\" >= ? or \"uuid_horarioFuncionamentoPedido\" = ?)  group by \"estadoPedido\" ")) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
+            preparedStatement.setObject(2, estabelecimento.getHoraAberturaPedidos());
+            HorarioFuncionamento horarioFuncionamento = estabelecimento.nextOrCurrentHorarioAbertoOfDay();
+            if (horarioFuncionamento != null) {
+                preparedStatement.setObject(3, horarioFuncionamento.getUuid());
+            } else {
+                preparedStatement.setObject(3, null);
+            }
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 map.put(resultSet.getString(1), resultSet.getInt(2));

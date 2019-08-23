@@ -44,22 +44,18 @@ public class ControleEstabelecimentos {
             return estabelecimentos.get(uuid);
         }
         synchronized (estabelecimentos) {
-            try {
-                QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
-                ResultSetHandler<Estabelecimento> h = new BeanHandler<Estabelecimento>(Estabelecimento.class);
-                Estabelecimento estabelecimento = queryRunner.query("select * from \"Estabelecimentos\" where uuid = ?", h, uuid);
-                if (estabelecimento == null) {
-                    return null;
-                }
-                estabelecimentos.putIfAbsent(uuid, estabelecimento);
-                estabelecimento.setCategorias(ControleCategorias.getInstance().getCategoriasEstabelecimento(estabelecimento));
-                estabelecimento.setRodizios(ControleRodizios.getInstace().getRodiziosEstabelecimento(estabelecimento));
-                estabelecimento.setTiposEntregas(ControleTiposEntrega.getInstance().getTiposEntregasEstabelecimento(estabelecimento));
-                estabelecimento.setHorariosFuncionamento(ControleHorariosFuncionamento.getInstance().getHorariosFuncionamento(estabelecimento));
-                return estabelecimentos.get(uuid);
-            } catch (SQLException e) {
-                throw e;
+            QueryRunner queryRunner = new QueryRunner(Conexao.getDataSource());
+            ResultSetHandler<Estabelecimento> h = new BeanHandler<>(Estabelecimento.class);
+            Estabelecimento estabelecimento = queryRunner.query("select * from \"Estabelecimentos\" where uuid = ?", h, uuid);
+            if (estabelecimento == null) {
+                return null;
             }
+            estabelecimentos.putIfAbsent(uuid, estabelecimento);
+            estabelecimento.setCategorias(ControleCategorias.getInstance().getCategoriasEstabelecimento(estabelecimento));
+            estabelecimento.setRodizios(ControleRodizios.getInstace().getRodiziosEstabelecimento(estabelecimento));
+            estabelecimento.setTiposEntregas(ControleTiposEntrega.getInstance().getTiposEntregasEstabelecimento(estabelecimento));
+            estabelecimento.setHorariosFuncionamento(ControleHorariosFuncionamento.getInstance().getHorariosFuncionamento(estabelecimento));
+            return estabelecimentos.get(uuid);
         }
     }
 
@@ -111,8 +107,6 @@ public class ControleEstabelecimentos {
                     preparedStatement2.setObject(1, usuario.getUuid());
                     preparedStatement2.setObject(2, estabelecimento.getUuid());
                     preparedStatement2.executeUpdate();
-                } catch (SQLException ex) {
-                    throw ex;
                 }
                 for (TipoEntrega tipoEntrega : estabelecimento.getTiposEntregas()) {
                     tipoEntrega.setEstabelecimento(estabelecimento);
@@ -126,8 +120,6 @@ public class ControleEstabelecimentos {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException ex) {
-            throw ex;
         }
     }
 
@@ -183,8 +175,6 @@ public class ControleEstabelecimentos {
             } else {
                 return false;
             }
-        } catch (SQLException e) {
-            throw e;
         }
     }
 
@@ -197,11 +187,7 @@ public class ControleEstabelecimentos {
                 preparedStatement.executeUpdate();
                 connection.commit();
                 if (ControleSessions.getInstance().checkSessionAtiva(estabelecimento)) {
-                    try {
-                        ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento).logout();
-                    } catch (IOException e) {
-                        throw e;
-                    }
+                    ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento).logout();
                     ControleSessions.getInstance().finalizarSessionForEstabelecimento(estabelecimento);
                 }
                 synchronized (estabelecimentos) {
@@ -214,8 +200,6 @@ public class ControleEstabelecimentos {
             } finally {
                 connection.setAutoCommit(true);
             }
-        } catch (SQLException | IOException e) {
-            throw e;
         }
     }
 
@@ -229,8 +213,6 @@ public class ControleEstabelecimentos {
                     estabelecimentos.add(getEstabelecimentoByUUID(UUID.fromString(resultSet.getString("uuid"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return estabelecimentos;
     }
@@ -248,8 +230,6 @@ public class ControleEstabelecimentos {
                     estabelecimentos.add(getEstabelecimentoByUUID(UUID.fromString(resultSet.getString("uuid_estabelecimento"))));
                 }
             }
-        } catch (SQLException e) {
-            throw e;
         }
         return estabelecimentos;
     }

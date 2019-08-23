@@ -104,6 +104,7 @@ public class ControleHorariosFuncionamento {
                     if (horariosFuncionamento.containsKey(horarioFuncionamento.getUuid())) {
                         Utilitarios.atualizarObjeto(horariosFuncionamento.get(horarioFuncionamento.getUuid()), horarioFuncionamento);
                     }
+                    horarioFuncionamento.getEstabelecimento().setHorariosFuncionamento(ControleHorariosFuncionamento.getInstance().getHorariosFuncionamento(horarioFuncionamento.getEstabelecimento()));
                     ControleSessions.getInstance().getSessionForEstabelecimento(horarioFuncionamento.getEstabelecimento()).atualizarJobsHorariosFuncionamento();
                     return true;
                 } catch (SQLException ex) {
