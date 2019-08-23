@@ -33,7 +33,7 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
         }
         MessageBuilder builder = new MessageBuilder();
         builder.text(msg).text(" ").text(((ChatBotDelivery) chat).getNome()).text(".").newLine();
-        builder.textNewLine("Eu sou o " + getChatBotDelivery().getEstabelecimento().getNomeBot() + ", atendende virtual da " + getChatBotDelivery().getEstabelecimento().getNomeEstabelecimento() + ", e irei te ajudar a completar seu pedido.").
+        builder.textNewLine("Eu sou o " + getChatBotDelivery().getEstabelecimento().getNomeBot() + ", atendente virtual da " + getChatBotDelivery().getEstabelecimento().getNomeEstabelecimento() + ", e irei te ajudar a completar seu pedido.").
                 textNewLine("*_Lembre-se de ler as instruções com atenção_*");
         ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(((ChatBotDelivery) chat).getCliente(), getChatBotDelivery().getEstabelecimento()));
         chat.getChat().sendMessage(builder.build());
