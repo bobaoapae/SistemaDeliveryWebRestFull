@@ -27,6 +27,7 @@
                         <resource>
                             <filtering>true</filtering>
                             <directory>${basedir}/web/WEB-INF</directory>
+                            <targetPath>WEB-INF</targetPath>
                             <includes>
                                 <include>**</include>
                             </includes>
