@@ -16,6 +16,7 @@
                 <configuration>
                     <source>12</source>
                     <target>12</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
             <plugin><!-- don't pack the war  -->
