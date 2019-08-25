@@ -3,13 +3,18 @@ package restFul.modelo;
 
 import sistemaDelivery.modelo.Estabelecimento;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
 
 public class Usuario {
     private UUID uuid, uuid_usuario_indicacao;
     private String usuario, senha;
     private TipoUsuario tipoUsuario;
-    private Date dataRegistro;
+    private LocalDate dataRegistro;
     private boolean ativo;
     private List<Estabelecimento> estabelecimentos;
     private int maxEstabelecimentos;
@@ -70,11 +75,11 @@ public class Usuario {
         this.senha = senha;
     }
 
-    public Date getDataRegistro() {
+    public LocalDate getDataRegistro() {
         return dataRegistro;
     }
 
-    public void setDataRegistro(Date dataRegistro) {
+    public void setDataRegistro(LocalDate dataRegistro) {
         this.dataRegistro = dataRegistro;
     }
 
