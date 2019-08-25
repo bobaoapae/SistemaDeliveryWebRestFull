@@ -42,6 +42,9 @@ public class Propriedades {
     }
 
     public static EstadoServidor getEstadoServidor() {
+        if (getProperty("estadoServidor").equals("${webwats.estadoServidor}")) {
+            return EstadoServidor.TESTES;
+        }
         return EstadoServidor.valueOf(getProperty("estadoServidor").toUpperCase());
     }
 
