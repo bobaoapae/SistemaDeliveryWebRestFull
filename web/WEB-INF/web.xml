@@ -19,4 +19,8 @@
         <param-name>estadoServidor</param-name>
         <param-value>producao</param-value>
     </context-param>
+    <context-param>
+        <param-name>data-source</param-name>
+        <param-value>DeliverySistem</param-value>
+    </context-param>
 </web-app>

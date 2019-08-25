@@ -45,6 +45,10 @@ public class Propriedades {
         return EstadoServidor.valueOf(getProperty("estadoServidor").toUpperCase());
     }
 
+    public static String getDataSource() {
+        return getProperty("data-source");
+    }
+
     public enum EstadoServidor {
         PRODUCAO,
         HOMOLOGACAO,

@@ -1,6 +1,7 @@
 package DAO;
 
 import restFul.controle.ControleSistema;
+import utils.Propriedades;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -28,7 +29,7 @@ public class Conexao {
             InitialContext ctx = null;
             try {
                 ctx = new InitialContext();
-                dataSource = (DataSource) ctx.lookup("java:jboss/datasources/DeliverySistem");
+                dataSource = (DataSource) ctx.lookup("java:jboss/datasources/" + Propriedades.getDataSource());
             } catch (NamingException e) {
                 ControleSistema.getInstance().getLogger().log(Level.SEVERE, e.getMessage(), e);
             }
