@@ -61,6 +61,6 @@ public class ListennerServer implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         System.out.println("Finalizando Sistema Delivery WhatsApp Web");
-        ControleSessions.getInstance().finalizar();
+        new Thread(() -> ControleSessions.getInstance().finalizar()).start();
     }
 }
