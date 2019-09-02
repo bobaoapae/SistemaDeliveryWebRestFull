@@ -61,7 +61,7 @@ public class HandlerMenuPrincipal extends HandlerBotDelivery {
         if (!getChatBotDelivery().getEstabelecimento().getRodizios().isEmpty()) {
             addOpcaoMenu(new HandlerMenuRodizios(chat), null, "Ver Rodizios", "", "rodizios", "rodizio");
         }
-        addOpcaoMenu(new HandlerAdeus(chat), null, "Cancelar Pedido ❌", "", "cancelar");
+        addOpcaoMenu(new HandlerCancelar(chat), null, "Cancelar Pedido ❌", "", "cancelar");
         if (getChatBotDelivery().getPedidoAtual() != null && getChatBotDelivery().getPedidoAtual().getProdutos().size() > 0) {
             addOpcaoMenu(new HandlerVerificaPedidoCorreto(chat), null, "Concluir Pedido ✅", "", "concluir");
         }

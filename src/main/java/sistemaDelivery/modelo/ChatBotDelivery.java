@@ -231,7 +231,7 @@ public class ChatBotDelivery extends ChatBot {
             return;
         }
         if (m.getContent().trim().toLowerCase().equals("cancelar") || Utils.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "cancelar")) {
-            setHandler(new HandlerAdeus(this), true);
+            setHandler(new HandlerCancelar(this), true);
             return;
         }
         if (Utils.retornarApenasLetras(m.getContent()).equalsIgnoreCase("ajuda") || Utils.verificarFrasePossuiPalavraIgualOuParecida(m.getContent(), "ajuda")) {

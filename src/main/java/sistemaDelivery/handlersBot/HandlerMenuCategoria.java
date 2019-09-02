@@ -68,7 +68,7 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
         gerarMenu(c, builder);
         builder.textNewLine("---------");
         builder.textNewLine(addOpcaoMenu(new HandlerMenuPrincipal(chat), null, "Voltar ao Menu Principal ↩", "", "voltar", "menu", "principal").toString());
-        builder.textNewLine(addOpcaoMenu(new HandlerAdeus(chat), null, "Cancelar Pedido ❌", "", "cancelar").toString());
+        builder.textNewLine(addOpcaoMenu(new HandlerCancelar(chat), null, "Cancelar Pedido ❌", "", "cancelar").toString());
         builder.textNewLine(gerarObs("Escolha um item por vez"));
         chat.getChat().markComposing(5000);
         chat.getChat().sendMessage(builder.build());

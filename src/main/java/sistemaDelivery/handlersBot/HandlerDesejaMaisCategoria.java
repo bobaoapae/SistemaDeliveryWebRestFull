@@ -70,7 +70,7 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
         } catch (SQLException e) {
             getChatBotDelivery().getChat().getDriver().onError(e);
         }
-        builder.textNewLine(addOpcaoMenu(new HandlerAdeus(chat), null, "Cancelar Pedido ❌", "", "cancelar", "❌").toString());
+        builder.textNewLine(addOpcaoMenu(new HandlerCancelar(chat), null, "Cancelar Pedido ❌", "", "cancelar", "❌").toString());
         builder.textNewLine(addOpcaoMenu(new HandlerVerificaPedidoCorreto(chat), consumer, "Concluir Pedido ✅", "", "concluir", "✅").toString());
         chat.getChat().markComposing(1500);
         chat.getChat().sendMessage(builder.build());
