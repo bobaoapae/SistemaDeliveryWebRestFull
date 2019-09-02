@@ -305,9 +305,9 @@ public class ControlePedidos {
         map.put("Novo", 0);
         map.put("Cancelado", 0);
         try (Connection connection = Conexao.getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement("select \"estadoPedido\",count(\"estadoPedido\") from \"Pedidos\" where uuid_estabelecimento = ? and (\"dataPedido\" >= ? or \"uuid_horarioFuncionamentoPedido\" = ?)  group by \"estadoPedido\" ")) {
+             PreparedStatement preparedStatement = connection.prepareStatement("select \"estadoPedido\",count(\"estadoPedido\") from \"Pedidos\" where uuid_estabelecimento = ? and \"dataPedido\"::date = ? and \"uuid_horarioFuncionamentoPedido\" = ?  group by \"estadoPedido\" ")) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
-            preparedStatement.setObject(2, estabelecimento.getHoraAberturaPedidos());
+            preparedStatement.setObject(2, estabelecimento.getHoraAberturaPedidos().toLocalDate());
             HorarioFuncionamento horarioFuncionamento = estabelecimento.nextOrCurrentHorarioAbertoOfDay();
             if (horarioFuncionamento != null) {
                 preparedStatement.setObject(3, horarioFuncionamento.getUuid());
