@@ -50,7 +50,7 @@ public class HandlerMenuPrincipal extends HandlerBotDelivery {
                         }
                     }
                 }
-                addOpcaoMenu(new HandlerMenuCategoria(c, chat), null, c.getNomeCategoria(), "", c.getNomeCategoria());
+                addOpcaoMenu(new HandlerMenuCategoria(c, chat), null, c.getNomeCategoria(), "");
             }
         } catch (SQLException e) {
             getChatBotDelivery().getChat().getDriver().onError(e);

@@ -104,7 +104,7 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                 chat.setHandler(nextHandler, true);
                 return true;
             }
-            String[] adicionaisInformados = msg.getContent().replace(" ", "").replace(".", ",").replaceAll(",+", ",").split(",");
+            String[] adicionaisInformados = msg.getContent().replace(" ", "").replace(".", ",").replaceAll(",+", ",").lines().distinct().collect(Collectors.joining(",")).split(",");
             int totalEscolhidos = 0;
             for (String adicionalAtual : adicionaisInformados) {
                 if (grupoAtual.getQtdMax() > 0) {
@@ -124,7 +124,7 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                     }
                 } else {
                     boolean found = false;
-                    String possivelNomeAdicionalCorrigido = Utils.localizarKeywordParaFrase(adicionaisDisponiveis.stream().map(adicionalProduto -> adicionalProduto.getNome()).collect(Collectors.toList()), adicionalAtual);
+                    String possivelNomeAdicionalCorrigido = Utils.localizarKeywordParaFrase(adicionaisDisponiveis.stream().map(AdicionalProduto::getNome).collect(Collectors.toList()), adicionalAtual);
                     for (AdicionalProduto ad : adicionaisDisponiveis) {
                         if (possivelNomeAdicionalCorrigido.equalsIgnoreCase(ad.getNome())) {
                             adicionaisEscolhidos.add(ad);
@@ -153,12 +153,9 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
             chat.getChat().markComposing(3000);
             chat.getChat().sendMessage("*_Obs: Caso a escolha esteja incorreta envie: VOLTAR_*");
             chat.getChat().markComposing(1500);
-            getChatBotDelivery().setHandlerVoltar(new HandlerVoltar(nextHandler, new Runnable() {
-                @Override
-                public void run() {
-                    ((HandlerAdicionaisProduto) nextHandler).pedirGrupoNovamente(grupoAtual);
-                    getChatBotDelivery().getLastPedido().getAdicionais().removeAll(adicionaisEscolhidos);
-                }
+            getChatBotDelivery().setHandlerVoltar(new HandlerVoltar(nextHandler, () -> {
+                ((HandlerAdicionaisProduto) nextHandler).pedirGrupoNovamente(grupoAtual);
+                getChatBotDelivery().getLastPedido().getAdicionais().removeAll(adicionaisEscolhidos);
             }, true));
             chat.setHandler(nextHandler, true);
             return true;

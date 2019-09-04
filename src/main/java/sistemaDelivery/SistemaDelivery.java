@@ -226,6 +226,10 @@ public class SistemaDelivery {
             if (!ControleEstabelecimentos.getInstance().salvarEstabelecimento(estabelecimento)) {
                 return false;
             }
+            ControleChatsAsync.getInstance(estabelecimento).getChats().stream().filter(ChatBotDelivery::isAvisarPedidoAbriu).forEach(chatBotDelivery -> {
+                chatBotDelivery.setAvisarPedidoAbriu(false);
+                chatBotDelivery.getChat().sendMessage("Olá, estou passando para avisar que já iniciamos nosso atendimento. Caso queira fazer um pedido basta me mandar uma mensagem blz!?");
+            });
             Chat c = driver.getFunctions().getChatByNumber("554491050665");
             if (c != null) {
                 c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Aberto");

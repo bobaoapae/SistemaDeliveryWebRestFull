@@ -35,6 +35,7 @@ public class ChatBotDelivery extends ChatBot {
     private Reserva reservaAtual;
     private Estabelecimento estabelecimento;
     private HandlerVoltar handlerVoltar;
+    private boolean avisarPedidoAbriu;
 
     public ChatBotDelivery(Chat chat, Estabelecimento estabelecimento, boolean autoPause) throws SQLException {
         super(chat, autoPause);
@@ -132,9 +133,26 @@ public class ChatBotDelivery extends ChatBot {
         }
     }
 
+    public boolean isNovoCliente() {
+        try {
+            return cliente.getPedidosCliente().isEmpty();
+        } catch (SQLException e) {
+            chat.getDriver().onError(e);
+        }
+        return false;
+    }
+
+    public boolean isAvisarPedidoAbriu() {
+        return avisarPedidoAbriu;
+    }
+
+    public void setAvisarPedidoAbriu(boolean avisarPedidoAbriu) {
+        this.avisarPedidoAbriu = avisarPedidoAbriu;
+    }
+
     public void sendEncerramos() {
         setHandler(new HandlerBoasVindas(this), false);
-        getChat().sendMessage(getNome() + ", sinto muito...Vejo que você estava no meio de um pedido, mas infelizmente encerramos os pedidos por hoje.");
+        getChat().sendMessage(getNome() + ", sinto muito... Vejo que você estava no meio de um pedido, mas infelizmente encerramos os pedidos por hoje.");
         getChat().sendMessage("Aguardamos seu retorno.");
     }
 
@@ -142,20 +160,20 @@ public class ChatBotDelivery extends ChatBot {
         chat.markComposing(3000);
         if (!this.getEstabelecimento().isOpenPedidos()) {
             if (!this.getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
-                chat.sendMessage("_Obs: Não realizamos atendimentos hoje_");
+                chat.sendMessage("Agradecemos sua preferência, porém sinto lhe informar que não realizamos atendimentos hoje.");
                 this.setHandler(new HandlerAdeus(this), true);
             } else if (this.getEstabelecimento().nextHorarioAbertoOfDay() == null) {
-                chat.sendMessage("_Obs: Já encerramos os atendimentos por hoje_");
+                chat.sendMessage("Agradecemos sua preferência, porém já encerramos os atendimentos por hoje.");
                 this.setHandler(new HandlerAdeus(this), true);
             } else if (this.getEstabelecimento().isAgendamentoDePedidos()) {
-                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, porém você pode deixar seu pedido agendado._");
+                chat.sendMessage("Nós não iniciamos o nosso atendimento ainda, porém você pode deixar seu pedido agendado blz!?");
                 this.setHandler(new HandlerMenuPrincipal(this), true);
             } else if (this.getEstabelecimento().isReservas() && this.getEstabelecimento().isReservasComPedidosFechados()) {
-                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode realizar sua reserva de mesa_");
+                chat.sendMessage("Nós não iniciamos o nosso atendimento ainda, o nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode garantir sua mesa realizando sua reserva.");
                 this.setHandler(new HandlerDesejaFazerUmaReserva(this), true);
             } else {
-                chat.sendMessage("_Obs: Não iniciamos nosso atendimento ainda, nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + "._");
-                this.setHandler(new HandlerAdeus(this), true);
+                chat.sendMessage("Nós não iniciamos o nosso atendimento ainda, o nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + ".");
+                this.setHandler(new HandlerPerguntarDesejaSerAvisadoQuandoAbrirOsPedidos(this), true);
             }
         } else {
             boolean possuiEntrega = this.getEstabelecimento().possuiEntrega();
@@ -183,19 +201,23 @@ public class ChatBotDelivery extends ChatBot {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        try {
-            Chat c = chat.getDriver().getFunctions().getChatByNumber("554491050665");
-            if (c != null) {
-                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
-                c.setArchive(true);
-            }
-            c = chat.getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
-            if (c != null) {
-                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
-            }
-        } catch (Exception ex) {
+        chat.getDriver().runOnDriverThreads(() -> {
+            try {
+                Chat c = chat.getDriver().getFunctions().getChatByNumber("554491050665");
+                if (c != null) {
+                    c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
+                    c.sendFile(c.printScreen(), "Pedido de Ajuda");
+                    Thread.sleep(3000);
+                    c.setArchive(true);
+                }
+                c = chat.getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
+                if (c != null) {
+                    c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
+                }
+            } catch (Exception ignored) {
 
-        }
+            }
+        });
         return true;
     }
 

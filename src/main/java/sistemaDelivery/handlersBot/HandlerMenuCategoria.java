@@ -31,7 +31,7 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
     protected boolean runFirstTime(Message m) {
         MessageBuilder builder = new MessageBuilder();
         chat.getChat().markComposing(2000);
-        chat.getChat().sendMessage("Segue as opções de: " + c.getNomeCategoria() + ".");
+        chat.getChat().sendMessage("Seguem as opções de: " + c.getNomeCategoria() + ".");
         if (!c.isFazEntrega()) {
             chat.getChat().markComposing(2000);
             chat.getChat().sendMessage(gerarObs("Não é feita a entrega dos produtos abaixo"));
