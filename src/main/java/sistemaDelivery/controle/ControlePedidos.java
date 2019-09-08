@@ -218,10 +218,10 @@ public class ControlePedidos {
     public List<Pedido> getPedidosDoDia(Estabelecimento estabelecimento) throws SQLException {
         List<Pedido> pedidos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
-             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and (\"dataPedido\" >= ? or \"uuid_horarioFuncionamentoPedido\" = ?) order by \"dataPedido\" asc");
+             PreparedStatement preparedStatement = conn.prepareStatement("select uuid from \"Pedidos\" where uuid_estabelecimento = ? and \"dataPedido\"::date = ? and \"uuid_horarioFuncionamentoPedido\" = ? order by \"dataPedido\" asc");
         ) {
             preparedStatement.setObject(1, estabelecimento.getUuid());
-            preparedStatement.setObject(2, estabelecimento.getHoraAberturaPedidos());
+            preparedStatement.setObject(2, estabelecimento.getHoraAberturaPedidos().toLocalDate());
             HorarioFuncionamento horarioFuncionamento = estabelecimento.nextOrCurrentHorarioAbertoOfDay();
             if (horarioFuncionamento != null) {
                 preparedStatement.setObject(3, estabelecimento.nextOrCurrentHorarioAbertoOfDay().getUuid());
