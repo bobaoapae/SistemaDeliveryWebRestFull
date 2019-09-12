@@ -41,7 +41,7 @@ public class HandlerSolicitarHorarioReserva extends HandlerBotDelivery {
                     withNano(0).
                     withHour(horaInformada.getHour()).
                     withMinute(horaInformada.getMinute());
-            if (localDateTimeReserva.toLocalTime().isBefore(getChatBotDelivery().getEstabelecimento().getHoraInicioReservas()) || localDateTimeReserva.getDayOfYear() > localDateTimeAtual.getDayOfYear()) {
+            if (localDateTimeReserva.toLocalTime().isAfter(getChatBotDelivery().getEstabelecimento().getHoraInicioReservas()) || localDateTimeReserva.getDayOfYear() > localDateTimeAtual.getDayOfYear()) {
                 getChatBotDelivery().getReservaAtual().setDataReserva(localDateTimeReserva);
                 chat.setHandler(new HandlerSolicitarQuantidadePessoasReserva(chat), true);
                 return true;

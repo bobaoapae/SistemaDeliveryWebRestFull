@@ -8,8 +8,11 @@ package sistemaDelivery.handlersBot;
 import modelo.ChatBot;
 import modelo.Message;
 import sistemaDelivery.modelo.Reserva;
+import utils.Utils;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -34,9 +37,9 @@ public class HandlerRealizarReserva extends HandlerBotDelivery {
     protected boolean runSecondTime(Message m) {
         String dataS = m.getContent().trim().replaceAll(" ", "");
         try {
-            LocalDateTime localDateTime = LocalDateTime.parse(dataS, DateTimeFormatter.ofPattern("dd/MM"));
             LocalDateTime localDateTimeAtual = getChatBotDelivery().getEstabelecimento().getDataComHoraAtual();
-            localDateTime = localDateTime.withYear(localDateTimeAtual.getYear());
+            MonthDay monthDay = Utils.tryParseDataSemAno(dataS);
+            LocalDateTime localDateTime = LocalDateTime.of(monthDay.atYear(localDateTimeAtual.getYear()), LocalTime.MIDNIGHT);
             if (localDateTime.toLocalDate().equals(localDateTimeAtual.toLocalDate()) || localDateTime.toLocalDate().isAfter(localDateTimeAtual.toLocalDate())) {
                 Reserva r = new Reserva();
                 r.setCliente(getChatBotDelivery().getCliente());
