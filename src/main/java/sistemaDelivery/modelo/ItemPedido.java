@@ -211,7 +211,7 @@ public class ItemPedido implements Comparable<ItemPedido> {
 
     public boolean addAdicional(AdicionalProduto ad) {
         int contTotalGrupo = getAdicionais(ad.getGrupoAdicional()).size();
-        if (contTotalGrupo < ad.getGrupoAdicional().getQtdMax()) {
+        if (ad.getGrupoAdicional().getQtdMax() == 0 || contTotalGrupo < ad.getGrupoAdicional().getQtdMax()) {
             getAdicionais().add(ad);
             return true;
         }
