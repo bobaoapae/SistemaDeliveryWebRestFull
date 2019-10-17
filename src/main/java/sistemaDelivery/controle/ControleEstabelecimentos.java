@@ -199,7 +199,7 @@ public class ControleEstabelecimentos {
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         }
-                    });
+                    }).start();
                 }
                 synchronized (estabelecimentos) {
                     estabelecimentos.remove(estabelecimento.getUuid());
