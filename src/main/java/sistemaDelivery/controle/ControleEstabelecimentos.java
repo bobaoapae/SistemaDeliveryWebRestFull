@@ -1,6 +1,7 @@
 package sistemaDelivery.controle;
 
 import DAO.Conexao;
+import modelo.EstadoDriver;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
@@ -187,8 +188,18 @@ public class ControleEstabelecimentos {
                 preparedStatement.executeUpdate();
                 connection.commit();
                 if (ControleSessions.getInstance().checkSessionAtiva(estabelecimento)) {
-                    ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento).logout();
-                    ControleSessions.getInstance().finalizarSessionForEstabelecimento(estabelecimento);
+                    var session = ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
+                    if (session.getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
+                        ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento).logout();
+                    }
+                    new Thread(() -> {
+                        try {
+                            Thread.sleep(2500);
+                            ControleSessions.getInstance().finalizarSessionForEstabelecimento(estabelecimento);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    });
                 }
                 synchronized (estabelecimentos) {
                     estabelecimentos.remove(estabelecimento.getUuid());
