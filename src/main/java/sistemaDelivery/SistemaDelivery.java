@@ -118,9 +118,9 @@ public class SistemaDelivery {
         if (!headless) {
             telaWhatsApp = new TelaWhatsApp(estabelecimento);
             telaWhatsApp.setVisible(true);
-            this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+            this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect, null);
         } else {
-            this.driver = new WebWhatsDriver(Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect);
+            this.driver = new WebWhatsDriver(Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect, null);
         }
         executores.scheduleWithFixedDelay(() -> {
             if (broadcasterWhats != null) {
@@ -131,7 +131,7 @@ public class SistemaDelivery {
             }
         }, 0, 20, TimeUnit.SECONDS);
         executores.scheduleWithFixedDelay(() -> {
-            if ((driver.getEstadoDriver() != EstadoDriver.LOGGED) && (driver.getLastTimeLogged() == null || driver.getLastTimeLogged().plusMinutes(5).isBefore(LocalDateTime.now()))) {
+            if ((!estabelecimento.isOpenChatBot() || driver.getEstadoDriver() != EstadoDriver.LOGGED) && (driver.getLastTimeLogged() == null || driver.getLastTimeLogged().plusMinutes(5).isBefore(LocalDateTime.now()))) {
                 if (estabelecimento.isIniciarAutomaticamente()) {
                     estabelecimento.setIniciarAutomaticamente(false);
                     try {
