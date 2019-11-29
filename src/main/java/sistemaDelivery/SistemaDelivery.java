@@ -131,7 +131,7 @@ public class SistemaDelivery {
             }
         }, 0, 20, TimeUnit.SECONDS);
         executores.scheduleWithFixedDelay(() -> {
-            if ((!estabelecimento.isOpenChatBot() || driver.getEstadoDriver() != EstadoDriver.LOGGED) && (driver.getLastTimeLogged() == null || driver.getLastTimeLogged().plusMinutes(5).isBefore(LocalDateTime.now()))) {
+            if ((!estabelecimento.isOpenChatBot() || driver.getEstadoDriver() != EstadoDriver.LOGGED)) {
                 if (estabelecimento.isIniciarAutomaticamente()) {
                     estabelecimento.setIniciarAutomaticamente(false);
                     try {
