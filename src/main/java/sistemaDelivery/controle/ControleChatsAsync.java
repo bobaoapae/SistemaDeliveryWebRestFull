@@ -51,7 +51,7 @@ public class ControleChatsAsync {
         synchronized (chats) {
             try {
                 if (chat instanceof UserChat) {
-                    ChatBotDelivery chatt = new ChatBotDelivery(chat, estabelecimento, true);
+                    ChatBotDelivery chatt = new ChatBotDelivery(chat, estabelecimento);
                     chats.add(chatt);
                 }
             } catch (Exception ex) {
@@ -59,6 +59,16 @@ public class ControleChatsAsync {
             }
         }
     }
+
+    public void removeChat(Chat chat) {
+        synchronized (chats) {
+            ChatBotDelivery chatBotDelivery = getChatAsyncByChat(chat);
+            if (chatBotDelivery != null) {
+                chats.remove(chatBotDelivery);
+            }
+        }
+    }
+
 
     public ChatBotDelivery getChatAsyncByChat(Chat chat) {
         synchronized (chats) {

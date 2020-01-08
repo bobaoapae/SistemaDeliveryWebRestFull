@@ -22,6 +22,7 @@
             <plugin><!-- don't pack the war  -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
+                <version>3.2.3</version>
                 <configuration>
                     <webResources>
                         <resource>
@@ -68,7 +69,7 @@
         <dependency>
             <groupId>br.com.zapia</groupId>
             <artifactId>BotWhatsApp</artifactId>
-            <version>4.8</version>
+            <version>6.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

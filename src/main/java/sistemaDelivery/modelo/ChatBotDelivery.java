@@ -37,8 +37,8 @@ public class ChatBotDelivery extends ChatBot {
     private HandlerVoltar handlerVoltar;
     private boolean avisarPedidoAbriu;
 
-    public ChatBotDelivery(Chat chat, Estabelecimento estabelecimento, boolean autoPause) throws SQLException {
-        super(chat, autoPause);
+    public ChatBotDelivery(Chat chat, Estabelecimento estabelecimento) throws SQLException {
+        super(chat);
         this.estabelecimento = estabelecimento;
         Cliente cliente = ControleClientes.getInstance().getClienteChatId(chat.getId(), estabelecimento);
         if (cliente != null) {
@@ -264,17 +264,9 @@ public class ChatBotDelivery extends ChatBot {
         getHandler().handle(m);
     }
 
-    @Override
-    public void processNewStatusV3Msg(Message message) {
-
-    }
-
     public void finalizar() {
         if (this.checkMsgs != null && !this.checkMsgs.isCancelled() && !this.checkMsgs.isDone()) {
             this.checkMsgs.cancel(true);
-        }
-        if (this.checkMsgsStatusV3 != null && !this.checkMsgsStatusV3.isCancelled() && !this.checkMsgsStatusV3.isDone()) {
-            this.checkMsgsStatusV3.cancel(true);
         }
         if (((HandlerBotDelivery) handler).notificaPedidosFechados()) {
             this.sendEncerramos();

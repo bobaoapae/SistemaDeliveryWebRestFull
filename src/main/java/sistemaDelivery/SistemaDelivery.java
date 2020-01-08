@@ -78,8 +78,9 @@ public class SistemaDelivery {
             for (Chat chat : driver.getFunctions().getAllNewChats()) {
                 ControleChatsAsync.getInstance(estabelecimento).addChat(chat);
             }
-            driver.getFunctions().addListennerToNewChat(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat));
-            driver.getFunctions().addListennerToNewChat(c -> {
+            driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat), EventType.ADD, false);
+            driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat), EventType.REMOVE, false);
+            driver.getFunctions().addChatListenner(c -> {
                 JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.toJson()));
                 object.add("contact", builder.toJsonTree(parser.parse(c.getContact().toJson())));
                 Cliente cliente = null;
@@ -92,19 +93,13 @@ public class SistemaDelivery {
                     object.add("cliente", builder.toJsonTree(cliente));
                 }
                 enviarEventoWpp(TipoEventoWpp.NEW_CHAT, builder.toJson(object));
-            });
-            driver.getFunctions().addListennerToNewMsg(new MessageObserverIncludeMe() {
-
+            }, EventType.ADD);
+            driver.getFunctions().addMsgListenner(new MessageObserverIncludeMe(MessageObserver.MsgType.CHAT) {
                 @Override
-                public void onNewMsg(Message msg) {
-                    enviarEventoWpp(TipoEventoWpp.NEW_MSG, builder.toJson(parser.parse(msg.toJson())));
+                public void run(Message m) {
+                    enviarEventoWpp(TipoEventoWpp.NEW_MSG, builder.toJson(parser.parse(m.toJson())));
                 }
-
-                @Override
-                public void onNewStatusV3(Message msg) {
-                    enviarEventoWpp(TipoEventoWpp.NEW_MSG_V3, builder.toJson(parser.parse(msg.toJson())));
-                }
-            });
+            }, EventType.ADD);
         };
         onLowBaterry = (e) -> {
             enviarEventoWpp(TipoEventoWpp.LOW_BATTERY, e + "");
