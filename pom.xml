@@ -69,7 +69,7 @@
         <dependency>
             <groupId>br.com.zapia</groupId>
             <artifactId>BotWhatsApp</artifactId>
-            <version>6.8</version>
+            <version>7.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
