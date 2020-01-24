@@ -20,6 +20,7 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author jvbor
@@ -188,12 +189,17 @@ public class ChatBotDelivery extends ChatBot {
 
     @Override
     public boolean sendRequestAjuda() {
-        if (getChat().getDriver().getFunctions().isBusiness()) {
-            getChat().addLabel("Precisa de Ajuda", true);
-        }
+        getChat().getDriver().getFunctions().isBusiness().thenCompose(value -> {
+            if (value) {
+                return getChat().addLabel("Precisa de Ajuda", true);
+            } else {
+                return CompletableFuture.completedFuture(null);
+            }
+        });
         setQtdErroResposta(0);
-        getChat().sendMessage("Parece que você precisa de ajuda, vou te transferir para nosso atendente.");
-        getChat().sendMessage("Caso queira voltar para o atendimento automatico envie: *INICIAR*.");
+        getChat().sendMessage("Parece que você precisa de ajuda, vou te transferir para nosso atendente.").thenRun(() -> {
+            getChat().sendMessage("Caso queira voltar para o atendimento automatico envie: *INICIAR*.");
+        });
         setPaused(true);
         try {
             SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
@@ -201,21 +207,29 @@ public class ChatBotDelivery extends ChatBot {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        chat.getDriver().runOnDriverThreads(() -> {
-            try {
-                Chat c = chat.getDriver().getFunctions().getChatByNumber("554491050665");
-                if (c != null) {
-                    c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
-                    c.sendFile(c.printScreen(), "Pedido de Ajuda");
-                    Thread.sleep(3000);
-                    c.setArchive(true);
-                }
-                c = chat.getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
-                if (c != null) {
-                    c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome());
-                }
-            } catch (Exception ignored) {
-
+        String message = "*" + estabelecimento.getNomeEstabelecimento() + ":* Novo Pedido de Ajuda de " + this.getNome();
+        chat.getDriver().getFunctions().getChatByNumber("554491050665").thenCompose(chat -> {
+            if (chat != null) {
+                return chat.sendMessage(message).thenCompose(jsValue -> {
+                    return chat.printScreen().thenCompose(file -> {
+                        try {
+                            return chat.sendFile(file, "Pedido de Ajuda");
+                        } catch (IOException e) {
+                            return CompletableFuture.failedFuture(e);
+                        }
+                    });
+                }).thenCompose(jsValue -> {
+                    return chat.setArchive(true);
+                });
+            } else {
+                return CompletableFuture.failedFuture(new RuntimeException("Chat Não Encontrado"));
+            }
+        });
+        chat.getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso())).thenCompose(chat -> {
+            if (chat != null) {
+                return chat.sendMessage(message);
+            } else {
+                return CompletableFuture.failedFuture(new RuntimeException("Chat Não Encontrado"));
             }
         });
         return true;
@@ -223,9 +237,13 @@ public class ChatBotDelivery extends ChatBot {
 
     @Override
     public void onResume() {
-        if (getChat().getDriver().getFunctions().isBusiness()) {
-            getChat().removeLabel("Precisa de Ajuda");
-        }
+        getChat().getDriver().getFunctions().isBusiness().thenCompose(value -> {
+            if (value) {
+                return getChat().removeLabel("Precisa de Ajuda");
+            } else {
+                return CompletableFuture.completedFuture(null);
+            }
+        });
     }
 
     @Override

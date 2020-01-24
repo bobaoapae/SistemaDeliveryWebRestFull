@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import modelo.Chat;
 import modelo.EstadoDriver;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import restFul.controle.ControleSessions;
@@ -23,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
 @Path("/adm")
@@ -138,12 +138,17 @@ public class Adm {
                 jsonObject.addProperty("usuariosAtivos", sistemaDelivery.getUsuariosAtivos());
                 jsonObject.addProperty("estadoWhatsApp", sistemaDelivery.getDriver().getEstadoDriver().name());
                 if (sistemaDelivery.getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
-                    jsonObject.addProperty("idWhatsApp", sistemaDelivery.getDriver().getFunctions().getMyChat().getId());
+                    jsonObject.addProperty("idWhatsApp", sistemaDelivery.getDriver().getFunctions().getMyChat().join().getId());
                 }
                 jsonArray.add(jsonObject);
                 if (msgTeste && sistemaDelivery.getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
-                    Chat chat = sistemaDelivery.getDriver().getFunctions().getChatByNumber("5544991050665");
-                    chat.sendMessage("Mensagem para verificar se o sistema esta ativo");
+                    sistemaDelivery.getDriver().getFunctions().getChatByNumber("5544991050665").thenCompose(chat -> {
+                        if (chat != null) {
+                            return chat.sendMessage("Mensagem para verificar se o sistema esta ativo");
+                        } else {
+                            return CompletableFuture.failedFuture(new RuntimeException("Chat Não Encontrado"));
+                        }
+                    });
                 }
             }
             return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).entity(builder.toJson(jsonArray)).build();

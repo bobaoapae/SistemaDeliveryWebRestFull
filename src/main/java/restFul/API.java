@@ -1193,7 +1193,7 @@ public class API {
             cliente.setEstabelecimento(token.getEstabelecimento());
             if (!cliente.getTelefoneMovel().isEmpty() && token.getSistemaDelivery().getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
                 try {
-                    Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(cliente.getTelefoneMovel()));
+                    Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(cliente.getTelefoneMovel())).join();
                     if (chat != null) {
                         cliente.setChatId(chat.getId());
                     }
@@ -1286,12 +1286,12 @@ public class API {
         token.getEstabelecimento().setOpenChatBot(!token.getEstabelecimento().isOpenChatBot());
         try {
             String abertoFechado = token.getEstabelecimento().isOpenChatBot() ? "Aberto" : "Fechado";
-            Chat c = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("554491050665");
+            Chat c = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("554491050665").join();
             if (c != null) {
                 c.sendMessage("*" + token.getEstabelecimento().getNomeEstabelecimento() + ":* ChatBot " + abertoFechado);
                 c.setArchive(true);
             }
-            c = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(token.getEstabelecimento().getNumeroAviso()));
+            c = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(token.getEstabelecimento().getNumeroAviso())).join();
             if (c != null) {
                 c.sendMessage("*" + token.getEstabelecimento().getNomeEstabelecimento() + ":* ChatBot " + abertoFechado);
             }
@@ -1481,7 +1481,7 @@ public class API {
             pedido.setEstadoPedido(EstadoPedido.SaiuEntrega);
             if (ControlePedidos.getInstance().salvarPedido(pedido)) {
                 if (notificar) {
-                    Chat c = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatById(pedido.getCliente().getChatId());
+                    Chat c = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatById(pedido.getCliente().getChatId()).join();
                     if (c != null) {
                         c.sendMessage("Ótima notícia " + c.getContact().getSafeName() + ", seu pedido já esta pronto e está saindo para a entrega!!");
                     }
@@ -1520,7 +1520,7 @@ public class API {
             if (ControlePedidos.getInstance().salvarPedido(pedido)) {
                 if (notificar) {
                     if (!pedido.isEntrega()) {
-                        Chat c = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatById(pedido.getCliente().getChatId());
+                        Chat c = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento()).getDriver().getFunctions().getChatById(pedido.getCliente().getChatId()).join();
                         if (c != null) {
                             c.sendMessage("Ótima notícia " + c.getContact().getSafeName() + ", você já pode vir buscar o seu pedido!");
                         }
@@ -1898,7 +1898,7 @@ public class API {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
             JsonArray array = new JsonArray();
-            List<BroadcastChat> listas = driver.getFunctions().getAllBroadcastChats();
+            List<BroadcastChat> listas = driver.getFunctions().getAllBroadcastChats().join();
             for (BroadcastChat chat : listas) {
                 JsonObject ob = new JsonObject();
                 ob.addProperty("nome", chat.getFormattedTitle());
@@ -1947,9 +1947,9 @@ public class API {
             }
             Chat chat = null;
             if (cliente != null) {
-                chat = driver.getFunctions().getChatById(cliente.getChatId());
+                chat = driver.getFunctions().getChatById(cliente.getChatId()).join();
             } else {
-                chat = driver.getFunctions().getChatById(chatid);
+                chat = driver.getFunctions().getChatById(chatid).join();
             }
             if (chat != null) {
                 if (media == null || media.isEmpty()) {
@@ -1978,10 +1978,10 @@ public class API {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
             JsonArray array = new JsonArray();
-            List<Chat> chats = token.getSistemaDelivery().getDriver().getFunctions().getAllChats(100);
+            List<Chat> chats = token.getSistemaDelivery().getDriver().getFunctions().getAllChats(100).join();
             for (Chat c : chats) {
                 JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.toJson()));
-                object.addProperty("noEarlierMsgs", c.noEarlierMsgs());
+                object.addProperty("noEarlierMsgs", c.noEarlierMsgs().join());
                 object.add("contact", builder.toJsonTree(parser.parse(c.getContact().toJson())));
                 Cliente cliente = ControleClientes.getInstance().getClienteChatId(c.getId(), token.getEstabelecimento());
                 if (cliente != null) {
@@ -2002,9 +2002,9 @@ public class API {
         if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
-        Message message = token.getSistemaDelivery().getDriver().getFunctions().getMessageById(msgid);
+        Message message = token.getSistemaDelivery().getDriver().getFunctions().getMessageById(msgid).join();
         if (message != null && message instanceof MediaMessage) {
-            File file = ((MediaMessage) message).downloadMedia();
+            File file = ((MediaMessage) message).downloadMedia().join();
             try {
                 byte[] data = Files.readAllBytes(file.toPath());
                 String fileName = ((MediaMessage) message).getFileName();
@@ -2029,9 +2029,9 @@ public class API {
             if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
-            Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid);
+            Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid).join();
             if (chat != null) {
-                String img = chat.getContact().getThumb();
+                String img = chat.getContact().getThumb().join();
                 if (img.isEmpty()) {
                     return Response.status(Response.Status.NOT_FOUND).build();
                 }
@@ -2053,11 +2053,11 @@ public class API {
             if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
-            Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid);
+            Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid).join();
             if (chat == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-            chat.sendSeen(false);
+            chat.sendSeen();
             return Response.status(Response.Status.OK).build();
         } catch (Exception e) {
             Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
@@ -2073,16 +2073,16 @@ public class API {
             if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
-            Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid);
+            Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid).join();
             if (chat == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-            chat.loadEarlierMsgs(() -> {
+            chat.loadEarlierMsgs().thenRun(() -> {
                 JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(chat.toJson()));
-                object.addProperty("noEarlierMsgs", chat.noEarlierMsgs());
+                object.addProperty("noEarlierMsgs", chat.noEarlierMsgs().join());
                 object.add("contact", builder.toJsonTree(parser.parse(chat.getContact().toJson())));
                 token.getSistemaDelivery().enviarEventoWpp(SistemaDelivery.TipoEventoWpp.CHAT_UPDATE, builder.toJson(object));
-            });
+            }).join();
             return Response.status(Response.Status.OK).build();
         } catch (Exception e) {
             Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
@@ -2098,17 +2098,17 @@ public class API {
             if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
-            Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid);
+            Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid).join();
             if (chat == null) {
                 return Response.status(Response.Status.NOT_FOUND).build();
             }
-            List<Message> msgs = token.getSistemaDelivery().getDriver().getFunctions().getAllMessagesInChat(chat, true, true);
+            List<Message> msgs = chat.getAllMessages().join();
             JsonArray array = new JsonArray();
             for (Message msg : msgs) {
                 if (msg instanceof MediaMessage) {
                     JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(msg.toJson()));
                     MediaMessage mediaMessage = (MediaMessage) msg;
-                    File file = mediaMessage.downloadMedia();
+                    File file = mediaMessage.downloadMedia().join();
                     String contentType = Files.probeContentType(file.toPath());
 
                     // read data as byte[]

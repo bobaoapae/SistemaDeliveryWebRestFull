@@ -34,10 +34,7 @@ import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.CompletionStage;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.logging.*;
 
 public class SistemaDelivery {
@@ -75,11 +72,13 @@ public class SistemaDelivery {
                     Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
                 }
             }
-            for (Chat chat : driver.getFunctions().getAllNewChats()) {
-                ControleChatsAsync.getInstance(estabelecimento).addChat(chat);
-            }
+            driver.getFunctions().getAllChats().thenAccept(chats -> {
+                for (Chat chat : chats) {
+                    ControleChatsAsync.getInstance(estabelecimento).addChat(chat);
+                }
+            });
             driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat), EventType.ADD, false);
-            driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat), EventType.REMOVE, false);
+            driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).removeChat(chat), EventType.REMOVE, false);
             driver.getFunctions().addChatListenner(c -> {
                 JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.toJson()));
                 object.add("contact", builder.toJsonTree(parser.parse(c.getContact().toJson())));
@@ -226,15 +225,24 @@ public class SistemaDelivery {
                 chatBotDelivery.setAvisarPedidoAbriu(false);
                 chatBotDelivery.getChat().sendMessage("Olá, estou passando para avisar que já iniciamos nosso atendimento. Caso queira fazer um pedido basta me mandar uma mensagem blz!?");
             });
-            Chat c = driver.getFunctions().getChatByNumber("554491050665");
-            if (c != null) {
-                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Aberto");
-                c.setArchive(true);
-            }
-            c = driver.getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
-            if (c != null) {
-                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Aberto");
-            }
+            driver.getFunctions().getChatByNumber("554491050665").thenCompose(chat -> {
+                if (chat != null) {
+                    return chat.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Aberto").thenApply(jsValue -> {
+                        return chat;
+                    });
+                } else {
+                    return CompletableFuture.failedFuture(new RuntimeException("Chat Não Encontrado"));
+                }
+            }).thenCompose(chat -> {
+                return chat.setArchive(true);
+            });
+            driver.getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso())).thenCompose(chat -> {
+                if (chat != null) {
+                    return chat.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Aberto");
+                } else {
+                    return CompletableFuture.failedFuture(new RuntimeException("Chat Não Encontrado"));
+                }
+            });
             return true;
         } catch (Exception ex) {
             throw ex;
@@ -301,21 +309,28 @@ public class SistemaDelivery {
         if (valorPedidos > 0) {
             builder.textBold("Valor Total").text(": ").text(new DecimalFormat("###,###,###.00").format(valorPedidos) + "").newLine().newLine();
         }
-        try {
-            Chat c = driver.getFunctions().getChatByNumber("554491050665");
-            if (c != null) {
-                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Fechado");
-                c.sendMessage(builder.build());
-                c.setArchive(true);
+        driver.getFunctions().getChatByNumber("554491050665").thenCompose(chat -> {
+            if (chat != null) {
+                return chat.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Fechado").thenCompose(jsValue -> {
+                    return chat.sendMessage(builder.build());
+                }).thenCompose(jsValue -> {
+                    return chat.setArchive(true);
+                });
+            } else {
+                return CompletableFuture.failedFuture(new RuntimeException("Chat Não Encontrado"));
             }
-            c = driver.getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
-            if (c != null) {
-                c.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Fechado");
-                c.sendMessage(builder.build());
+        });
+        driver.getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso())).thenCompose(chat -> {
+            if (chat != null) {
+                return chat.sendMessage("*" + estabelecimento.getNomeEstabelecimento() + ":* Pedidos Fechado").thenCompose(jsValue -> {
+                    return chat.sendMessage(builder.build());
+                }).thenCompose(jsValue -> {
+                    return chat.setArchive(true);
+                });
+            } else {
+                return CompletableFuture.failedFuture(new RuntimeException("Chat Não Encontrado"));
             }
-        } catch (Exception ex) {
-            return false;
-        }
+        });
         return true;
     }
 
@@ -418,21 +433,28 @@ public class SistemaDelivery {
     }
 
     public void enviarMesagemParaTecnico(String msg) {
-        Chat c = driver.getFunctions().getChatByNumber("554491050665");
         String mensagem = "*" + estabelecimento.getNomeEstabelecimento() + ":* " + msg;
-        if (c != null) {
-            c.sendMessage(mensagem);
-            c.setArchive(true);
-        }
+        driver.getFunctions().getChatByNumber("554491050665").thenCompose(chat -> {
+            if (chat != null) {
+                return chat.sendMessage(mensagem).thenCompose(jsValue -> {
+                    return chat.setArchive(true);
+                });
+            } else {
+                return CompletableFuture.failedFuture(new RuntimeException("Chat Não Encontrado"));
+            }
+        });
     }
 
     public void enviarMensagemParaSuporte(String msg) {
         String mensagem = "*" + estabelecimento.getNomeEstabelecimento() + ":* " + msg;
         enviarMesagemParaTecnico(mensagem);
-        Chat c = driver.getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso()));
-        if (c != null) {
-            c.sendMessage(mensagem);
-        }
+        driver.getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(estabelecimento.getNumeroAviso())).thenCompose(chat -> {
+            if (chat != null) {
+                return chat.sendMessage(mensagem);
+            } else {
+                return CompletableFuture.failedFuture(new RuntimeException("Chat Não Econtrado"));
+            }
+        });
     }
 
     public CompletionStage<?> enviarEventoDelivery(TipoEventoDelivery tipoEventoDelivery, String dado) {
