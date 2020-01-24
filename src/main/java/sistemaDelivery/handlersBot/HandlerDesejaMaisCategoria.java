@@ -72,8 +72,8 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
         }
         builder.textNewLine(addOpcaoMenu(new HandlerCancelar(chat), null, "Cancelar Pedido ❌", "", "cancelar", "❌").toString());
         builder.textNewLine(addOpcaoMenu(new HandlerVerificaPedidoCorreto(chat), consumer, "Concluir Pedido ✅", "", "concluir", "✅").toString());
-        chat.getChat().markComposing(1500);
-        chat.getChat().sendMessage(builder.build());
+        chat.getChat().markComposing(1500).join();
+        chat.getChat().sendMessage(builder.build()).join();
         return true;
     }
 

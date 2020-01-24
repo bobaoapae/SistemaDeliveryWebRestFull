@@ -26,10 +26,10 @@ public class HandlerFinalizarCadastro extends HandlerBotDelivery {
         } catch (Exception ex) {
             this.reset();
             chat.getChat().getDriver().onError(ex);
-            chat.getChat().sendMessage("Falha ao salvar seu cadastro, tente novamente em alguns minutos");
+            chat.getChat().sendMessage("Falha ao salvar seu cadastro, tente novamente em alguns minutos").join();
             return true;
         }
-        chat.getChat().sendMessage("Parabéns, você finalizou seu cadastro, agora você podera participar das nossas promoções e descontos exclusivos!");
+        chat.getChat().sendMessage("Parabéns, você finalizou seu cadastro, agora você podera participar das nossas promoções e descontos exclusivos!").join();
         chat.setHandler(new HandlerAdeus(chat), true);
         return true;
     }

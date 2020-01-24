@@ -25,8 +25,8 @@ public class HandlerSolicitarHorarioReserva extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Para que horas seria sua reserva?");
-        chat.getChat().sendMessage("*Obs*: Envie a hora no seguinte formato *hh:mm*. Ex: *18:45*");
+        chat.getChat().sendMessage("Para que horas seria sua reserva?").join();
+        chat.getChat().sendMessage("*Obs*: Envie a hora no seguinte formato *hh:mm*. Ex: *18:45*").join();
         return true;
     }
 
@@ -58,10 +58,10 @@ public class HandlerSolicitarHorarioReserva extends HandlerBotDelivery {
 
     @Override
     protected void onError(Message m) {
-        chat.getChat().sendMessage("A hora informada é invalida, tente novamente");
-        chat.getChat().sendMessage("*Obs¹*: Envie a hora no seguinte formato *hh:mm*. Ex: *18:50*");
-        chat.getChat().sendMessage("*Obs²*: Os horarios de reservas disponíveis são apenas para após as *" + getChatBotDelivery().getEstabelecimento().getHoraInicioReservas().format(DateTimeFormatter.ofPattern("HH:mm")) + "*");
-        chat.getChat().sendMessage("*Obs³*: Você não pode solicitar um horario de reserva para um horario anterior à: *" + getChatBotDelivery().getTimeFormat().format(Calendar.getInstance().getTime()) + "*");
+        chat.getChat().sendMessage("A hora informada é invalida, tente novamente").join();
+        chat.getChat().sendMessage("*Obs¹*: Envie a hora no seguinte formato *hh:mm*. Ex: *18:50*").join();
+        chat.getChat().sendMessage("*Obs²*: Os horarios de reservas disponíveis são apenas para após as *" + getChatBotDelivery().getEstabelecimento().getHoraInicioReservas().format(DateTimeFormatter.ofPattern("HH:mm")) + "*").join();
+        chat.getChat().sendMessage("*Obs³*: Você não pode solicitar um horario de reserva para um horario anterior à: *" + getChatBotDelivery().getTimeFormat().format(Calendar.getInstance().getTime()) + "*").join();
     }
 
     @Override

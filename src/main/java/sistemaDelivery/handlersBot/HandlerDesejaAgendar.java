@@ -26,34 +26,34 @@ public class HandlerDesejaAgendar extends HandlerBotDelivery {
             return true;
         }
         if (!getChatBotDelivery().getEstabelecimento().isOpenPedidos()) {
-            chat.getChat().markComposing(3000);
+            chat.getChat().markComposing(3000).join();
             if (getChatBotDelivery().getEstabelecimento().nextHorarioAbertoOfDay() != null) {
-                chat.getChat().sendMessage("Não iniciamos o atendimento ainda, nosso horário de atentimento é das " + getChatBotDelivery().getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + " às " + getChatBotDelivery().getEstabelecimento().nextHorarioAbertoOfDay().getHoraFechar().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você pode agendar o horario do seu pedido.");
+                chat.getChat().sendMessage("Não iniciamos o atendimento ainda, nosso horário de atentimento é das " + getChatBotDelivery().getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + " às " + getChatBotDelivery().getEstabelecimento().nextHorarioAbertoOfDay().getHoraFechar().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você pode agendar o horario do seu pedido.").join();
             } else {
-                chat.getChat().sendMessage("Não iniciamos o atendimento ainda, porém você pode agendar o horario do seu pedido.");
+                chat.getChat().sendMessage("Não iniciamos o atendimento ainda, porém você pode agendar o horario do seu pedido.").join();
             }
             if (getChatBotDelivery().getPedidoAtual().isEntrega()) {
-                chat.getChat().sendMessage("Você gostaria de agendar algum horario para o seu pedido ou quer que ele seja entregue assim que iniciarmos a produção e o pedido estiver pronto?");
+                chat.getChat().sendMessage("Você gostaria de agendar algum horario para o seu pedido ou quer que ele seja entregue assim que iniciarmos a produção e o pedido estiver pronto?").join();
                 addOpcaoMenu(new HandlerAgendamentoPedido(chat), null, "Agendar", "", "agendar");
                 addOpcaoMenu(new HandlerConcluirPedido(chat), null, "Entregar assim que estiver pronto", "", "quando", "pronto", "estiver");
             } else {
-                chat.getChat().sendMessage("Você gostaria de agendar algum horario para a retirada do seu pedido ou podemos deixar ele pronto logo após iniciarmos a nossa produção?");
+                chat.getChat().sendMessage("Você gostaria de agendar algum horario para a retirada do seu pedido ou podemos deixar ele pronto logo após iniciarmos a nossa produção?").join();
                 addOpcaoMenu(new HandlerAgendamentoPedido(chat), null, "Agendar", "", "agendar");
                 addOpcaoMenu(new HandlerConcluirPedido(chat), null, "Deixar pronto assim que iniciar a produção", "", "quando", "iniciar", "produção");
             }
         } else {
             if (getChatBotDelivery().getPedidoAtual().isEntrega()) {
-                chat.getChat().sendMessage("Você gostaria de agendar algum horario para o seu pedido ou quer que ele seja entregue assim que estiver pronto?");
+                chat.getChat().sendMessage("Você gostaria de agendar algum horario para o seu pedido ou quer que ele seja entregue assim que estiver pronto?").join();
                 addOpcaoMenu(new HandlerAgendamentoPedido(chat), null, "Agendar", "", "agendar");
                 addOpcaoMenu(new HandlerConcluirPedido(chat), null, "Entregar assim que estiver pronto", "", "quando", "pronto", "estiver");
             } else {
-                chat.getChat().sendMessage("Você gostaria de agendar algum horario para a retirada do seu pedido?");
+                chat.getChat().sendMessage("Você gostaria de agendar algum horario para a retirada do seu pedido?").join();
                 addOpcaoSim(new HandlerAgendamentoPedido(chat), null);
                 addOpcaoNao(new HandlerConcluirPedido(chat), null);
             }
         }
-        chat.getChat().markComposing(2500);
-        chat.getChat().sendMessage(gerarTextoOpcoes());
+        chat.getChat().markComposing(2500).join();
+        chat.getChat().sendMessage(gerarTextoOpcoes()).join();
         return true;
     }
 

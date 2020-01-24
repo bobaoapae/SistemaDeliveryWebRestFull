@@ -45,8 +45,8 @@ public class HandlerConfirmarEndereco extends HandlerBotDelivery {
                 chat.getChat().sendMessage("Sinto muito, vou anotar seu endereço novamente então");
             }
         }).toString());
-        chat.getChat().markComposing(4000);
-        chat.getChat().sendMessage(builder.build());
+        chat.getChat().markComposing(4000).join();
+        chat.getChat().sendMessage(builder.build()).join();
         return true;
     }
 

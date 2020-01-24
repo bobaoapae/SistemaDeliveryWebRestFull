@@ -34,8 +34,8 @@ public class HandlerUsarUltimoEndereco extends HandlerBotDelivery {
             }
         }).toString());
         builder.textNewLine(addOpcaoNao(new HandlerSolicitarEndereco(chat), null).toString());
-        chat.getChat().markComposing(4000);
-        chat.getChat().sendMessage(builder.build());
+        chat.getChat().markComposing(4000).join();
+        chat.getChat().sendMessage(builder.build()).join();
         return true;
     }
 

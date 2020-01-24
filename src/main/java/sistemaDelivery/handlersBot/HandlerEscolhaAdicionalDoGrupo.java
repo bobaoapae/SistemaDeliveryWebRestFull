@@ -40,12 +40,12 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
         adicionaisEscolhidos.clear();
         synchronized (grupoAtual.getAdicionais()) {
             if (!grupoAtual.getAdicionais().isEmpty() && grupoAtual.getAdicionais().stream().anyMatch(AdicionalProduto::isAtivo)) {
-                chat.getChat().markComposing(3000);
+                chat.getChat().markComposing(3000).join();
                 if (grupoAtual.getDescricaoGrupo().isEmpty()) {
                     if (grupoAtual.getQtdMax() > 1 || grupoAtual.getQtdMax() == 0) {
-                        chat.getChat().sendMessage("Quais " + grupoAtual.getNomeGrupo() + " você quer?");
+                        chat.getChat().sendMessage("Quais " + grupoAtual.getNomeGrupo() + " você quer?").join();
                     } else {
-                        chat.getChat().sendMessage("Qual " + grupoAtual.getNomeGrupo() + " você quer?");
+                        chat.getChat().sendMessage("Qual " + grupoAtual.getNomeGrupo() + " você quer?").join();
                     }
                 } else {
                     chat.getChat().sendMessage(grupoAtual.getDescricaoGrupo());
@@ -66,8 +66,8 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                     }
                     adicionais += "\n";
                 }
-                chat.getChat().markComposing(4500);
-                chat.getChat().sendMessage(adicionais);
+                chat.getChat().markComposing(4500).join();
+                chat.getChat().sendMessage(adicionais).join();
                 String exemploEscolhas = "";
                 if (grupoAtual.getQtdMax() == 0) {
                     exemploEscolhas = "1, 2";
@@ -81,14 +81,14 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                 }
                 chat.getChat().markComposing(2000);
                 if (grupoAtual.getQtdMax() > 1) {
-                    chat.getChat().sendMessage(gerarObs("Você pode escolher no máximo " + grupoAtual.getQtdMax() + " " + grupoAtual.getNomeGrupo() + ". Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: " + exemploEscolhas));
+                    chat.getChat().sendMessage(gerarObs("Você pode escolher no máximo " + grupoAtual.getQtdMax() + " " + grupoAtual.getNomeGrupo() + ". Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: " + exemploEscolhas)).join();
                 } else if (grupoAtual.getQtdMax() == 1) {
-                    chat.getChat().sendMessage(gerarObs("Envie o número da sua escolha."));
+                    chat.getChat().sendMessage(gerarObs("Envie o número da sua escolha.")).join();
                 } else {
-                    chat.getChat().sendMessage(gerarObs("Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: " + exemploEscolhas));
+                    chat.getChat().sendMessage(gerarObs("Envie o número da sua escolha, ou escolhas separadas por virgula. Ex: " + exemploEscolhas)).join();
                 }
                 if (grupoAtual.getQtdMin() == 0) {
-                    chat.getChat().sendMessage(gerarObs("Caso não deseje nada, basta enviar NÃO."));
+                    chat.getChat().sendMessage(gerarObs("Caso não deseje nada, basta enviar NÃO.")).join();
                 }
             } else {
                 chat.setHandler(nextHandler, true);
@@ -148,11 +148,11 @@ public class HandlerEscolhaAdicionalDoGrupo extends HandlerBotDelivery {
                     adicionais += ", ";
                 }
             }
-            chat.getChat().markComposing(2000);
-            chat.getChat().sendMessage(grupoAtual.getNomeGrupo() + " do pedido: " + adicionais + ".");
-            chat.getChat().markComposing(3000);
-            chat.getChat().sendMessage("*_Obs: Caso a escolha esteja incorreta envie: VOLTAR_*");
-            chat.getChat().markComposing(1500);
+            chat.getChat().markComposing(2000).join();
+            chat.getChat().sendMessage(grupoAtual.getNomeGrupo() + " do pedido: " + adicionais + ".").join();
+            chat.getChat().markComposing(3000).join();
+            chat.getChat().sendMessage("*_Obs: Caso a escolha esteja incorreta envie: VOLTAR_*").join();
+            chat.getChat().markComposing(1500).join();
             getChatBotDelivery().setHandlerVoltar(new HandlerVoltar(nextHandler, () -> {
                 ((HandlerAdicionaisProduto) nextHandler).pedirGrupoNovamente(grupoAtual);
                 getChatBotDelivery().getLastPedido().getAdicionais().removeAll(adicionaisEscolhidos);

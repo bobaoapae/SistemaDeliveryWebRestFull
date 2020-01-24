@@ -19,13 +19,13 @@ public class HandlerSolicitarTroco extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Seu pedido ficou no valor de R$" + moneyFormat.format(getChatBotDelivery().getPedidoAtual().getTotal()));
+        chat.getChat().sendMessage("Seu pedido ficou no valor de R$" + moneyFormat.format(getChatBotDelivery().getPedidoAtual().getTotal())).join();
         if (getChatBotDelivery().getPedidoAtual().isCartao()) {
-            chat.getChat().sendMessage("Me informe como sera a divisão para que eu possa levar o troco.");
+            chat.getChat().sendMessage("Me informe como sera a divisão para que eu possa levar o troco.").join();
         } else {
-            chat.getChat().sendMessage("Você vai precisar que levemos troco? Caso precise, basta me informar para quantos reais.");
+            chat.getChat().sendMessage("Você vai precisar que levemos troco? Caso precise, basta me informar para quantos reais.").join();
         }
-        chat.getChat().sendMessage("*_Obs: Caso não queira troco, basta enviar NÃO_*");
+        chat.getChat().sendMessage("*_Obs: Caso não queira troco, basta enviar NÃO_*").join();
         return true;
     }
 
@@ -34,7 +34,7 @@ public class HandlerSolicitarTroco extends HandlerBotDelivery {
         if (!getChatBotDelivery().getPedidoAtual().isCartao()) {
             if (msg.getContent().toLowerCase().trim().contains("não") || msg.getContent().toLowerCase().trim().contains("nao") || msg.getContent().toLowerCase().trim().equals("n")) {
                 getChatBotDelivery().getPedidoAtual().setTroco(0);
-                chat.getChat().sendMessage("Beleza");
+                chat.getChat().sendMessage("Beleza").join();
             } else {
                 String valorTroco = "";
                 for (char c : msg.getContent().trim().replaceAll(",", ".").toCharArray()) {
@@ -48,14 +48,14 @@ public class HandlerSolicitarTroco extends HandlerBotDelivery {
                         return false;
                     }
                     getChatBotDelivery().getPedidoAtual().setTroco(valorTrocoDouble);
-                    chat.getChat().sendMessage("Beleza, já anotei aqui o valor para levar de troco");
+                    chat.getChat().sendMessage("Beleza, já anotei aqui o valor para levar de troco").join();
                 } catch (Exception ex) {
                     return false;
                 }
             }
         } else {
             getChatBotDelivery().getPedidoAtual().setComentarioPedido(msg.getContent().trim());
-            chat.getChat().sendMessage("Beleza, já anotei aqui");
+            chat.getChat().sendMessage("Beleza, já anotei aqui").join();
         }
         chat.setHandler(new HandlerDesejaAgendar(chat), true);
         return true;

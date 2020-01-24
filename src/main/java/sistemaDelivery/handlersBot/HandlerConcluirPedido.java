@@ -53,20 +53,20 @@ public class HandlerConcluirPedido extends HandlerBotDelivery {
                                 .textBold(p.getEstabelecimento().getEndereco());
                     }
                 }
-                chat.getChat().markComposing(5000);
-                chat.getChat().sendMessage(builder.build());
+                chat.getChat().markComposing(5000).join();
+                chat.getChat().sendMessage(builder.build()).join();
                 chat.setHandler(new HandlerPedidoConcluido(chat), true);
             } else {
                 this.reset();
                 chat.setHandler(this, false);
-                chat.getChat().sendMessage("Ouve um erro ao salvar seu pedido!");
-                chat.getChat().sendMessage("Tente novamente em alguns minutos ou aguarde nosso Atendente ler suas mensagens.");
+                chat.getChat().sendMessage("Ouve um erro ao salvar seu pedido!").join();
+                chat.getChat().sendMessage("Tente novamente em alguns minutos ou aguarde nosso Atendente ler suas mensagens.").join();
             }
         } catch (Exception ex) {
             this.reset();
             chat.setHandler(this, false);
-            chat.getChat().sendMessage("Ouve um erro ao salvar seu pedido!");
-            chat.getChat().sendMessage("Tente novamente em alguns minutos ou aguarde nosso Atendente ler suas mensagens.");
+            chat.getChat().sendMessage("Ouve um erro ao salvar seu pedido!").join();
+            chat.getChat().sendMessage("Tente novamente em alguns minutos ou aguarde nosso Atendente ler suas mensagens.").join();
             getChatBotDelivery().getChat().getDriver().onError(ex);
         }
         return true;

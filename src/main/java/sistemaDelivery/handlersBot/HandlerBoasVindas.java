@@ -39,7 +39,7 @@ public class HandlerBoasVindas extends HandlerBotDelivery {
             builder.textNewLine("É um prazer poder estar te atendendo novamente.");
         }
         ((ChatBotDelivery) chat).setPedidoAtual(new Pedido(((ChatBotDelivery) chat).getCliente(), getChatBotDelivery().getEstabelecimento()));
-        chat.getChat().sendMessage(builder.build());
+        chat.getChat().sendMessage(builder.build()).join();
         getChatBotDelivery().enviarMensageInformesIniciais();
         return true;
     }

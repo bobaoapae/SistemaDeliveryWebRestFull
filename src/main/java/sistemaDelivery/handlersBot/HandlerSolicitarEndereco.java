@@ -26,9 +26,9 @@ public class HandlerSolicitarEndereco extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Por favor, me envie o endereço para que eu possa entregar seu pedido");
-        chat.getChat().markComposing(3000);
-        chat.getChat().sendMessage(gerarObs("Envie tudo em uma unica mensagem. Ex: Av Tupassi, numero 10, casa verde de esquina...(O PONTO DE REFERÊNCIA É MUITO IMPORTANTE)"));
+        chat.getChat().sendMessage("Por favor, me envie o endereço para que eu possa entregar seu pedido").join();
+        chat.getChat().markComposing(3000).join();
+        chat.getChat().sendMessage(gerarObs("Envie tudo em uma unica mensagem. Ex: Av Tupassi, numero 10, casa verde de esquina...(O PONTO DE REFERÊNCIA É MUITO IMPORTANTE)")).join();
         return true;
     }
 
@@ -48,7 +48,7 @@ public class HandlerSolicitarEndereco extends HandlerBotDelivery {
                 endereco.setLogradouro(ende);
                 getChatBotDelivery().getPedidoAtual().setEndereco(endereco);
             } catch (Exception ex) {
-                chat.getChat().sendMessage("Desculpe, não consegui achar seu endereço com base na sua localização.");
+                chat.getChat().sendMessage("Desculpe, não consegui achar seu endereço com base na sua localização.").join();
                 getChatBotDelivery().getChat().getDriver().onError(ex);
                 return false;
             }

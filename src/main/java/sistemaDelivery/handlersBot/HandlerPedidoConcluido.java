@@ -22,7 +22,7 @@ public class HandlerPedidoConcluido extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Existe algo mais em que eu possa lhe ajudar?");
+        chat.getChat().sendMessage("Existe algo mais em que eu possa lhe ajudar?").join();
         addOpcaoSim(new HandlerMenuPrincipal(chat), new Consumer<String>() {
             @Override
             public void accept(String s) {
@@ -36,7 +36,7 @@ public class HandlerPedidoConcluido extends HandlerBotDelivery {
             handlerBotDelivery = new HandlerVerificaDesejaRealizarCadastro(chat);
         }
         addOpcaoNao(handlerBotDelivery, null);
-        chat.getChat().sendMessage(gerarTextoOpcoes());
+        chat.getChat().sendMessage(gerarTextoOpcoes()).join();
         return true;
     }
 

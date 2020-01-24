@@ -27,9 +27,9 @@ public class HandlerRealizarReserva extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Certo, para poder realizar a sua reserva preciso anotar alguns dados");
-        chat.getChat().sendMessage("A primeira informação que preciso é a data da reserva.");
-        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm*. Ex: *" + getChatBotDelivery().getEstabelecimento().getDataComHoraAtual().format(DateTimeFormatter.ofPattern("dd/MM")) + "*");
+        chat.getChat().sendMessage("Certo, para poder realizar a sua reserva preciso anotar alguns dados").join();
+        chat.getChat().sendMessage("A primeira informação que preciso é a data da reserva.").join();
+        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm*. Ex: *" + getChatBotDelivery().getEstabelecimento().getDataComHoraAtual().format(DateTimeFormatter.ofPattern("dd/MM")) + "*").join();
         return true;
     }
 
@@ -61,8 +61,8 @@ public class HandlerRealizarReserva extends HandlerBotDelivery {
 
     @Override
     protected void onError(Message m) {
-        chat.getChat().sendMessage("A data informada é invalida, tente novamente");
-        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm*. Ex: *" + getChatBotDelivery().getEstabelecimento().getDataComHoraAtual().format(DateTimeFormatter.ofPattern("dd/MM")) + "*");
+        chat.getChat().sendMessage("A data informada é invalida, tente novamente").join();
+        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm*. Ex: *" + getChatBotDelivery().getEstabelecimento().getDataComHoraAtual().format(DateTimeFormatter.ofPattern("dd/MM")) + "*").join();
     }
 
     @Override

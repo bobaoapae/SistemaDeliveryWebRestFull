@@ -38,7 +38,7 @@ public class HandlerMenuRodizios extends HandlerBotDelivery {
             builder.textNewLine(lastCodeRodizio + " - *" + r.getNome() + "*");
         }
         builder.textNewLine(lastCodeRodizio + 1 + " - Voltar ao Menu Principal ↩️");
-        chat.getChat().sendMessage(builder.build());
+        chat.getChat().sendMessage(builder.build()).join();
         return true;
     }
 
@@ -87,7 +87,7 @@ public class HandlerMenuRodizios extends HandlerBotDelivery {
                 builder.textNewLine("Horario: " + r.getHoraInicio().format(DateTimeFormatter.ofPattern("HH:mm")));
                 builder.textNewLine("");
                 builder.textNewLine("");
-                chat.getChat().sendMessage(builder.build());
+                chat.getChat().sendMessage(builder.build()).join();
                 chat.setHandler(new HandlerDesejaFazerUmaReserva(chat), true);
                 return true;
             }

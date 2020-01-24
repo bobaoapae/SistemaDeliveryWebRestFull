@@ -59,19 +59,19 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
                 }
             }
         }
-        chat.getChat().markComposing(1000);
-        chat.getChat().sendMessage("Ótimo, agora só falta você me dizer como deseja retirar o seu pedido. 😁");
+        chat.getChat().markComposing(1000).join();
+        chat.getChat().sendMessage("Ótimo, agora só falta você me dizer como deseja retirar o seu pedido. 😁").join();
         String formasRetiradas = getChatBotDelivery().getEstabelecimento().getTiposEntregasConcatenados();
         boolean possuiEntrega = getChatBotDelivery().getEstabelecimento().possuiEntrega();
         synchronized (getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
-            chat.getChat().markComposing(2500);
+            chat.getChat().markComposing(2500).join();
             if (possuiEntrega) {
-                chat.getChat().sendMessage("Informo que nosso prazo médio para entrega é de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
+                chat.getChat().sendMessage("Informo que nosso prazo médio para entrega é de " + getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000).join();
             } else {
-                chat.getChat().sendMessage("Informo que nosso prazo médio para retirada é de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000);
+                chat.getChat().sendMessage("Informo que nosso prazo médio para retirada é de " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada()) + " à " + (getChatBotDelivery().getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.", 2000).join();
             }
-            chat.getChat().markComposing(2000);
-            chat.getChat().sendMessage("Você quer que seu pedido seja para " + formasRetiradas + "?");
+            chat.getChat().markComposing(2000).join();
+            chat.getChat().sendMessage("Você quer que seu pedido seja para " + formasRetiradas + "?").join();
             for (TipoEntrega tipoEntrega : getChatBotDelivery().getEstabelecimento().getTiposEntregas()) {
                 boolean cobrarTaxa = tipoEntrega.getValor() > 0;
                 if (tipoEntrega.getValor() > 0) {
@@ -111,7 +111,7 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
                     }
                 }, tipoEntrega.getNome() + (cobrarTaxa ? " R$ " + getChatBotDelivery().getMoneyFormat().format(tipoEntrega.getValor()) : ""), "", tipoEntrega.getNome());
             }
-            chat.getChat().sendMessage(gerarTextoOpcoes());
+            chat.getChat().sendMessage(gerarTextoOpcoes()).join();
         }
         return true;
     }

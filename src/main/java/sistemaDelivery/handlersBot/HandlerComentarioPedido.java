@@ -33,16 +33,16 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
             chat.setHandler(nextHandler, true);
             return true;
         }
-        chat.getChat().markComposing(2000);
-        chat.getChat().sendMessage("Você deseja modificar algo em seu pedido?");
+        chat.getChat().markComposing(2000).join();
+        chat.getChat().sendMessage("Você deseja modificar algo em seu pedido?").join();
         if (getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido() != null && !getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido().isEmpty()) {
-            chat.getChat().markComposing(3000);
-            chat.getChat().sendMessage("Por exemplo: " + getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido() + "... etc");
+            chat.getChat().markComposing(3000).join();
+            chat.getChat().sendMessage("Por exemplo: " + getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido() + "... etc").join();
         }
-        chat.getChat().sendMessage("Basta escrever e me enviar, o que você escrever sera repassado para a àrea de produção");
-        chat.getChat().sendMessage(gerarObs("Caso não queira modificar nada, basta enviar NÃO"));
+        chat.getChat().sendMessage("Basta escrever e me enviar, o que você escrever sera repassado para a àrea de produção").join();
+        chat.getChat().sendMessage(gerarObs("Caso não queira modificar nada, basta enviar NÃO")).join();
         if (!getChatBotDelivery().getCliente().isCadastroRealizado()) {
-            chat.getChat().markComposing(3000);
+            chat.getChat().markComposing(3000).join();
             Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
             int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
             LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
@@ -76,7 +76,7 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
             if (categoriasDisponiveis.contains(", ")) {
                 categoriasDisponiveis = categoriasDisponiveis.substring(0, categoriasDisponiveis.lastIndexOf(",")) + " ou" + categoriasDisponiveis.substring(categoriasDisponiveis.lastIndexOf(",") + 1);
             }
-            chat.getChat().sendMessage(gerarObs("Não use esse campo para pedir " + categoriasDisponiveis + " aguarde as próximas opções para isso."));
+            chat.getChat().sendMessage(gerarObs("Não use esse campo para pedir " + categoriasDisponiveis + " aguarde as próximas opções para isso.")).join();
         }
         return true;
     }
@@ -88,7 +88,7 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
             getChatBotDelivery().getLastPedido().setComentario("");
         } else {
             getChatBotDelivery().getLastPedido().setComentario(msg.getContent().trim());
-            chat.getChat().sendMessage("Perfeito, já anotei aqui o que você me disse ✌️😉");
+            chat.getChat().sendMessage("Perfeito, já anotei aqui o que você me disse ✌️😉").join();
         }
         chat.setHandler(nextHandler, true);
         return true;

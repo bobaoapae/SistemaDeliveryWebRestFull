@@ -19,7 +19,7 @@ public class HandlerVerificaDesejaRealizarCadastro extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Vejo aqui que você não concluiu seu cadastro ainda, com o cadastro você pode ganhar *selos de fidelidade*, participa de *promoções*, ganha *descontos exclusivos* e possui muitas outras *vantagens*!");
+        chat.getChat().sendMessage("Vejo aqui que você não concluiu seu cadastro ainda, com o cadastro você pode ganhar *selos de fidelidade*, participa de *promoções*, ganha *descontos exclusivos* e possui muitas outras *vantagens*!").join();
         chat.setHandler(new HandlerVerificaNomeCadastro(chat), true);
         return true;
     }

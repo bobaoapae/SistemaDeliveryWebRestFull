@@ -61,10 +61,10 @@ public class HandlerDesejaFazerUmaReserva extends HandlerBotDelivery {
             }
             chat.getChat().sendMessage(builder.build());
         }*/
-        chat.getChat().sendMessage("Você deseja realizar uma reserva agora?");
-        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-        chat.getChat().sendMessage("1 - Sim");
-        chat.getChat().sendMessage("2 - Não");
+        chat.getChat().sendMessage("Você deseja realizar uma reserva agora?").join();
+        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*").join();
+        chat.getChat().sendMessage("1 - Sim").join();
+        chat.getChat().sendMessage("2 - Não").join();
         return true;
     }
 

@@ -25,10 +25,10 @@ public class HandlerFinalizarReserva extends HandlerBotDelivery {
         } catch (Exception ex) {
             this.reset();
             chat.getChat().getDriver().onError(ex);
-            chat.getChat().sendMessage("Falha ao registrar o pedido de reserva, tente novamente em alguns minutos");
+            chat.getChat().sendMessage("Falha ao registrar o pedido de reserva, tente novamente em alguns minutos").join();
             return true;
         }
-        chat.getChat().sendMessage("Ótimo, seu pedido de reserva foi recebido. Agora aguarde o nosso contato para a confirmação da reserva!");
+        chat.getChat().sendMessage("Ótimo, seu pedido de reserva foi recebido. Agora aguarde o nosso contato para a confirmação da reserva!").join();
         chat.setHandler(new HandlerPedidoConcluido(chat), true);
         return true;
     }

@@ -29,13 +29,13 @@ public class HandlerRetiradaAutomatica extends HandlerBotDelivery {
             }
         }
         if (getChatBotDelivery().getEstabelecimento().possuiEntrega()) {
-            chat.getChat().sendMessage("O seu pedido foi marcado automaticamente como para retirada, pois algum produto que você pediu não pode ser entregue.", 2000);
-            chat.getChat().sendMessage("Deseja prosseguir com o pedido?");
-            chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
+            chat.getChat().sendMessage("O seu pedido foi marcado automaticamente como para retirada, pois algum produto que você pediu não pode ser entregue.", 2000).join();
+            chat.getChat().sendMessage("Deseja prosseguir com o pedido?").join();
+            chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*").join();
             MessageBuilder builder = new MessageBuilder();
             builder.textNewLine("*1* - Sim.").
                     textNewLine("*2* - Não.");
-            chat.getChat().sendMessage(builder.build());
+            chat.getChat().sendMessage(builder.build()).join();
         } else {
             irParaProximaEtapa();
         }

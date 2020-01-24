@@ -21,14 +21,14 @@ public class HandlerSolicitarFormaPagamento extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Qual vai ser a forma do pagamento?");
-        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-        chat.getChat().sendMessage("*1* - 💵 Dinheiro");
-        chat.getChat().sendMessage("*2* - 💳 Cartão de Crédito");
-        chat.getChat().sendMessage("*3* - 💳💵 Dinheiro e Cartão de Crédito");
+        chat.getChat().sendMessage("Qual vai ser a forma do pagamento?").join();
+        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*").join();
+        chat.getChat().sendMessage("*1* - 💵 Dinheiro").join();
+        chat.getChat().sendMessage("*2* - 💳 Cartão de Crédito").join();
+        chat.getChat().sendMessage("*3* - 💳💵 Dinheiro e Cartão de Crédito").join();
         try {
             if (getChatBotDelivery().getCliente().getCreditosDisponiveis() > 0) {
-                chat.getChat().sendMessage("*4* - Créditos de Recarga");
+                chat.getChat().sendMessage("*4* - Créditos de Recarga").join();
             }
         } catch (SQLException e) {
             getChatBotDelivery().getChat().getDriver().onError(e);

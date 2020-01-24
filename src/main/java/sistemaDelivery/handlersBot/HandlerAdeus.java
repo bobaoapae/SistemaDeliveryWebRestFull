@@ -23,10 +23,10 @@ public class HandlerAdeus extends HandlerBotDelivery {
         getChatBotDelivery().setHandlerVoltar(null);
         getChatBotDelivery().setPedidoAtual(new Pedido(getChatBotDelivery().getCliente(), getChatBotDelivery().getEstabelecimento()));
         chat.setHandler(new HandlerComecarNovoPedido(chat), false);
-        chat.getChat().markComposing(2500);
-        chat.getChat().sendMessage("Até mais, " + getChatBotDelivery().getNome() + ". Obrigado pela preferência");
-        chat.getChat().markComposing(2000);
-        chat.getChat().sendMessage("Aguardamos seu retorno 🤗🖤");
+        chat.getChat().markComposing(2500).join();
+        chat.getChat().sendMessage("Até mais, " + getChatBotDelivery().getNome() + ". Obrigado pela preferência").join();
+        chat.getChat().markComposing(2000).join();
+        chat.getChat().sendMessage("Aguardamos seu retorno 🤗🖤").join();
         return true;
     }
 

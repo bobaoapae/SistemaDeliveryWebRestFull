@@ -19,7 +19,7 @@ public class HandlerSolicitarQuantidadePessoasReserva extends HandlerBotDelivery
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("A sua reserva seria para quantas pessoas?");
+        chat.getChat().sendMessage("A sua reserva seria para quantas pessoas?").join();
         return true;
     }
 
@@ -50,7 +50,7 @@ public class HandlerSolicitarQuantidadePessoasReserva extends HandlerBotDelivery
 
     @Override
     protected void onError(Message m) {
-        chat.getChat().sendMessage("A quantidade de pessoas informada é invalida, por favor informe novamente.");
+        chat.getChat().sendMessage("A quantidade de pessoas informada é invalida, por favor informe novamente.").join();
     }
 
     @Override

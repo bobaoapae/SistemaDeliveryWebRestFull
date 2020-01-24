@@ -161,27 +161,27 @@ public class ChatBotDelivery extends ChatBot {
         chat.markComposing(3000);
         if (!this.getEstabelecimento().isOpenPedidos()) {
             if (!this.getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
-                chat.sendMessage("Agradecemos sua preferência, porém sinto lhe informar que não realizamos atendimentos hoje.");
+                chat.sendMessage("Agradecemos sua preferência, porém sinto lhe informar que não realizamos atendimentos hoje.").join();
                 this.setHandler(new HandlerAdeus(this), true);
             } else if (this.getEstabelecimento().nextHorarioAbertoOfDay() == null) {
-                chat.sendMessage("Agradecemos sua preferência, porém já encerramos os atendimentos por hoje.");
+                chat.sendMessage("Agradecemos sua preferência, porém já encerramos os atendimentos por hoje.").join();
                 this.setHandler(new HandlerAdeus(this), true);
             } else if (this.getEstabelecimento().isAgendamentoDePedidos()) {
-                chat.sendMessage("Nós não iniciamos o nosso atendimento ainda, porém você pode deixar seu pedido agendado blz!?");
+                chat.sendMessage("Nós não iniciamos o nosso atendimento ainda, porém você pode deixar seu pedido agendado blz!?").join();
                 this.setHandler(new HandlerMenuPrincipal(this), true);
             } else if (this.getEstabelecimento().isReservas() && this.getEstabelecimento().isReservasComPedidosFechados()) {
-                chat.sendMessage("Nós não iniciamos o nosso atendimento ainda, o nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode garantir sua mesa realizando sua reserva.");
+                chat.sendMessage("Nós não iniciamos o nosso atendimento ainda, o nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + ", porém você já pode garantir sua mesa realizando sua reserva.").join();
                 this.setHandler(new HandlerDesejaFazerUmaReserva(this), true);
             } else {
-                chat.sendMessage("Nós não iniciamos o nosso atendimento ainda, o nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + ".");
+                chat.sendMessage("Nós não iniciamos o nosso atendimento ainda, o nosso atendimento iniciasse às " + this.getEstabelecimento().nextHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + ".").join();
                 this.setHandler(new HandlerPerguntarDesejaSerAvisadoQuandoAbrirOsPedidos(this), true);
             }
         } else {
             boolean possuiEntrega = this.getEstabelecimento().possuiEntrega();
             if (possuiEntrega) {
-                chat.sendMessage("Informo que nosso prazo médio para entrega é de " + this.getEstabelecimento().getTempoMedioEntrega() + " à " + (this.getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (this.getEstabelecimento().getTempoMedioRetirada()) + " à " + (this.getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.");
+                chat.sendMessage("Informo que nosso prazo médio para entrega é de " + this.getEstabelecimento().getTempoMedioEntrega() + " à " + (this.getEstabelecimento().getTempoMedioEntrega() + 15) + " minutos. Já para retirada cerca de " + (this.getEstabelecimento().getTempoMedioRetirada()) + " à " + (this.getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.").join();
             } else {
-                chat.sendMessage("Informo que nosso prazo médio para retirada é de " + (this.getEstabelecimento().getTempoMedioRetirada()) + " à " + (this.getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.");
+                chat.sendMessage("Informo que nosso prazo médio para retirada é de " + (this.getEstabelecimento().getTempoMedioRetirada()) + " à " + (this.getEstabelecimento().getTempoMedioRetirada() + 5) + " minutos.").join();
             }
             this.setHandler(new HandlerMenuPrincipal(this), true);
         }

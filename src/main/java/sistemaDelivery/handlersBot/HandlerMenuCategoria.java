@@ -30,11 +30,11 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         MessageBuilder builder = new MessageBuilder();
-        chat.getChat().markComposing(2000);
-        chat.getChat().sendMessage("Seguem as opções de: " + c.getNomeCategoria() + ".");
+        chat.getChat().markComposing(2000).join();
+        chat.getChat().sendMessage("Seguem as opções de: " + c.getNomeCategoria() + ".").join();
         if (!c.isFazEntrega()) {
-            chat.getChat().markComposing(2000);
-            chat.getChat().sendMessage(gerarObs("Não é feita a entrega dos produtos abaixo"));
+            chat.getChat().markComposing(2000).join();
+            chat.getChat().sendMessage(gerarObs("Não é feita a entrega dos produtos abaixo")).join();
         } else {
             boolean temCategoriaPrecisa = false;
             boolean msg = false;
@@ -55,13 +55,13 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
                 msg = true;
             }
             if (msg) {
-                chat.getChat().markComposing(3000);
+                chat.getChat().markComposing(3000).join();
                 if (c.getRootCategoria().getQtdMinEntrega() > 1 && !c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens"));
+                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens")).join();
                 } else if (c.getRootCategoria().getQtdMinEntrega() > 1 && c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens ou pedir junto algum produto de outro cardapio"));
+                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir no minimo " + c.getRootCategoria().getQtdMinEntrega() + " itens ou pedir junto algum produto de outro cardapio")).join();
                 } else if (c.getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir junto algum produto de outro cardapio"));
+                    chat.getChat().sendMessage(gerarObs("A entrega só e feita se você pedir junto algum produto de outro cardapio")).join();
                 }
             }
         }
@@ -70,8 +70,8 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
         builder.textNewLine(addOpcaoMenu(new HandlerMenuPrincipal(chat), null, "Voltar ao Menu Principal ↩", "", "voltar", "menu", "principal").toString());
         builder.textNewLine(addOpcaoMenu(new HandlerCancelar(chat), null, "Cancelar Pedido ❌", "", "cancelar").toString());
         builder.textNewLine(gerarObs("Escolha um item por vez"));
-        chat.getChat().markComposing(5000);
-        chat.getChat().sendMessage(builder.build());
+        chat.getChat().markComposing(5000).join();
+        chat.getChat().sendMessage(builder.build()).join();
         return true;
     }
 

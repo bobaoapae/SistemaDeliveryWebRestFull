@@ -19,10 +19,10 @@ public class HandlerVerificaNumeroContatoReserva extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Seu número para contato é esse mesmo que estamos conversando? \n" + getChatBotDelivery().getCliente().getTelefoneMovel());
-        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-        chat.getChat().sendMessage("1 - Sim");
-        chat.getChat().sendMessage("2 - Não");
+        chat.getChat().sendMessage("Seu número para contato é esse mesmo que estamos conversando? \n" + getChatBotDelivery().getCliente().getTelefoneMovel()).join();
+        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*").join();
+        chat.getChat().sendMessage("1 - Sim").join();
+        chat.getChat().sendMessage("2 - Não").join();
         return true;
     }
 

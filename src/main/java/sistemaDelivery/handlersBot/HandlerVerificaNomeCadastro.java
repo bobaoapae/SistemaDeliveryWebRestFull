@@ -19,11 +19,11 @@ public class HandlerVerificaNomeCadastro extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("O seu nome está correto?");
-        chat.getChat().sendMessage("*" + getChatBotDelivery().getNome() + "*");
-        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-        chat.getChat().sendMessage("*1* - Sim");
-        chat.getChat().sendMessage("*2* - Não");
+        chat.getChat().sendMessage("O seu nome está correto?").join();
+        chat.getChat().sendMessage("*" + getChatBotDelivery().getNome() + "*").join();
+        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*").join();
+        chat.getChat().sendMessage("*1* - Sim").join();
+        chat.getChat().sendMessage("*2* - Não").join();
         return true;
     }
 

@@ -26,13 +26,13 @@ public class HandlerAgendamentoPedido extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().markComposing(1000);
+        chat.getChat().markComposing(1000).join();
         if (getChatBotDelivery().getPedidoAtual().isEntrega()) {
-            chat.getChat().sendMessage("Para que horas você gostaria que a entrega fosse feita?");
+            chat.getChat().sendMessage("Para que horas você gostaria que a entrega fosse feita?").join();
         } else {
-            chat.getChat().sendMessage("Que horas você quer vir buscar o seu pedido?");
+            chat.getChat().sendMessage("Que horas você quer vir buscar o seu pedido?").join();
         }
-        chat.getChat().sendMessage(gerarObs("Envie a hora no seguinte formato *hh:mm*. Ex: *18:45*"));
+        chat.getChat().sendMessage(gerarObs("Envie a hora no seguinte formato *hh:mm*. Ex: *18:45*")).join();
         resetarObs();
         return true;
     }
@@ -64,15 +64,15 @@ public class HandlerAgendamentoPedido extends HandlerBotDelivery {
 
     @Override
     protected void onError(Message m) {
-        chat.getChat().sendMessage("A hora informada é invalida, tente novamente");
+        chat.getChat().sendMessage("A hora informada é invalida, tente novamente").join();
         if (formatoIncorreto) {
-            chat.getChat().sendMessage(gerarObs("Envie a hora no seguinte formato *hh:mm*. Ex: *18:50*"));
+            chat.getChat().sendMessage(gerarObs("Envie a hora no seguinte formato *hh:mm*. Ex: *18:50*")).join();
         }
         if (getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay() != null) {
-            chat.getChat().sendMessage(gerarObs("Os horarios de agendamento disponíveis são entre *" + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + " e " + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraFechar().format(DateTimeFormatter.ofPattern("HH:mm")) + "*"));
+            chat.getChat().sendMessage(gerarObs("Os horarios de agendamento disponíveis são entre *" + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraAbrir().format(DateTimeFormatter.ofPattern("HH:mm")) + " e " + getChatBotDelivery().getEstabelecimento().nextOrCurrentHorarioAbertoOfDay().getHoraFechar().format(DateTimeFormatter.ofPattern("HH:mm")) + "*")).join();
         }
         if (horaInformada.isBefore(getChatBotDelivery().getEstabelecimento().getHoraAtual())) {
-            chat.getChat().sendMessage(gerarObs("Você não pode informar um horario anterior à hora atual: *" + getChatBotDelivery().getEstabelecimento().getHoraAtual().format(DateTimeFormatter.ofPattern("HH:mm")) + "*"));
+            chat.getChat().sendMessage(gerarObs("Você não pode informar um horario anterior à hora atual: *" + getChatBotDelivery().getEstabelecimento().getHoraAtual().format(DateTimeFormatter.ofPattern("HH:mm")) + "*")).join();
         }
     }
 

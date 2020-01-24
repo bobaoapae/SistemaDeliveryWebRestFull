@@ -11,11 +11,11 @@ public class HandlerPerguntarDesejaSerAvisadoQuandoAbrirOsPedidos extends Handle
 
     @Override
     protected boolean runFirstTime(Message message) {
-        chat.getChat().markComposing(2500);
-        chat.getChat().sendMessage("Você gostaría de ser avisado quando iniciarmos o atendimento?");
+        chat.getChat().markComposing(2500).join();
+        chat.getChat().sendMessage("Você gostaría de ser avisado quando iniciarmos o atendimento?").join();
         addOpcaoSim(null, s -> {
-            chat.getChat().markComposing(2000);
-            chat.getChat().sendMessage("Blz, assim que iniciarmos os atendimentos eu te aviso para você poder fazer o seu pedido.");
+            chat.getChat().markComposing(2000).join();
+            chat.getChat().sendMessage("Blz, assim que iniciarmos os atendimentos eu te aviso para você poder fazer o seu pedido.").join();
             getChatBotDelivery().setAvisarPedidoAbriu(true);
             chat.setHandler(new HandlerAdeus(chat), true);
         });

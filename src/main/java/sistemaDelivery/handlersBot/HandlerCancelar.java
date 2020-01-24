@@ -20,15 +20,15 @@ public class HandlerCancelar extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().markComposing(2500);
-        chat.getChat().sendMessage("O atendimento foi cancelado.");
+        chat.getChat().markComposing(2500).join();
+        chat.getChat().sendMessage("O atendimento foi cancelado.").join();
         chat.setHandler(new HandlerAdeus(chat), true);
         chat.getChat().getDriver().runOnDriverThreads(() -> {
             try {
                 Chat c = chat.getChat().getDriver().getFunctions().getChatByNumber("554491050665").join();
                 if (c != null) {
-                    c.sendMessage("*" + getChatBotDelivery().getEstabelecimento().getNomeEstabelecimento() + ":* Pedido cancelado para o cliente " + getChatBotDelivery().getNome());
-                    c.sendFile(c.printScreen().join(), "Pedido Cancelado");
+                    c.sendMessage("*" + getChatBotDelivery().getEstabelecimento().getNomeEstabelecimento() + ":* Pedido cancelado para o cliente " + getChatBotDelivery().getNome()).join();
+                    c.sendFile(c.printScreen().join(), "Pedido Cancelado").join();
                     Thread.sleep(3000);
                     c.setArchive(true);
                 }

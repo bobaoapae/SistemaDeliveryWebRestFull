@@ -26,12 +26,12 @@ public class HandlerComecarNovoPedido extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         if (m.getContent().toLowerCase().contains("vlw") || m.getContent().toLowerCase().contains("obrigado")) {
-            chat.getChat().sendMessage(agradecimentos[new Random().nextInt(agradecimentos.length - 1)]);
+            chat.getChat().sendMessage(agradecimentos[new Random().nextInt(agradecimentos.length - 1)]).join();
             this.reset();
             return true;
         }
-        chat.getChat().sendMessage("Olá, " + getChatBotDelivery().getNome() + " 😄");
-        chat.getChat().sendMessage("Gostaria de iniciar um novo pedido?");
+        chat.getChat().sendMessage("Olá, " + getChatBotDelivery().getNome() + " 😄").join();
+        chat.getChat().sendMessage("Gostaria de iniciar um novo pedido?").join();
         addOpcaoSim(null, new Consumer<String>() {
             @Override
             public void accept(String s) {
@@ -40,7 +40,7 @@ public class HandlerComecarNovoPedido extends HandlerBotDelivery {
             }
         });
         addOpcaoNao(new HandlerAdeus(chat), null);
-        chat.getChat().sendMessage(gerarTextoOpcoes());
+        chat.getChat().sendMessage(gerarTextoOpcoes()).join();
         return true;
     }
 

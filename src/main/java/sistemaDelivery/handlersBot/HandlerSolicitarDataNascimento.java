@@ -23,9 +23,9 @@ public class HandlerSolicitarDataNascimento extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Certo, para poder finalizar seu cadastro só preciso de mais uma informação");
-        chat.getChat().sendMessage("Me informe sua data de nascimento.");
-        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm/aaaa*. Ex: *" + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "*");
+        chat.getChat().sendMessage("Certo, para poder finalizar seu cadastro só preciso de mais uma informação").join();
+        chat.getChat().sendMessage("Me informe sua data de nascimento.").join();
+        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm/aaaa*. Ex: *" + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "*").join();
         return true;
     }
 
@@ -43,8 +43,8 @@ public class HandlerSolicitarDataNascimento extends HandlerBotDelivery {
 
     @Override
     protected void onError(Message m) {
-        chat.getChat().sendMessage("A data informada é invalida, tente novamente");
-        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm/aaaa*. Ex: *" + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "*");
+        chat.getChat().sendMessage("A data informada é invalida, tente novamente").join();
+        chat.getChat().sendMessage("*Obs*: Envie a data no seguinte formato *dd/mm/aaaa*. Ex: *" + LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "*").join();
     }
 
     @Override

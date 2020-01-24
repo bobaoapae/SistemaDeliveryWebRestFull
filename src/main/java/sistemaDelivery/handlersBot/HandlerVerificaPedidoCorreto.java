@@ -28,8 +28,8 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().markComposing(1500);
-        chat.getChat().sendMessage("Vou mandar um resumo do seu pedido para que você verifique se está tudo certo, okay ☺️?!");
+        chat.getChat().markComposing(1500).join();
+        chat.getChat().sendMessage("Vou mandar um resumo do seu pedido para que você verifique se está tudo certo, okay ☺️?!").join();
         Pedido p = getChatBotDelivery().getPedidoAtual();
         MessageBuilder builder = new MessageBuilder();
         for (int x = 0; x < p.getProdutos().size(); x++) {
@@ -54,18 +54,18 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
         }
         p.calcularValor();
         builder.textNewLine("Total: R$" + moneyFormat.format(p.getTotal()) + " 💵");
-        chat.getChat().markComposing(5000);
-        chat.getChat().sendMessage(builder.build());
-        chat.getChat().sendMessage("Está tudo certo? 🤞");
+        chat.getChat().markComposing(5000).join();
+        chat.getChat().sendMessage(builder.build()).join();
+        chat.getChat().sendMessage("Está tudo certo? 🤞").join();
         addOpcaoSim(new HandlerFormaRetirada(chat), null);
         addOpcaoNao(new HandlerBoasVindas(chat), new Consumer<String>() {
             @Override
             public void accept(String s) {
-                chat.getChat().sendMessage("Oh ☹️, sinto muito.");
-                chat.getChat().sendMessage("Vamos começar novamente, espero que agora de tudo certo. 🤞😄");
+                chat.getChat().sendMessage("Oh ☹️, sinto muito.").join();
+                chat.getChat().sendMessage("Vamos começar novamente, espero que agora de tudo certo. 🤞😄").join();
             }
         });
-        chat.getChat().sendMessage(gerarTextoOpcoes());
+        chat.getChat().sendMessage(gerarTextoOpcoes()).join();
         return true;
     }
 

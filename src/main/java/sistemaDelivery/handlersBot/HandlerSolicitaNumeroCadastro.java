@@ -19,7 +19,7 @@ public class HandlerSolicitaNumeroCadastro extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Beleza, me envie o número para contato!");
+        chat.getChat().sendMessage("Beleza, me envie o número para contato!").join();
         return true;
     }
 
@@ -35,7 +35,7 @@ public class HandlerSolicitaNumeroCadastro extends HandlerBotDelivery {
 
     @Override
     protected void onError(Message m) {
-        chat.getChat().sendMessage("O número informado é invalido, por favor informe seu número novamente");
+        chat.getChat().sendMessage("O número informado é invalido, por favor informe seu número novamente").join();
     }
 
     @Override

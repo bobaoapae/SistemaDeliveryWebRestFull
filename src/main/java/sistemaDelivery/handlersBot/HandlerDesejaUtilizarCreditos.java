@@ -22,14 +22,14 @@ public class HandlerDesejaUtilizarCreditos extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         try {
-            chat.getChat().sendMessage("Você possui R$ " + moneyFormat.format(getChatBotDelivery().getCliente().getCreditosDisponiveis()) + " de créditos", 500);
+            chat.getChat().sendMessage("Você possui R$ " + moneyFormat.format(getChatBotDelivery().getCliente().getCreditosDisponiveis()) + " de créditos", 500).join();
         } catch (SQLException e) {
             getChatBotDelivery().getChat().getDriver().onError(e);
         }
-        chat.getChat().sendMessage("Deseja utlizar o valor como desconto?", 300);
-        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*");
-        chat.getChat().sendMessage("1 - Sim");
-        chat.getChat().sendMessage("2 - Não");
+        chat.getChat().sendMessage("Deseja utlizar o valor como desconto?", 300).join();
+        chat.getChat().sendMessage("*_Obs: Envie somente o número da sua escolha_*").join();
+        chat.getChat().sendMessage("1 - Sim").join();
+        chat.getChat().sendMessage("2 - Não").join();
         return true;
     }
 

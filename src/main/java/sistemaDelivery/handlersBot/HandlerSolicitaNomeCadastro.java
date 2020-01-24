@@ -19,7 +19,7 @@ public class HandlerSolicitaNomeCadastro extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        chat.getChat().sendMessage("Beleza, me informe seu nome completo!");
+        chat.getChat().sendMessage("Beleza, me informe seu nome completo!").join();
         return true;
     }
 
@@ -35,7 +35,7 @@ public class HandlerSolicitaNomeCadastro extends HandlerBotDelivery {
 
     @Override
     protected void onError(Message m) {
-        chat.getChat().sendMessage("O nome informado é invalido, por favor informe seu nome novamente");
+        chat.getChat().sendMessage("O nome informado é invalido, por favor informe seu nome novamente").join();
     }
 
     @Override
