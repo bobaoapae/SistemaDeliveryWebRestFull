@@ -249,14 +249,14 @@ public class ChatBotDelivery extends ChatBot {
     @Override
     public void processNewMsg(Message m) {
         if (m.getChat().getContact().getId().equals("554491050665@c.us")) {
-        }
-        if (m.getContent().toLowerCase().equals("/testar")) {
-            m.getChat().sendMessage("Online");
-            return;
-        }
-        if (m.getContent().toLowerCase().equals("/rebind")) {
-            m.getChat().getDriver().getFunctions().recriarBindsJavaListenner();
-            return;
+            if (m.getContent().toLowerCase().equals("/testar")) {
+                m.getChat().sendMessage("Online");
+                return;
+            }
+            if (m.getContent().toLowerCase().equals("/rebind")) {
+                m.getChat().getDriver().getFunctions().recriarBindsJavaListenner();
+                return;
+            }
         }
         if (!estabelecimento.isOpenChatBot()) {
             return;

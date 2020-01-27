@@ -78,7 +78,7 @@ public class SistemaDelivery {
                 }
             });
             driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat), EventType.ADD, false);
-            driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).removeChat(chat), EventType.REMOVE, false);
+            driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).removeChat(chat), EventType.REMOVE, true);
             driver.getFunctions().addChatListenner(c -> {
                 JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.toJson()));
                 object.add("contact", builder.toJsonTree(parser.parse(c.getContact().toJson())));
