@@ -72,7 +72,7 @@ public class SistemaDelivery {
                     Logger.getLogger(estabelecimento.getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
                 }
             }
-            driver.getFunctions().getAllChats().thenAccept(chats -> {
+            driver.getFunctions().getAllChats(false).thenAccept(chats -> {
                 for (Chat chat : chats) {
                     ControleChatsAsync.getInstance(estabelecimento).addChat(chat);
                 }
