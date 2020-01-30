@@ -6,6 +6,7 @@
 package sistemaDelivery.modelo;
 
 import handlersBot.HandlerBot;
+import modelo.BindMsgListennerException;
 import modelo.Chat;
 import modelo.ChatBot;
 import modelo.Message;
@@ -38,7 +39,7 @@ public class ChatBotDelivery extends ChatBot {
     private HandlerVoltar handlerVoltar;
     private boolean avisarPedidoAbriu;
 
-    public ChatBotDelivery(Chat chat, Estabelecimento estabelecimento) throws SQLException {
+    public ChatBotDelivery(Chat chat, Estabelecimento estabelecimento) throws SQLException, BindMsgListennerException {
         super(chat);
         this.estabelecimento = estabelecimento;
         Cliente cliente = ControleClientes.getInstance().getClienteChatId(chat.getId(), estabelecimento);

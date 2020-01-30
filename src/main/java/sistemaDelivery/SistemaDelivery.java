@@ -43,6 +43,7 @@ public class SistemaDelivery {
     private ActionOnNeedQrCode onNeedQrCode;
     private ActionOnLowBattery onLowBaterry;
     private ActionOnErrorInDriver onErrorInDriver;
+    private ActionOnWhatsAppVersionMismatch onWhatsAppVersionMismatch;
     private Runnable onConnect, onDisconnect;
     private Estabelecimento estabelecimento;
     private SseBroadcaster broadcaster, broadcasterWhats;
@@ -109,12 +110,15 @@ public class SistemaDelivery {
         onErrorInDriver = (e) -> {
             logger.log(Level.SEVERE, e.getMessage(), e);
         };
+        onWhatsAppVersionMismatch = (targetVersion, actualVersion) -> {
+            logger.log(Level.SEVERE, "Mudança na versão do WhatsApp - Versão do WhatsApp: " + targetVersion.toString() + " - Versão da Lib:" + actualVersion.toString());
+        };
         if (!headless) {
             telaWhatsApp = new TelaWhatsApp(estabelecimento);
             telaWhatsApp.setVisible(true);
-            this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect, null);
+            this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect, null, onWhatsAppVersionMismatch);
         } else {
-            this.driver = new WebWhatsDriver(Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect, null);
+            this.driver = new WebWhatsDriver(Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect, null, onWhatsAppVersionMismatch);
         }
         executores.scheduleWithFixedDelay(() -> {
             if (broadcasterWhats != null) {
