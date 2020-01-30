@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import driver.WebWhatsDriver;
+import modelo.*;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import restFul.controle.ControleSessions;
