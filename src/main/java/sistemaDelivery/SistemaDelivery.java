@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import driver.WebWhatsDriver;
-import modelo.*;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
 import restFul.controle.ControleSessions;
@@ -111,7 +110,7 @@ public class SistemaDelivery {
             logger.log(Level.SEVERE, e.getMessage(), e);
         };
         onWhatsAppVersionMismatch = (targetVersion, actualVersion) -> {
-            logger.log(Level.SEVERE, "Mudança na versão do WhatsApp - Versão do WhatsApp: " + targetVersion.toString() + " - Versão da Lib:" + actualVersion.toString());
+            logger.log(Level.SEVERE, "Mudança na versão do WhatsApp - Versão do WhatsApp: " + actualVersion.toString() + " - Versão da Lib:" + targetVersion.toString());
         };
         if (!headless) {
             telaWhatsApp = new TelaWhatsApp(estabelecimento);
