@@ -110,8 +110,8 @@ public class SistemaDelivery {
         onErrorInDriver = (e) -> {
             logger.log(Level.SEVERE, e.getMessage(), e);
         };
-        onWhatsAppVersionMismatch = (targetVersion, actualVersion) -> {
-            logger.log(Level.SEVERE, "Mudança na versão do WhatsApp - Versão do WhatsApp: " + actualVersion.toString() + " - Versão da Lib:" + targetVersion.toString());
+        onWhatsAppVersionMismatch = (minVersion, maxVersion, actualVersion) -> {
+            logger.log(Level.SEVERE, "Mudança na versão do WhatsApp - Versão do WhatsApp: " + actualVersion.toString() + " - Versão da Lib:" + minVersion.toString() + " - " + maxVersion.toString());
         };
         if (!headless) {
             telaWhatsApp = new TelaWhatsApp(estabelecimento);
