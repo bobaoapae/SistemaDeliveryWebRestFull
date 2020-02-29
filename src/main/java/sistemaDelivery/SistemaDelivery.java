@@ -125,6 +125,7 @@ public class SistemaDelivery {
             telaWhatsApp.setVisible(true);
             builder.renderInPanel(telaWhatsApp.getPanel());
         }
+        driver = builder.build();
         executores.scheduleWithFixedDelay(() -> {
             if (broadcasterWhats != null) {
                 broadcasterWhats.broadcast(sseWhats.newEvent("none"));
