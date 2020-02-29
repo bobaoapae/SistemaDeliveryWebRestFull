@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import modelo.EstadoDriver;
+import modelo.DriverState;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import restFul.controle.ControleSessions;
 import restFul.controle.ControleSistema;
@@ -136,12 +136,12 @@ public class Adm {
                 jsonObject.addProperty("uuid-estabelecimento", sistemaDelivery.getEstabelecimento().getUuid().toString());
                 jsonObject.addProperty("estabelecimento", sistemaDelivery.getEstabelecimento().getNomeEstabelecimento());
                 jsonObject.addProperty("usuariosAtivos", sistemaDelivery.getUsuariosAtivos());
-                jsonObject.addProperty("estadoWhatsApp", sistemaDelivery.getDriver().getEstadoDriver().name());
-                if (sistemaDelivery.getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
+                jsonObject.addProperty("estadoWhatsApp", sistemaDelivery.getDriver().getDriverState().name());
+                if (sistemaDelivery.getDriver().getDriverState() == DriverState.LOGGED) {
                     jsonObject.addProperty("idWhatsApp", sistemaDelivery.getDriver().getFunctions().getMyChat().join().getId());
                 }
                 jsonArray.add(jsonObject);
-                if (msgTeste && sistemaDelivery.getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
+                if (msgTeste && sistemaDelivery.getDriver().getDriverState() == DriverState.LOGGED) {
                     sistemaDelivery.getDriver().getFunctions().getChatByNumber("5544991050665").thenCompose(chat -> {
                         if (chat != null) {
                             return chat.sendMessage("Mensagem para verificar se o sistema esta ativo");

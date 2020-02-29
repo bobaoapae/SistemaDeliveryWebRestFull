@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import driver.WebWhatsDriver;
+import driver.WebWhatsDriverBuilder;
 import modelo.*;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -35,14 +36,15 @@ import java.time.format.TextStyle;
 import java.util.List;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Consumer;
 import java.util.logging.*;
 
 public class SistemaDelivery {
     private static HashMap<Estabelecimento, Logger> loggers = new HashMap<>();
     private WebWhatsDriver driver;
-    private ActionOnNeedQrCode onNeedQrCode;
-    private ActionOnLowBattery onLowBaterry;
-    private ActionOnErrorInDriver onErrorInDriver;
+    private Consumer<String> onNeedQrCode;
+    private Consumer<Integer> onLowBaterry;
+    private Consumer<Throwable> onErrorInDriver;
     private ActionOnWhatsAppVersionMismatch onWhatsAppVersionMismatch;
     private Runnable onConnect, onDisconnect;
     private Estabelecimento estabelecimento;
@@ -113,12 +115,15 @@ public class SistemaDelivery {
         onWhatsAppVersionMismatch = (minVersion, maxVersion, actualVersion) -> {
             logger.log(Level.SEVERE, "Mudança na versão do WhatsApp - Versão do WhatsApp: " + actualVersion.toString() + " - Versão da Lib:" + minVersion.toString() + " - " + maxVersion.toString());
         };
+        WebWhatsDriverBuilder builder = new WebWhatsDriverBuilder(Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString());
+        builder.addErrorHandler(onErrorInDriver);
+        builder.onNeedQrCode(onNeedQrCode);
+        builder.onWhatsAppVersionMismatch(onWhatsAppVersionMismatch);
+        builder.runOnConnect(onConnect);
         if (!headless) {
             telaWhatsApp = new TelaWhatsApp(estabelecimento);
             telaWhatsApp.setVisible(true);
-            this.driver = new WebWhatsDriver(telaWhatsApp.getPanel(), Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect, null, onWhatsAppVersionMismatch);
-        } else {
-            this.driver = new WebWhatsDriver(Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), onConnect, onNeedQrCode, onErrorInDriver, onLowBaterry, onDisconnect, null, onWhatsAppVersionMismatch);
+            builder.renderInPanel(telaWhatsApp.getPanel());
         }
         executores.scheduleWithFixedDelay(() -> {
             if (broadcasterWhats != null) {
@@ -129,7 +134,7 @@ public class SistemaDelivery {
             }
         }, 0, 20, TimeUnit.SECONDS);
         executores.scheduleWithFixedDelay(() -> {
-            if ((!estabelecimento.isOpenChatBot() || driver.getEstadoDriver() != EstadoDriver.LOGGED)) {
+            if ((!estabelecimento.isOpenChatBot() || driver.getDriverState() != DriverState.LOGGED)) {
                 if (estabelecimento.isIniciarAutomaticamente()) {
                     estabelecimento.setIniciarAutomaticamente(false);
                     try {

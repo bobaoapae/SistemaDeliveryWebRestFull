@@ -82,8 +82,8 @@ public class API {
         JsonObject object = new JsonObject();
         try {
             WebWhatsDriver driver = token.getSistemaDelivery().getDriver();
-            object.addProperty("status", driver.getEstadoDriver().toString());
-            if (driver.getEstadoDriver() == EstadoDriver.WAITING_QR_CODE_SCAN) {
+            object.addProperty("status", driver.getDriverState().toString());
+            if (driver.getDriverState() == DriverState.WAITING_QR_CODE_SCAN) {
                 object.addProperty("qrCode", driver.getQrCodePlain());
             }
             return Response.status(Response.Status.OK).type(MediaType.APPLICATION_JSON).entity(builder.toJson(object)).build();
@@ -1191,7 +1191,7 @@ public class API {
         try {
             Cliente cliente = builder.fromJson(cli, Cliente.class);
             cliente.setEstabelecimento(token.getEstabelecimento());
-            if (!cliente.getTelefoneMovel().isEmpty() && token.getSistemaDelivery().getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
+            if (!cliente.getTelefoneMovel().isEmpty() && token.getSistemaDelivery().getDriver().getDriverState() == DriverState.LOGGED) {
                 try {
                     Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatByNumber("55" + Utils.retornarApenasNumeros(cliente.getTelefoneMovel())).join();
                     if (chat != null) {
@@ -1894,7 +1894,7 @@ public class API {
     public Response getListasTransmissao() {
         try {
             WebWhatsDriver driver = token.getSistemaDelivery().getDriver();
-            if (driver.getEstadoDriver() != EstadoDriver.LOGGED) {
+            if (driver.getDriverState() != DriverState.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
             JsonArray array = new JsonArray();
@@ -1942,7 +1942,7 @@ public class API {
                 msg = msg.replaceAll("\\{cliente}", cliente.getNome());
             }
             WebWhatsDriver driver = token.getSistemaDelivery().getDriver();
-            if (driver.getEstadoDriver() != EstadoDriver.LOGGED) {
+            if (driver.getDriverState() != DriverState.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
             Chat chat = null;
@@ -1974,7 +1974,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getChats() {
         try {
-            if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            if (token.getSistemaDelivery().getDriver().getDriverState() != DriverState.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
             JsonArray array = new JsonArray();
@@ -1999,7 +1999,7 @@ public class API {
     @GET
     @Path("/mediaMessage")
     public Response mediaMessage(@QueryParam("msgId") String msgid) {
-        if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+        if (token.getSistemaDelivery().getDriver().getDriverState() != DriverState.LOGGED) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
         Message message = token.getSistemaDelivery().getDriver().getFunctions().getMessageById(msgid).join();
@@ -2026,7 +2026,7 @@ public class API {
     @Produces("image/png")
     public Response pictureChat(@QueryParam("chatId") String chatid) {
         try {
-            if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            if (token.getSistemaDelivery().getDriver().getDriverState() != DriverState.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
             Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid).join();
@@ -2050,7 +2050,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response sendSeenChat(@QueryParam("chatId") String chatid) {
         try {
-            if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            if (token.getSistemaDelivery().getDriver().getDriverState() != DriverState.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
             Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid).join();
@@ -2070,7 +2070,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response loadEarly(@QueryParam("chatId") String chatid) {
         try {
-            if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            if (token.getSistemaDelivery().getDriver().getDriverState() != DriverState.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
             Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid).join();
@@ -2095,7 +2095,7 @@ public class API {
     @Produces(MediaType.APPLICATION_JSON)
     public Response msgsChat(@QueryParam("chatId") String chatid) {
         try {
-            if (token.getSistemaDelivery().getDriver().getEstadoDriver() != EstadoDriver.LOGGED) {
+            if (token.getSistemaDelivery().getDriver().getDriverState() != DriverState.LOGGED) {
                 return Response.status(Response.Status.FORBIDDEN).build();
             }
             Chat chat = token.getSistemaDelivery().getDriver().getFunctions().getChatById(chatid).join();

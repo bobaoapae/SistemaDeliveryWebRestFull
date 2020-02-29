@@ -1,7 +1,7 @@
 package sistemaDelivery.controle;
 
 import DAO.Conexao;
-import modelo.EstadoDriver;
+import modelo.DriverState;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.BeanHandler;
@@ -189,7 +189,7 @@ public class ControleEstabelecimentos {
                 connection.commit();
                 if (ControleSessions.getInstance().checkSessionAtiva(estabelecimento)) {
                     var session = ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento);
-                    if (session.getDriver().getEstadoDriver() == EstadoDriver.LOGGED) {
+                    if (session.getDriver().getDriverState() == DriverState.LOGGED) {
                         ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento).logout();
                     }
                     new Thread(() -> {
