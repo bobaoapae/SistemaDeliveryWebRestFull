@@ -119,7 +119,7 @@ public class SistemaDelivery {
         builder.addErrorHandler(onErrorInDriver);
         builder.onNeedQrCode(onNeedQrCode);
         builder.onWhatsAppVersionMismatch(onWhatsAppVersionMismatch);
-        builder.runOnConnect(onConnect);
+        builder.onConnect(onConnect);
         if (!headless) {
             telaWhatsApp = new TelaWhatsApp(estabelecimento);
             telaWhatsApp.setVisible(true);
