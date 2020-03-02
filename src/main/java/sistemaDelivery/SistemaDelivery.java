@@ -66,7 +66,7 @@ public class SistemaDelivery {
         parser = new JsonParser();
         builder = Utilitarios.getDefaultGsonBuilder(null).create();
         onConnect = () -> {
-            ControleChatsAsync.getInstance(estabelecimento).finalizar();
+            ControleChatsAsync.getInstance(estabelecimento).forceFinalizar();
             if (!estabelecimento.isIniciarAutomaticamente()) {
                 estabelecimento.setIniciarAutomaticamente(true);
                 try {

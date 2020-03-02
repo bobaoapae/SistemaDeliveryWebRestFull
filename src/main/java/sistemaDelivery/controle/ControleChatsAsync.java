@@ -38,15 +38,6 @@ public class ControleChatsAsync {
         }
     }
 
-    public void finalizar() {
-        synchronized (instances) {
-            for (ChatBotDelivery chatt : chats) {
-                chatt.finalizar();
-            }
-            ControleChatsAsync.instances.remove(this.estabelecimento);
-        }
-    }
-
     public void addChat(Chat chat) {
         synchronized (chats) {
             try {
@@ -92,8 +83,20 @@ public class ControleChatsAsync {
         }
     }
 
+    public void finalizar() {
+        synchronized (instances) {
+            for (ChatBotDelivery chatt : chats) {
+                chatt.finalizar();
+            }
+            ControleChatsAsync.instances.remove(this.estabelecimento);
+        }
+    }
+
+    public void forceFinalizar() {
+        ControleChatsAsync.instances.remove(this.estabelecimento);
+    }
+
     public List<ChatBotDelivery> getChats() {
         return chats;
     }
-
 }
