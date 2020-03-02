@@ -434,8 +434,12 @@ public class SistemaDelivery {
         } catch (SchedulerException e) {
             logger.log(Level.SEVERE, e.getMessage(), e);
         }
-        ControleChatsAsync.getInstance(estabelecimento).finalizar();
-        driver.finalizar();
+        try {
+            ControleChatsAsync.getInstance(estabelecimento).finalizar();
+            driver.finalizar();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Finalizar", e);
+        }
     }
 
     public void logout() {
