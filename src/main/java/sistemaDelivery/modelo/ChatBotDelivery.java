@@ -159,7 +159,7 @@ public class ChatBotDelivery extends ChatBot {
     }
 
     public void enviarMensageInformesIniciais() {
-        chat.markComposing(3000);
+        chat.markComposing(3000).join();
         if (!this.getEstabelecimento().isOpenPedidos()) {
             if (!this.getEstabelecimento().checkTemHorarioFuncionamentoHoje()) {
                 chat.sendMessage("Agradecemos sua preferência, porém sinto lhe informar que não realizamos atendimentos hoje.").join();

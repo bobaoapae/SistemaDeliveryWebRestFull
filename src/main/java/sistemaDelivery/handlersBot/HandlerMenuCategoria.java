@@ -33,7 +33,6 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
         chat.getChat().markComposing(2000).join();
         chat.getChat().sendMessage("Seguem as opções de: " + c.getNomeCategoria() + ".").join();
         if (!c.isFazEntrega()) {
-            chat.getChat().markComposing(2000).join();
             chat.getChat().sendMessage(gerarObs("Não é feita a entrega dos produtos abaixo")).join();
         } else {
             boolean temCategoriaPrecisa = false;

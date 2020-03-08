@@ -31,7 +31,7 @@ public class HandlerInformesProdutoEscolhido extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         chat.getChat().sendMessage("Você escolheu: " + this.produtoEscolhido.getNomeWithCategories()).join();
-        chat.getChat().sendMessage("*_Obs¹: Caso a escolha esteja incorreta envie: VOLTAR_*", 1500).join();
+        chat.getChat().sendMessage("*_Obs¹: Caso a escolha esteja incorreta envie: VOLTAR_*").join();
         getChatBotDelivery().setHandlerVoltar(new HandlerVoltar(new HandlerMenuCategoria(produtoEscolhido.getCategoria(), chat), new Runnable() {
             @Override
             public void run() {
@@ -40,7 +40,7 @@ public class HandlerInformesProdutoEscolhido extends HandlerBotDelivery {
         }, false));
         boolean flagMsg = false;
         if (getChatBotDelivery().getEstabelecimento().possuiEntrega() && (!this.produtoEscolhido.getCategoria().isFazEntrega() || !this.produtoEscolhido.getCategoria().getRootCategoria().isFazEntrega())) {
-            chat.getChat().sendMessage("*_Obs²: Não é feita a entrega do produto escolhido_*", 3000).join();
+            chat.getChat().sendMessage("*_Obs²: Não é feita a entrega do produto escolhido_*").join();
         } else {
             List<ItemPedido> pedidos = new ArrayList<>(getChatBotDelivery().getPedidoAtual().getProdutos());
             for (ItemPedido item : pedidos) {
@@ -79,11 +79,11 @@ public class HandlerInformesProdutoEscolhido extends HandlerBotDelivery {
                     categoriasComprar = categoriasComprar.substring(0, categoriasComprar.lastIndexOf(","));
                 }
                 if (this.produtoEscolhido.getCategoria().getRootCategoria().getQtdMinEntrega() > 1 && !this.produtoEscolhido.getCategoria().getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    chat.getChat().sendMessage("*_Obs²: A entrega só e feita se você pedir no minimo " + this.produtoEscolhido.getCategoria().getRootCategoria().getQtdMinEntrega() + " itens_*", 3000).join();
+                    chat.getChat().sendMessage("*_Obs²: A entrega só e feita se você pedir no minimo " + this.produtoEscolhido.getCategoria().getRootCategoria().getQtdMinEntrega() + " itens_*").join();
                 } else if (this.produtoEscolhido.getCategoria().getRootCategoria().getQtdMinEntrega() > 1 && this.produtoEscolhido.getCategoria().getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    chat.getChat().sendMessage("*_Obs²: A entrega só e feita se você pedir no minimo " + this.produtoEscolhido.getCategoria().getRootCategoria().getQtdMinEntrega() + " itens ou pedir junto algum produto de outro cardapio (" + categoriasComprar + ")_*", 3000).join();
+                    chat.getChat().sendMessage("*_Obs²: A entrega só e feita se você pedir no minimo " + this.produtoEscolhido.getCategoria().getRootCategoria().getQtdMinEntrega() + " itens ou pedir junto algum produto de outro cardapio (" + categoriasComprar + ")_*").join();
                 } else if (this.produtoEscolhido.getCategoria().getRootCategoria().isPrecisaPedirOutraCategoria()) {
-                    chat.getChat().sendMessage("*_Obs²: A entrega só e feita se você pedir junto algum produto de outro cardapio (" + categoriasComprar + ")_*", 3000).join();
+                    chat.getChat().sendMessage("*_Obs²: A entrega só e feita se você pedir junto algum produto de outro cardapio (" + categoriasComprar + ")_*").join();
                 }
             }
         }
