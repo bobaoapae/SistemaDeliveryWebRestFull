@@ -410,6 +410,7 @@ public class SistemaDelivery {
     }
 
     public void finalizar() {
+        driver.finalizar();
         if (broadcaster != null) {
             broadcaster.broadcast(sse.newEvent("logout", "ok"));
             try {
@@ -436,7 +437,6 @@ public class SistemaDelivery {
         }
         try {
             ControleChatsAsync.getInstance(estabelecimento).finalizar();
-            driver.finalizar();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Finalizar", e);
         }
