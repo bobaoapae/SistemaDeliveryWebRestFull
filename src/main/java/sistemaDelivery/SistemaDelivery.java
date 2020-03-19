@@ -22,18 +22,15 @@ import utils.Propriedades;
 import utils.Utilitarios;
 import utils.Utils;
 
-import javax.swing.*;
 import javax.ws.rs.sse.Sse;
 import javax.ws.rs.sse.SseBroadcaster;
 import javax.ws.rs.sse.SseEventSink;
-import java.awt.*;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
-import java.util.List;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
@@ -53,7 +50,6 @@ public class SistemaDelivery {
     private ScheduledExecutorService executores = Executors.newScheduledThreadPool(5);
     private JsonParser parser;
     private Gson builder;
-    private TelaWhatsApp telaWhatsApp;
     private Logger logger;
     private StdSchedulerFactory schedulerFactory;
     private Scheduler scheduler;
@@ -80,8 +76,8 @@ public class SistemaDelivery {
                     ControleChatsAsync.getInstance(estabelecimento).addChat(chat);
                 }
             });
-            driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat), EventType.ADD, false);
-            driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).removeChat(chat), EventType.REMOVE, true);
+            driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).addChat(chat), EventType.ADD);
+            driver.getFunctions().addChatListenner(chat -> ControleChatsAsync.getInstance(estabelecimento).removeChat(chat), EventType.REMOVE);
             driver.getFunctions().addChatListenner(c -> {
                 JsonObject object = (JsonObject) builder.toJsonTree(parser.parse(c.toJson()));
                 object.add("contact", builder.toJsonTree(parser.parse(c.getContact().toJson())));
@@ -115,16 +111,11 @@ public class SistemaDelivery {
         onWhatsAppVersionMismatch = (minVersion, maxVersion, actualVersion) -> {
             logger.log(Level.SEVERE, "Mudança na versão do WhatsApp - Versão do WhatsApp: " + actualVersion.toString() + " - Versão da Lib:" + minVersion.toString() + " - " + maxVersion.toString());
         };
-        WebWhatsDriverBuilder builder = new WebWhatsDriverBuilder(Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString());
+        WebWhatsDriverBuilder builder = new WebWhatsDriverBuilder(Propriedades.pathCacheWebWhats() + estabelecimento.getUuid().toString(), Propriedades.pathBinarios());
         builder.addErrorHandler(onErrorInDriver);
         builder.onNeedQrCode(onNeedQrCode);
         builder.onWhatsAppVersionMismatch(onWhatsAppVersionMismatch);
         builder.onConnect(onConnect);
-        if (!headless) {
-            telaWhatsApp = new TelaWhatsApp(estabelecimento);
-            telaWhatsApp.setVisible(true);
-            builder.renderInPanel(telaWhatsApp.getPanel());
-        }
         driver = builder.build();
         executores.scheduleWithFixedDelay(() -> {
             if (broadcasterWhats != null) {
@@ -422,9 +413,6 @@ public class SistemaDelivery {
             broadcaster.close();
             broadcaster = null;
         }
-        if (telaWhatsApp != null) {
-            telaWhatsApp.dispose();
-        }
         if (executores != null && !executores.isShutdown()) {
             executores.shutdown();
         }
@@ -524,30 +512,6 @@ public class SistemaDelivery {
     public boolean possuiListennersDelivery() {
         synchronized (listennersEventosDelivery) {
             return !listennersEventosDelivery.isEmpty();
-        }
-    }
-
-    private class TelaWhatsApp extends JFrame {
-
-        private JPanel panel;
-
-        public TelaWhatsApp(Estabelecimento estabelecimento) {
-            this.setTitle(estabelecimento.getNomeEstabelecimento() + " - " + estabelecimento.getUuid().toString().replaceAll("-", ""));
-            this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-            this.setExtendedState(JFrame.MAXIMIZED_BOTH);
-            this.getContentPane().setLayout(new BorderLayout());
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            this.setMinimumSize(new Dimension(800, 600));
-            this.setPreferredSize(new Dimension(800, 600));
-            panel = new JPanel(new BorderLayout());
-            this.add(panel);
-            pack();
-            this.setExtendedState(JFrame.ICONIFIED);
-            this.setLocationRelativeTo(null);
-        }
-
-        public JPanel getPanel() {
-            return panel;
         }
     }
 
