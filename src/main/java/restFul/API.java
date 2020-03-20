@@ -1376,11 +1376,9 @@ public class API {
             JsonElement element = builder.toJsonTree(pedidos);
             JsonArray array = element.getAsJsonArray();
             for (int x = 0; x < array.size(); x++) {
-                JsonArray arrayItensPedidos = array.get(x).getAsJsonObject().get("produtos").getAsJsonArray();
-                for (int y = 0; y < arrayItensPedidos.size(); y++) {
-                    JsonObject object = arrayItensPedidos.get(y).getAsJsonObject().get("produto").getAsJsonObject();
-                    object.remove("foto");
-                }
+                array.get(x).getAsJsonObject().remove("produtos");
+                array.get(x).getAsJsonObject().remove("cliente");
+                array.get(x).getAsJsonObject().remove("estabelecimento");
             }
             return Response.status(Response.Status.OK).entity(builder.toJson(element)).build();
         } catch (Exception e) {
@@ -1427,6 +1425,30 @@ public class API {
                 }
             }
             return Response.status(Response.Status.OK).entity(builder.toJson(element)).build();
+        } catch (Exception e) {
+            Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+        }
+    }
+
+    @GET
+    @Path("/imprimirNovamente")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response imprimirNovamente(@QueryParam("uuid") String uuid) {
+        try {
+            if (uuid == null || uuid.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            Pedido pedido = ControlePedidos.getInstance().getPedidoByUUID(UUID.fromString(uuid));
+            if (pedido == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if (!pedido.getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            SistemaDelivery sistemaDelivery = ControleSessions.getInstance().getSessionForEstabelecimento(token.getEstabelecimento());
+            sistemaDelivery.enviarEventoDelivery(SistemaDelivery.TipoEventoDelivery.IMPRIMIR_NOVAMENTE, pedido.getUuid().toString());
+            return Response.status(Response.Status.CREATED).build();
         } catch (Exception e) {
             Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();

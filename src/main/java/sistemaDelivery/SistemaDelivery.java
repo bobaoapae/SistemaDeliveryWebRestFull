@@ -519,7 +519,8 @@ public class SistemaDelivery {
         NOVO_PEDIDO,
         NOVA_RESERVA,
         ATUALIZAR_PEDIDO,
-        PEDIDO_AJUDA
+        PEDIDO_AJUDA,
+        IMPRIMIR_NOVAMENTE
     }
 
     public enum TipoEventoWpp {
