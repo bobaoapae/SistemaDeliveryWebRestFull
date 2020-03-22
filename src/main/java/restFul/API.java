@@ -1377,7 +1377,6 @@ public class API {
             JsonArray array = element.getAsJsonArray();
             for (int x = 0; x < array.size(); x++) {
                 array.get(x).getAsJsonObject().remove("produtos");
-                array.get(x).getAsJsonObject().remove("cliente");
                 array.get(x).getAsJsonObject().remove("estabelecimento");
             }
             return Response.status(Response.Status.OK).entity(builder.toJson(element)).build();
