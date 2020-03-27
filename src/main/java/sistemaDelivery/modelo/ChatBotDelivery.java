@@ -213,11 +213,7 @@ public class ChatBotDelivery extends ChatBot {
             if (chat != null) {
                 return chat.sendMessage(message).thenCompose(jsValue -> {
                     return chat.printScreen().thenCompose(file -> {
-                        try {
-                            return chat.sendFile(file, "Pedido de Ajuda");
-                        } catch (IOException e) {
-                            return CompletableFuture.failedFuture(e);
-                        }
+                        return chat.sendFile(file, "Pedido de Ajuda");
                     });
                 }).thenCompose(jsValue -> {
                     return chat.setArchive(true);
