@@ -281,6 +281,33 @@ public class API {
     }
 
     @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/alterarEntregaGratisProduto")
+    public Response alterarEntregaGratisProduto(@QueryParam("uuid") String uuid) {
+        try {
+            if (uuid == null || uuid.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            Produto produto = ControleProdutos.getInstance().getProdutoByUUID(UUID.fromString(uuid));
+            if (produto == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+            if (!produto.getCategoria().getEstabelecimento().equals(token.getEstabelecimento())) {
+                return Response.status(Response.Status.BAD_REQUEST).build();
+            }
+            produto.setEntregaGratis(!produto.isEntregaGratis());
+            if (ControleProdutos.getInstance().salvarProduto(produto)) {
+                return Response.status(Response.Status.CREATED).entity(builder.toJson(ControleProdutos.getInstance().getProdutoByUUID(produto.getUuid()))).build();
+            } else {
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            }
+        } catch (Exception e) {
+            Logger.getLogger(token.getEstabelecimento().getUuid().toString()).log(Level.SEVERE, e.getMessage(), e);
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(ExceptionUtils.getStackTrace(e)).build();
+        }
+    }
+
+    @GET
     @Produces(MediaType.TEXT_PLAIN)
     @Path("/excluirCategoria")
     public Response excluirCategoria(@QueryParam("uuid") String uuid) {

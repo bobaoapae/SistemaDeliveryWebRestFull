@@ -76,7 +76,7 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
                 boolean cobrarTaxa = tipoEntrega.getValor() > 0;
                 if (tipoEntrega.getValor() > 0) {
                     for (ItemPedido itemPedido : getChatBotDelivery().getPedidoAtual().getProdutos()) {
-                        if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
+                        if (itemPedido.getProduto().isEntregaGratis() || itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
                             cobrarTaxa = false;
                             break;
                         }

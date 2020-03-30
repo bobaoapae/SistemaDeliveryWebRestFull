@@ -58,8 +58,8 @@ public class ControleProdutos {
             connection.setAutoCommit(false);
             if (prod.getUuid() == null || this.getProdutoByUUID(prod.getUuid()) == null) {
                 try (PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO \"Produtos\"(\n" +
-                        "            uuid, uuid_categoria, nome, descricao, foto, valor, \"onlyLocal\")\n" +
-                        "    VALUES (?, ?, ?, ?, ?, ?,?);\n")) {
+                        "            uuid, uuid_categoria, nome, descricao, foto, valor, \"onlyLocal\", \"entregaGratis\")\n" +
+                        "    VALUES (?, ?, ?, ?, ?, ?, ?, ?);\n")) {
                     if (prod.getUuid() == null) {
                         prod.setUuid(UUID.randomUUID());
                     }
@@ -70,6 +70,7 @@ public class ControleProdutos {
                     preparedStatement.setString(5, prod.getFoto());
                     preparedStatement.setDouble(6, prod.getValor());
                     preparedStatement.setBoolean(7, prod.isOnlyLocal());
+                    preparedStatement.setBoolean(8, prod.isEntregaGratis());
                     preparedStatement.executeUpdate();
                     if (prod.getRestricaoVisibilidade() != null) {
                         prod.getRestricaoVisibilidade().setProduto(prod);
@@ -91,7 +92,7 @@ public class ControleProdutos {
                 }
             } else {
                 try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE \"Produtos\"\n" +
-                        "set nome=?, descricao=?, foto = ?, valor=?, \"onlyLocal\"=?, \n" +
+                        "set nome=?, descricao=?, foto = ?, valor=?, \"onlyLocal\"=?, \"entregaGratis\", \n" +
                         "      visivel = ? \n" +
                         " WHERE uuid = ? ;\n")) {
                     preparedStatement.setString(1, prod.getNome());
@@ -99,8 +100,9 @@ public class ControleProdutos {
                     preparedStatement.setString(3, prod.getFoto());
                     preparedStatement.setDouble(4, prod.getValor());
                     preparedStatement.setBoolean(5, prod.isOnlyLocal());
-                    preparedStatement.setBoolean(6, prod.isVisivel());
-                    preparedStatement.setObject(7, prod.getUuid());
+                    preparedStatement.setBoolean(6, prod.isEntregaGratis());
+                    preparedStatement.setBoolean(7, prod.isVisivel());
+                    preparedStatement.setObject(8, prod.getUuid());
                     preparedStatement.executeUpdate();
                     if (ControleRestricaoVisibilidade.getInstance().getRestricaoProduto(prod) != null && !ControleRestricaoVisibilidade.getInstance().excluirRestricao(prod)) {
                         throw new SQLException("Falha ao remover restrição");

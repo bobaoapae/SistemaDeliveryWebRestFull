@@ -14,7 +14,7 @@ public class Produto implements Comparable<Produto> {
     private transient Categoria categoria;
     private String nome, descricao, foto;
     private double valor;
-    private boolean onlyLocal, ativo, visivel;
+    private boolean onlyLocal, ativo, visivel, entregaGratis;
     private RestricaoVisibilidade restricaoVisibilidade;
     @Ignorar
     private List<GrupoAdicional> gruposAdicionais;
@@ -143,6 +143,14 @@ public class Produto implements Comparable<Produto> {
         } else {
             return 999999999;
         }
+    }
+
+    public boolean isEntregaGratis() {
+        return entregaGratis;
+    }
+
+    public void setEntregaGratis(boolean entregaGratis) {
+        this.entregaGratis = entregaGratis;
     }
 
     @Override

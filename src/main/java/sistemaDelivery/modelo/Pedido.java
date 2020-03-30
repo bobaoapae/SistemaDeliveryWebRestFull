@@ -327,7 +327,7 @@ public class Pedido {
         if (this.tipoEntrega != null && this.tipoEntrega.getValor() > 0) {
             boolean cobrarTaxa = true;
             for (ItemPedido itemPedido : this.getProdutos()) {
-                if (itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
+                if (itemPedido.getProduto().isEntregaGratis() || itemPedido.getProduto().getCategoria().getRootCategoria().isEntregaGratis()) {
                     cobrarTaxa = false;
                     break;
                 }
