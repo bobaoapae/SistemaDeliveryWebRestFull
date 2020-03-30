@@ -92,7 +92,7 @@ public class ControleProdutos {
                 }
             } else {
                 try (PreparedStatement preparedStatement = connection.prepareStatement("UPDATE \"Produtos\"\n" +
-                        "set nome=?, descricao=?, foto = ?, valor=?, \"onlyLocal\"=?, \"entregaGratis\", \n" +
+                        "set nome=?, descricao=?, foto = ?, valor=?, \"onlyLocal\"=?, \"entregaGratis\" = ? , \n" +
                         "      visivel = ? \n" +
                         " WHERE uuid = ? ;\n")) {
                     preparedStatement.setString(1, prod.getNome());
