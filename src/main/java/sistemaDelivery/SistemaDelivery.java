@@ -62,6 +62,12 @@ public class SistemaDelivery {
         parser = new JsonParser();
         builder = Utilitarios.getDefaultGsonBuilder(null).create();
         onConnect = () -> {
+            try {
+                Thread.sleep(8000);
+            } catch (InterruptedException e) {
+                logger.log(Level.SEVERE, "Sleep Connect", e);
+                Thread.currentThread().interrupt();
+            }
             ControleChatsAsync.getInstance(estabelecimento).forceFinalizar();
             if (!estabelecimento.isIniciarAutomaticamente()) {
                 estabelecimento.setIniciarAutomaticamente(true);
