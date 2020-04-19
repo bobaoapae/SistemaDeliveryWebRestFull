@@ -122,6 +122,7 @@ public class SistemaDelivery {
         builder.onNeedQrCode(onNeedQrCode);
         builder.onWhatsAppVersionMismatch(onWhatsAppVersionMismatch);
         builder.onConnect(onConnect);
+        builder.headLess(headless);
         driver = builder.build();
         executores.scheduleWithFixedDelay(() -> {
             if (broadcasterWhats != null) {
