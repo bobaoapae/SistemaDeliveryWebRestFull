@@ -18,12 +18,13 @@ public class HandlerRepetirUltimoItemPedido extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message message) {
         getChatBotDelivery().getLastPedido().setQtd(getChatBotDelivery().getLastPedido().getQtd() + 1);
+        getChatBotDelivery().getChat().sendMessage("Blz, foi adicionado mais um item igual ao pedido").join();
         getChatBotDelivery().setHandler(new HandlerFinalizarItemPedido(getChatBotDelivery().getLastPedido().getProduto().getCategoria().getRootCategoria(), chat), true);
         return true;
     }
 
     @Override
     protected boolean runSecondTime(Message message) {
-        return runFirstTime(message);
+        return true;
     }
 }
