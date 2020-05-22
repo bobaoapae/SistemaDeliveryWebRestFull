@@ -40,7 +40,7 @@ public class HandlerFinalizarItemPedido extends HandlerBotDelivery {
                 p.addItemPedido(getChatBotDelivery().getLastPedido());
             }
         };
-        builder.textNewLine(addOpcaoMenu(new HandlerRepetirUltimoItemPedido(chat), consumer, "Pedir mais um(a) " + getChatBotDelivery().getLastPedido().getProduto().getNome() + " igual", "Os adicionais escolhidos serão iguais").toString());
+        builder.textNewLine(addOpcaoMenu(new HandlerRepetirUltimoItemPedido(chat), consumer, "Pedir mais um(a) " + getChatBotDelivery().getLastPedido().getProduto().getNomeWithCategories() + " igual", "Os adicionais escolhidos serão iguais").toString());
         builder.textNewLine(addOpcaoMenu(new HandlerMenuCategoria(c, chat), consumer, "Pedir mais " + c.getNomeCategoria(), "", c.getNomeCategoria()).toString());
         Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
