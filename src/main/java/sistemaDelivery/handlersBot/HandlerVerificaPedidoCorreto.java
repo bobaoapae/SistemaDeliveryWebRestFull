@@ -34,7 +34,7 @@ public class HandlerVerificaPedidoCorreto extends HandlerBotDelivery {
         MessageBuilder builder = new MessageBuilder();
         for (int x = 0; x < p.getProdutos().size(); x++) {
             ItemPedido produto = p.getProdutos().get(x);
-            builder.textNewLine(produto.getProduto().getNomeWithCategories() + (produto.getComentario().isEmpty() ? "" : " Obs: " + produto.getComentario()));
+            builder.textNewLine(produto.getQtd() + "x - " + produto.getProduto().getNomeWithCategories() + (produto.getComentario().isEmpty() ? "" : " Obs: " + produto.getComentario()));
             Map<GrupoAdicional, List<AdicionalProduto>> hashMap = produto.getAdicionaisGroupByGrupo();
             for (Map.Entry<GrupoAdicional, List<AdicionalProduto>> entry : hashMap.entrySet()) {
                 builder.textBold(entry.getKey().getNomeGrupo()).text(": ");
