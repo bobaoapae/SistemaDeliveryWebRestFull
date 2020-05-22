@@ -47,7 +47,7 @@ public class HandlerAdicionaisProduto extends HandlerBotDelivery {
                 return true;
             }
         }
-        chat.setHandler(new HandlerComentarioPedido(chat, new HandlerDesejaMaisCategoria(p.getCategoria(), chat)), true);
+        chat.setHandler(new HandlerComentarioPedido(chat, new HandlerFinalizarItemPedido(p.getCategoria(), chat)), true);
         return true;
     }
 

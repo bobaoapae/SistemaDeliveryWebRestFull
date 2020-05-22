@@ -30,7 +30,6 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         MessageBuilder builder = new MessageBuilder();
-        chat.getChat().markComposing(2000).join();
         chat.getChat().sendMessage("Seguem as opções de: " + c.getNomeCategoria() + ".").join();
         if (!c.isFazEntrega()) {
             chat.getChat().sendMessage(gerarObs("Não é feita a entrega dos produtos abaixo")).join();
@@ -69,7 +68,7 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
         builder.textNewLine(addOpcaoMenu(new HandlerMenuPrincipal(chat), null, "Voltar ao Menu Principal ↩", "", "voltar", "menu", "principal").toString());
         builder.textNewLine(addOpcaoMenu(new HandlerCancelar(chat), null, "Cancelar Pedido ❌", "", "cancelar").toString());
         builder.textNewLine(gerarObs("Escolha um item por vez"));
-        chat.getChat().markComposing(5000).join();
+        chat.getChat().markComposing(3000).join();
         chat.getChat().sendMessage(builder.build()).join();
         return true;
     }
@@ -147,7 +146,7 @@ public class HandlerMenuCategoria extends HandlerBotDelivery {
             if (!l.getDescricao().trim().isEmpty()) {
                 subTitulo = l.getDescricao();
             }
-            builder.textNewLine(addOpcaoMenu(new HandlerInformesProdutoEscolhido(l, chat, new HandlerAdicionaisProduto(l, chat)), null, titulo, subTitulo, l.getNome()).toString());
+            builder.textNewLine(addOpcaoMenu(new HandlerInformesProdutoEscolhido(l, chat), null, titulo, subTitulo, l.getNome()).toString());
         }
     }
 

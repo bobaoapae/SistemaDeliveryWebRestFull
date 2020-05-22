@@ -20,11 +20,11 @@ import java.util.function.Consumer;
 /**
  * @author jvbor
  */
-public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
+public class HandlerFinalizarItemPedido extends HandlerBotDelivery {
 
     private Categoria c;
 
-    public HandlerDesejaMaisCategoria(Categoria c, ChatBot chat) {
+    public HandlerFinalizarItemPedido(Categoria c, ChatBot chat) {
         super(chat);
         this.c = c.getRootCategoria();
     }
@@ -32,11 +32,7 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
     @Override
     protected boolean runFirstTime(Message m) {
         MessageBuilder builder = new MessageBuilder();
-        if (getChatBotDelivery().getPedidoAtual().getComentarioPedido().isEmpty()) {
-            builder.textNewLine("Blz, o que você quer fazer agora?");
-        } else {
-            builder.textNewLine("O que você quer fazer agora?");
-        }
+        builder.textNewLine("O que você quer fazer agora?");
         Consumer<String> consumer = new Consumer<>() {
             @Override
             public void accept(String s) {
@@ -44,6 +40,7 @@ public class HandlerDesejaMaisCategoria extends HandlerBotDelivery {
                 p.addItemPedido(getChatBotDelivery().getLastPedido());
             }
         };
+        builder.textNewLine(addOpcaoMenu(new HandlerRepetirUltimoItemPedido(chat), consumer, "Pedir mais um(a) " + getChatBotDelivery().getLastPedido().getProduto().getNome() + " igual", "Os adicionais escolhidos serão iguais").toString());
         builder.textNewLine(addOpcaoMenu(new HandlerMenuCategoria(c, chat), consumer, "Pedir mais " + c.getNomeCategoria(), "", c.getNomeCategoria()).toString());
         Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
         int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;

@@ -30,7 +30,7 @@ public class HandlerConfirmarEndereco extends HandlerBotDelivery {
         builder.textNewLine(addOpcaoSim(new HandlerSolicitarFormaPagamento(chat), new Consumer<String>() {
             @Override
             public void accept(String s) {
-                chat.getChat().sendMessage("Blz");
+                chat.getChat().sendMessage("Blz").join();
                 getChatBotDelivery().getCliente().setEndereco(getChatBotDelivery().getPedidoAtual().getEndereco());
                 try {
                     ControleClientes.getInstance().salvarCliente(getChatBotDelivery().getCliente());
@@ -42,7 +42,7 @@ public class HandlerConfirmarEndereco extends HandlerBotDelivery {
         builder.textNewLine(addOpcaoNao(new HandlerSolicitarEndereco(chat), new Consumer<String>() {
             @Override
             public void accept(String s) {
-                chat.getChat().sendMessage("Sinto muito, vou anotar seu endereço novamente então");
+                chat.getChat().sendMessage("Sinto muito, vou anotar seu endereço novamente então").join();
             }
         }).toString());
         chat.getChat().markComposing(4000).join();

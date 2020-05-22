@@ -19,12 +19,10 @@ import java.util.List;
  */
 public class HandlerInformesProdutoEscolhido extends HandlerBotDelivery {
 
-    private HandlerBotDelivery nextHandler;
     private Produto produtoEscolhido;
 
-    public HandlerInformesProdutoEscolhido(Produto produtoEscolhido, ChatBot chat, HandlerBotDelivery nextHandler) {
+    public HandlerInformesProdutoEscolhido(Produto produtoEscolhido, ChatBot chat) {
         super(chat);
-        this.nextHandler = nextHandler;
         this.produtoEscolhido = produtoEscolhido;
     }
 
@@ -90,7 +88,7 @@ public class HandlerInformesProdutoEscolhido extends HandlerBotDelivery {
         ItemPedido item = new ItemPedido();
         item.setProduto(produtoEscolhido);
         getChatBotDelivery().setLastPedido(item);
-        chat.setHandler(nextHandler, true);
+        chat.setHandler(new HandlerAdicionaisProduto(produtoEscolhido, chat), true);
         return true;
     }
 

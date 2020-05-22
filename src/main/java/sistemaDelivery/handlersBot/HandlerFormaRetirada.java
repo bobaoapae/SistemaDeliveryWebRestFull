@@ -89,7 +89,7 @@ public class HandlerFormaRetirada extends HandlerBotDelivery {
                         getChatBotDelivery().getPedidoAtual().calcularValor();
                         if (tipoEntrega.isSolicitarEndereco()) {
                             getChatBotDelivery().getPedidoAtual().setEntrega(true);
-                            chat.getChat().sendMessage("Blz");
+                            chat.getChat().sendMessage("Blz").join();
                             if (getChatBotDelivery().getCliente().getEndereco() == null || getChatBotDelivery().getCliente().getEndereco().getLogradouro().isEmpty()) {
                                 chat.setHandler(new HandlerSolicitarEndereco(chat), true);
                             } else {

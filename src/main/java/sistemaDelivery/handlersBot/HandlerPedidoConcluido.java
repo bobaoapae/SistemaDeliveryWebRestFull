@@ -33,7 +33,7 @@ public class HandlerPedidoConcluido extends HandlerBotDelivery {
         if (getChatBotDelivery().getCliente().isCadastroRealizado()) {
             handlerBotDelivery = new HandlerAdeus(chat);
         } else {
-            handlerBotDelivery = new HandlerVerificaDesejaRealizarCadastro(chat);
+            handlerBotDelivery = new HandlerVerificaNomeCadastro(chat);
         }
         addOpcaoNao(handlerBotDelivery, null);
         chat.getChat().sendMessage(gerarTextoOpcoes()).join();

@@ -7,12 +7,6 @@ package sistemaDelivery.handlersBot;
 
 import modelo.ChatBot;
 import modelo.Message;
-import sistemaDelivery.controle.ControleCategorias;
-import sistemaDelivery.modelo.Categoria;
-
-import java.sql.SQLException;
-import java.time.LocalTime;
-import java.util.Calendar;
 
 /**
  * @author jvbor
@@ -28,7 +22,7 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
 
     @Override
     protected boolean runFirstTime(Message m) {
-        if (getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido().isEmpty()) {
+        if (getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido().equalsIgnoreCase("não")) {
             getChatBotDelivery().getLastPedido().setComentario("");
             chat.setHandler(nextHandler, true);
             return true;
@@ -36,48 +30,10 @@ public class HandlerComentarioPedido extends HandlerBotDelivery {
         chat.getChat().markComposing(2000).join();
         chat.getChat().sendMessage("Você deseja modificar algo em seu pedido?").join();
         if (getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido() != null && !getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido().isEmpty()) {
-            chat.getChat().markComposing(3000).join();
             chat.getChat().sendMessage("Por exemplo: " + getChatBotDelivery().getLastPedido().getProduto().getCategoria().getExemplosComentarioPedido() + "... etc").join();
         }
         chat.getChat().sendMessage("Basta escrever e me enviar, o que você escrever sera repassado para a àrea de produção").join();
         chat.getChat().sendMessage(gerarObs("Caso não queira modificar nada, basta enviar NÃO")).join();
-        if (!getChatBotDelivery().getCliente().isCadastroRealizado()) {
-            chat.getChat().markComposing(3000).join();
-            Calendar dataAtual = Calendar.getInstance(getChatBotDelivery().getEstabelecimento().getTimeZoneObject());
-            int diaSemana = dataAtual.get(Calendar.DAY_OF_WEEK) - 1;
-            LocalTime horaAtual = getChatBotDelivery().getEstabelecimento().getHoraAtual();
-            String categoriasDisponiveis = "";
-            try {
-                for (Categoria c : ControleCategorias.getInstance().getCategoriasEstabelecimento(getChatBotDelivery().getEstabelecimento())) {
-                    if (c.getProdutos().isEmpty() && c.getCategoriasFilhas().isEmpty()) {
-                        continue;
-                    }
-                    if (!c.isVisivel()) {
-                        continue;
-                    }
-                    if (c.getRestricaoVisibilidade() != null) {
-                        if (c.getRestricaoVisibilidade().isRestricaoDia()) {
-                            if (!c.getRestricaoVisibilidade().getDiasSemana()[diaSemana]) {
-                                continue;
-                            }
-                        }
-                        if (c.getRestricaoVisibilidade().isRestricaoHorario()) {
-                            if (!(horaAtual.isAfter(c.getRestricaoVisibilidade().getHorarioDe()) && horaAtual.isBefore(c.getRestricaoVisibilidade().getHorarioAte()))) {
-                                continue;
-                            }
-                        }
-                    }
-                    categoriasDisponiveis += c.getNomeCategoria() + ", ";
-                }
-            } catch (SQLException e) {
-                getChatBotDelivery().getChat().getDriver().onError(e);
-            }
-            categoriasDisponiveis = categoriasDisponiveis.trim().substring(0, categoriasDisponiveis.lastIndexOf(","));
-            if (categoriasDisponiveis.contains(", ")) {
-                categoriasDisponiveis = categoriasDisponiveis.substring(0, categoriasDisponiveis.lastIndexOf(",")) + " ou" + categoriasDisponiveis.substring(categoriasDisponiveis.lastIndexOf(",") + 1);
-            }
-            chat.getChat().sendMessage(gerarObs("Não use esse campo para pedir " + categoriasDisponiveis + " aguarde as próximas opções para isso.")).join();
-        }
         return true;
     }
 

@@ -29,7 +29,7 @@ public class HandlerUsarUltimoEndereco extends HandlerBotDelivery {
         builder.textNewLine(addOpcaoSim(new HandlerSolicitarFormaPagamento(chat), new Consumer<String>() {
             @Override
             public void accept(String s) {
-                chat.getChat().sendMessage("Blz");
+                chat.getChat().sendMessage("Blz").join();
                 getChatBotDelivery().getPedidoAtual().setEndereco(getChatBotDelivery().getCliente().getEndereco());
             }
         }).toString());
