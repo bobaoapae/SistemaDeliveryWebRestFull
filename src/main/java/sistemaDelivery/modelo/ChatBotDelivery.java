@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
 
@@ -245,6 +246,11 @@ public class ChatBotDelivery extends ChatBot {
 
     @Override
     public void processNewMsg(Message m) {
+        try {
+            ControleSessions.getInstance().getSessionForEstabelecimento(estabelecimento).setLastReceiveMsg(LocalDateTime.now());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         if (m.getChat().getContact().getId().equals("554491050665@c.us")) {
             if (m.getContent().toLowerCase().equals("/testar")) {
                 m.getChat().sendMessage("Online");

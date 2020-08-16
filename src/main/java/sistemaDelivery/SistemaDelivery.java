@@ -54,6 +54,7 @@ public class SistemaDelivery {
     private StdSchedulerFactory schedulerFactory;
     private Scheduler scheduler;
     private List<SseEventSink> listennersEventosDelivery;
+    private LocalDateTime lastReceiveMsg;
 
     public SistemaDelivery(Estabelecimento estabelecimento, boolean headless) throws IOException {
         listennersEventosDelivery = Collections.synchronizedList(new ArrayList<>());
@@ -62,6 +63,7 @@ public class SistemaDelivery {
         parser = new JsonParser();
         builder = Utilitarios.getDefaultGsonBuilder(null).create();
         onConnect = () -> {
+            lastReceiveMsg = LocalDateTime.now();
             try {
                 Thread.sleep(8000);
             } catch (InterruptedException e) {
@@ -147,6 +149,8 @@ public class SistemaDelivery {
                         ControleSessions.getInstance().finalizarSessionForEstabelecimento(estabelecimento);
                     }
                 }.start();
+            } else if (!estabelecimento.isOpenPedidos() && lastReceiveMsg.plusHours(1).isBefore(LocalDateTime.now())) {
+                driver.reiniciar(1000);
             }
         }, 5, 5, TimeUnit.MINUTES);
         schedulerFactory = new StdSchedulerFactory();
@@ -520,6 +524,14 @@ public class SistemaDelivery {
         synchronized (listennersEventosDelivery) {
             return !listennersEventosDelivery.isEmpty();
         }
+    }
+
+    public LocalDateTime getLastReceiveMsg() {
+        return lastReceiveMsg;
+    }
+
+    public void setLastReceiveMsg(LocalDateTime lastReceiveMsg) {
+        this.lastReceiveMsg = lastReceiveMsg;
     }
 
     public enum TipoEventoDelivery {
