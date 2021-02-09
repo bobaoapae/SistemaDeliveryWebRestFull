@@ -232,7 +232,7 @@ public class ControleEstabelecimentos {
         List<Estabelecimento> estabelecimentos = new ArrayList<>();
         try (Connection conn = Conexao.getConnection();
              PreparedStatement preparedStatement = conn.prepareStatement("select uuid_estabelecimento from \"Estabelecimentos_Usuario\" as a " +
-                     "inner join \"Estabelecimentos\" as b on a.uuid_estabelecimento=b.uuid where uuid_usuario = ? and ativo or ? order by b.\"dataCriacao\"");
+                     "inner join \"Estabelecimentos\" as b on a.uuid_estabelecimento=b.uuid where (uuid_usuario = ? or ?) and ativo  order by b.\"dataCriacao\"");
         ) {
             preparedStatement.setObject(1, u.getUuid());
             preparedStatement.setBoolean(2, u.getTipoUsuario() == TipoUsuario.SUPER_ADMIN);
